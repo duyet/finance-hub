@@ -5,6 +5,8 @@
  * Generates intelligent analysis of spending patterns, recommendations,
  * and answers natural language questions about finances.
  *
+ * Uses Cloudflare AI Gateway for observability, caching, and cost optimization.
+ *
  * @see PRD - AI-powered insights and recommendations
  */
 
@@ -13,6 +15,13 @@ import type { CloudflareRequest } from "~/lib/auth/db.server";
 // ============================================================================
 // Types
 // ============================================================================
+
+interface AIGatewayOptions {
+  gateway?: {
+    id: string;
+    skipCache?: boolean;
+  };
+}
 
 export interface TransactionAnalysis {
   summary: string;
@@ -64,6 +73,9 @@ export async function generateSpendingAnalysis(
 
   try {
     // Use Cloudflare Workers AI for analysis
+    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
+    const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
     const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
       messages: [
         {
@@ -76,7 +88,7 @@ export async function generateSpendingAnalysis(
         },
       ],
       max_tokens: 1024,
-    } as any);
+    }, gatewayOptions as any);
 
     // Parse AI response
     const text = (response as any).response || (response as any).text || "";
@@ -109,6 +121,9 @@ export async function answerFinancialQuestion(
   const prompt = buildQuestionPrompt(question, userContext);
 
   try {
+    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
+    const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
     const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
       messages: [
         {
@@ -121,7 +136,7 @@ export async function answerFinancialQuestion(
         },
       ],
       max_tokens: 512,
-    } as any);
+    }, gatewayOptions as any);
 
     return (response as any).response || (response as any).text || "I couldn't generate a response. Please try again.";
   } catch (error) {
@@ -148,6 +163,9 @@ export async function detectAnomalies(
   const prompt = buildAnomalyPrompt(recentTransactions);
 
   try {
+    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
+    const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
     const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
       messages: [
         {
@@ -160,7 +178,7 @@ export async function detectAnomalies(
         },
       ],
       max_tokens: 512,
-    } as any);
+    }, gatewayOptions as any);
 
     const text = (response as any).response || (response as any).text || "";
     return parseAnomalyResponse(text, recentTransactions);

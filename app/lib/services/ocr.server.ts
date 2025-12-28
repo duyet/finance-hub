@@ -95,6 +95,10 @@ export async function processReceiptWithAI(
 
     let extractedText: string;
 
+    // Get AI Gateway ID for observability
+    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
+    const gatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
     if (model === "gemma-3") {
       // Use Gemma 3 with messages API for multimodal input
       const modelResponse = await ai.run("@cf/google/gemma-3-12b-it", {
@@ -112,7 +116,7 @@ export async function processReceiptWithAI(
         ],
         max_tokens: 2048,
         temperature: 0.2, // Lower temperature for more consistent extraction
-      });
+      }, gatewayOptions);
       extractedText = modelResponse.response || modelResponse.text || "";
     } else {
       // Use Llama 3.2 Vision as fallback
@@ -120,7 +124,7 @@ export async function processReceiptWithAI(
         image: [imageDataUrl],
         prompt: prompt,
         max_tokens: 2048,
-      });
+      }, gatewayOptions);
       extractedText = modelResponse.response || modelResponse.text || "";
     }
 

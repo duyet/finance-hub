@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 43
+iteration: 45
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -139,6 +139,15 @@ started_at: "2025-12-28T17:17:15Z"
     - Accessibility tests: keyboard focus management, heading hierarchy
     - Total test coverage: ~575 lines of production validation tests
 
+18. **Cloudflare AI Gateway Integration** (Iteration 40)
+    - Added AI_GATEWAY_ID environment variable to Env interface
+    - Updated ai-insights.server.ts with gateway options for all AI inference calls
+    - Updated ocr.server.ts with gateway options for Gemma 3 and Llama 3.2 OCR models
+    - Updated ocr-queue-consumer.ts with gateway options for async OCR processing
+    - AI Gateway provides: unified observability, request caching, cost optimization
+    - Gateway ID is optional - AI calls work without it (graceful degradation)
+    - All AI inference now routed through AI Gateway when ID is configured
+
 ### Things to consider to brainstorm later
 
 - ~~Further bundle optimizations~~ ✅ Done (Iteration 38 - granular vendor chunking)
@@ -150,7 +159,7 @@ started_at: "2025-12-28T17:17:15Z"
 - ~~Performance optimizations~~ ✅ Done (Iteration 36)
 - ~~Progressive Web App (PWA) features~~ ✅ Done (Iteration 35)
 - ~~Offline support~~ ✅ Done (Iteration 35)
-- Using Cloudflare AI Gateway + Workers for serverless functions
+- ~~Using Cloudflare AI Gateway + Workers for serverless functions~~ ✅ Done (Iteration 40)
 - OpenRouter via AI binding
 - AI Agents consider using free models first
 

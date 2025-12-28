@@ -10,6 +10,8 @@ export interface Env {
   BUCKET_NAME?: string;
   /** OCR model selection: "gemma-3" (default) or "llama-3.2" */
   OCR_MODEL?: string;
+  /** Cloudflare AI Gateway ID for observability and caching */
+  AI_GATEWAY_ID?: string;
   // Other bindings...
 }
 
