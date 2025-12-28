@@ -59,9 +59,8 @@ export function PWAInstallPrompt() {
     setDeferredPrompt(null);
     setShowPrompt(false);
 
-    if (outcome === "accepted") {
-      console.log("PWA installation accepted");
-    }
+    // PWA installation handled by browser
+    // No action needed - userChoice outcome is available for analytics if needed
   };
 
   const handleDismiss = () => {
@@ -158,9 +157,8 @@ export function PWAInstallButton({ className = "" }: { className?: string }) {
     deferredPromptRef.current = null;
     setCanInstall(false);
 
-    if (outcome === "accepted") {
-      console.log("PWA installation accepted");
-    }
+    // PWA installation handled by browser
+    // No action needed - userChoice outcome is available for analytics if needed
   };
 
   if (!canInstall) return null;
