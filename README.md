@@ -5,6 +5,7 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 ## Features
 
 - **Dashboard**: Real-time net worth, runway calculation, and interactive charts
+- **AI Financial Insights**: Natural language Q&A about your finances using Llama 3.1 8B
 - **Transactions**: Full CRUD with advanced filtering, bulk operations, and pagination
 - **Credit Cards**: Billing cycle management with grace period calculations
 - **Loans**: Floating interest rate tracking with amortization schedules
@@ -14,6 +15,8 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 - **PDF Reports**: Client-side report generation with Vietnamese character support
 - **Authentication**: Google and GitHub OAuth
 - **Bilingual**: Full English/Vietnamese localization
+- **PWA Support**: Installable on desktop and mobile with offline capability
+- **Accessibility**: WCAG-compliant ARIA labels and screen reader support
 
 ## Tech Stack
 
@@ -21,13 +24,14 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 - **Runtime**: Cloudflare Workers (Edge)
 - **Database**: Cloudflare D1 (SQLite)
 - **Storage**: Cloudflare R2 (S3-compatible)
-- **AI**: Cloudflare Workers AI (Llama 3.2 Vision, Llama 3.3)
+- **AI**: Cloudflare Workers AI (Llama 3.1 8B, Llama 3.2 Vision, Llama 3.3)
 - **Queue**: Cloudflare Queues (async processing)
 - **UI**: Shadcn UI + Tailwind CSS v4
 - **Charts**: Recharts
 - **PDF**: @react-pdf/renderer
 - **i18n**: react-i18next
 - **Auth**: Arctic (OAuth) + Oslo (sessions)
+- **PWA**: Service Worker with offline caching
 
 ## Getting Started
 
@@ -143,6 +147,8 @@ finance-hub/
 │   │   ├── receipts/       # Receipt OCR components
 │   │   ├── bank-sync/      # Bank sync components
 │   │   ├── reports/        # PDF report components
+│   │   ├── ai/             # AI insights components
+│   │   ├── pwa/            # PWA install prompts
 │   │   └── layout/         # Layout components
 │   ├── lib/
 │   │   ├── auth/           # Authentication logic
@@ -154,11 +160,13 @@ finance-hub/
 │   │   └── utils.ts        # Utility functions
 │   ├── routes/             # React Router routes
 │   ├── root.tsx            # Root component
+│   ├── entry.worker.ts     # Service worker for PWA
 │   └── tailwind.css        # Tailwind CSS
 ├── functions/              # Cloudflare Workers
 ├── migrations/             # D1 database migrations
 ├── public/
-│   └── locales/            # i18n translation files
+│   ├── locales/            # i18n translation files
+│   └── app.webmanifest    # PWA manifest
 ├── server/                 # Server entry points
 ├── .github/workflows/      # CI/CD workflows
 ├── wrangler.toml           # Cloudflare configuration
