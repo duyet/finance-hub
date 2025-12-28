@@ -32,7 +32,7 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm your financial assistant. Ask me anything about your finances - spending patterns, budget advice, or specific transactions.",
+      content: "Hi! I'm your financial assistant. You can ask me about spending patterns, budget advice, or try one of the quick questions below.",
       timestamp: new Date(),
     },
   ]);
@@ -40,23 +40,31 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const quickQuestions = [
+    "What's my biggest expense category?",
+    "How much did I spend last month?",
+    "Am I spending more than usual?",
+    "Give me a budget tip",
+  ];
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (questionText?: string) => {
+    const messageText = questionText || input;
+    if (!messageText?.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input.trim(),
+      content: messageText.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!questionText) setInput("");
     setIsLoading(true);
 
     try {
@@ -95,6 +103,8 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
       setIsLoading(false);
     }
   };
+
+  const handleSendClick = () => handleSend();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -139,6 +149,26 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
             </div>
           </div>
         )}
+        {/* Quick Questions - Show only on welcome */}
+        {messages.length === 1 && !isLoading && (
+          <div className="space-y-2 pt-2">
+            <p className="text-xs text-gray-500">Quick questions:</p>
+            <div className="flex flex-wrap gap-2">
+              {quickQuestions.map((question) => (
+                <button
+                  key={question}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSend(question);
+                  }}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition-colors"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -154,7 +184,7 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
             className="flex-1"
           />
           <Button
-            onClick={handleSend}
+            onClick={handleSendClick}
             disabled={!input.trim() || isLoading}
             size="icon"
           >
@@ -194,7 +224,7 @@ export function QuickInsightQuestions({
             key={question}
             variant="outline"
             size="sm"
-            onClick={() => onSelect(question)}
+            onClick={(_e: React.MouseEvent) => onSelect(question)}
             className="text-xs"
           >
             {question}
