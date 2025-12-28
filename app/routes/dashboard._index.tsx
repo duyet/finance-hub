@@ -12,7 +12,7 @@
 
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { requireAuth } from "../lib/auth/session.server";
 import { getDashboardData } from "../lib/db/transactions.server";
 import { getUnpaidStatements } from "~/lib/db/credit-cards.server";
@@ -21,13 +21,20 @@ import { Sidebar } from "~/components/layout/Sidebar";
 import {
   NetWorthCard,
   RunwayCard,
-  IncomeExpenseChart,
-  ExpenseBreakdownChart,
   RecentTransactionsTable,
   QuickActions,
 } from "~/components/dashboard";
 import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
 import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
+import { ChartSkeleton } from "~/components/ui/skeleton";
+
+// Lazy load chart components to defer recharts loading (425KB)
+const IncomeExpenseChart = lazy(() =>
+  import("~/components/dashboard/IncomeExpenseChart").then(m => ({ default: m.IncomeExpenseChart }))
+);
+const ExpenseBreakdownChart = lazy(() =>
+  import("~/components/dashboard/ExpenseBreakdownChart").then(m => ({ default: m.ExpenseBreakdownChart }))
+);
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
@@ -273,15 +280,19 @@ export default function DashboardPage() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <IncomeExpenseChart
-              data={dashboard.incomeVsExpense}
-              currency="VND"
-              onBarClick={handleBarClick}
-            />
-            <ExpenseBreakdownChart
-              data={dashboard.expenseByCategory}
-              currency="VND"
-            />
+            <Suspense fallback={<ChartSkeleton />}>
+              <IncomeExpenseChart
+                data={dashboard.incomeVsExpense}
+                currency="VND"
+                onBarClick={handleBarClick}
+              />
+            </Suspense>
+            <Suspense fallback={<ChartSkeleton />}>
+              <ExpenseBreakdownChart
+                data={dashboard.expenseByCategory}
+                currency="VND"
+              />
+            </Suspense>
           </div>
 
           {/* AI Financial Insights */}

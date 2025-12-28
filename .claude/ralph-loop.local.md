@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 35
+iteration: 37
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -99,6 +99,14 @@ started_at: "2025-12-28T17:17:15Z"
     - App can now be installed on desktop and mobile devices
     - Offline support for cached static assets and locales
 
+14. **Bundle Size Optimization** (Iteration 36)
+    - Implemented React.lazy() for chart components (IncomeExpenseChart, ExpenseBreakdownChart)
+    - Added Suspense boundaries with ChartSkeleton fallback for better UX
+    - Deferred recharts library loading (425KB) until chart components are needed
+    - Dashboard chunk reduced from 22.63 kB to 21.11 kB
+    - Separate chart chunks created: 4.91 kB and 4.65 kB
+    - ChartSkeleton component provides loading state during lazy import
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
@@ -107,7 +115,7 @@ started_at: "2025-12-28T17:17:15Z"
 - ~~Chat AI Agents for financial insights~~ ✅ Done (Iteration 4)
 - ~~UX/UI improvements - simple but powerful design~~ ✅ Done (Iterations 33-34)
 - ~~Accessibility enhancements~~ ✅ Done (Iteration 34)
-- Performance optimizations
+- ~~Performance optimizations~~ ✅ Done (Iteration 36)
 - ~~Progressive Web App (PWA) features~~ ✅ Done (Iteration 35)
 - ~~Offline support~~ ✅ Done (Iteration 35)
 - Using Cloudflare AI Gateway + Workers for serverless functions
