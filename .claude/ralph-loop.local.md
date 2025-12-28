@@ -43,6 +43,13 @@ started_at: "2025-12-28T17:17:15Z"
    - Pushed 3 commits to github.com:duyet/finance-hub
    - All code tracked and checkpointed
 
+
+### Things to consider to brainstorm later
+
+- Further bundle optimizations (analyze with rollup-plugin-visualizer)
+- More E2E tests for edge cases
+- Better model OCR (Qwen2.5-VL, Mistral OCR, DeepSeek-VL2)
+
 ### Pending
 
 1. **Deployment** (Blocked by API Token)
