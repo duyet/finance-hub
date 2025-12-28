@@ -22,3 +22,8 @@ binding = "AI"
 [[kv_namespaces]]
 binding = "CACHE"
 id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Queue Producer for OCR/CSV jobs (Pages Functions can send, Worker consumes)
+[[queues.producers]]
+queue = "finance-hub-jobs"
+binding = "QUEUE"

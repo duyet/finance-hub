@@ -17,6 +17,9 @@
 - ✅ **Bundle Optimization** - Manual chunk splitting for recharts (425KB) and i18next (13KB)
 - ✅ **Code Quality** - typecheck passes, lint passes (186 warnings, 0 errors)
 - ✅ **Account/Category Routes** - Verified fully implemented with CRUD operations
+- ✅ **Queue Worker Setup** - Created wrangler.queue-worker.toml for standalone deployment
+- ✅ **Queue Producer Binding** - Added QUEUE producer to main wrangler.toml
+- ✅ **Deploy Scripts** - Added deploy:queue and deploy:all scripts
 
 ## Immediate Action Required
 
@@ -76,10 +79,11 @@
    - Get real R2 bucket ID: `wrangler r2 bucket list`
    - Get real KV namespace ID: `wrangler kv:namespace list`
 
-2. [ ] Deploy Queue Consumer Worker
-   - Create separate `wrangler.queue-worker.toml`
-   - Deploy queue consumer as standalone Worker
-   - Configure queue producer binding in Pages Functions
+2. [x] Deploy Queue Consumer Worker
+   - [x] Create separate `wrangler.queue-worker.toml`
+   - [x] Configure queue producer binding in Pages Functions
+   - [ ] Deploy queue consumer: `bun run deploy:queue`
+   - [ ] Create Cloudflare Queue: `finance-hub-jobs`
 
 3. [ ] Set up production environment variables
    - OAuth credentials (GitHub/Google)
@@ -240,15 +244,17 @@
 
 ### Remaining Issues
 
-1. **Queue Consumer Not Deployed**
-   - Consumer exists at `./workers/queue-consumer.ts`
-   - Not configured in Pages-compatible wrangler.toml
-   - **Impact**: OCR/CSV jobs won't process
-   - **Fix**: Deploy as separate Worker
+1. **~~Queue Consumer Not Deployed~~**
+   - ~~Consumer exists at `./workers/queue-consumer.ts`~~
+   - ~~Not configured in Pages-compatible wrangler.toml~~
+   - **Status**: Configuration created, pending deployment
+   - **Next**: Run `bun run deploy:queue` and create Cloudflare Queue
 
 2. **Dependency Vulnerability**
    - 1 moderate vulnerability detected by Dependabot
-   - Check: https://github.com/duyet/finance-hub/security/dependabot/1
+   - **Analysis**: esbuild <=0.24.2 in dev dependencies only (vite, vitest, wrangler)
+   - **Impact**: Development-only, does not affect production bundle
+   - **Status**: Dependencies up to date, waiting for upstream fixes
 
 ### Dependencies to Review
 
@@ -297,6 +303,12 @@ bun run build
 # Deploy to Cloudflare Pages
 bun run deploy
 
+# Deploy Queue Consumer Worker
+bun run deploy:queue
+
+# Deploy both (Pages + Queue Worker)
+bun run deploy:all
+
 # Configure production secrets
 bun run config
 
@@ -330,9 +342,10 @@ Copy `.dev.vars.example` to `.dev.vars` and fill in:
 
 1. **Priority 1**: Fix API token and deploy
 2. **Priority 2**: Run E2E tests against production URL
-3. **Priority 3**: Deploy Queue Consumer Worker
-4. **Priority 4**: Further optimize PDF.js bundle
-5. **Priority 5**: Fix dependency vulnerability
+3. **Priority 3**: Deploy Queue Consumer Worker (`bun run deploy:queue`)
+4. **Priority 4**: Create Cloudflare Queue (`finance-hub-jobs`)
+5. **Priority 5**: Further optimize PDF.js bundle
+6. **Priority 6**: Update wrangler.toml with real resource IDs
 
 Remember: Never stop improving. Focus on one area at a time and iterate.
 

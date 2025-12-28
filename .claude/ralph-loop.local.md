@@ -49,6 +49,16 @@ started_at: "2025-12-28T17:17:15Z"
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
 - More E2E tests for edge cases
 - Better model OCR (Qwen2.5-VL, Mistral OCR, DeepSeek-VL2)
+- Chat AI Agents
+- Beeter UX/UI improvements
+- Accessibility enhancements
+- Performance optimizations
+- Progressive Web App (PWA) features
+- Offline support
+- Better UX/UI improvements, simple but powerful design, do not make AI-like stuff
+- Using Cloudflare AI Gateway + Workers for serverless functions
+- OpenRouter via AI binding
+- AI Agents consider using free models first
 
 ### Pending
 
@@ -77,3 +87,4 @@ Verified - Already fully implemented:
 
 Git repo: git@github.com:duyet/finance-hub.git
 Commit as duyetbot: duyetbot@users.noreply.github.com
+AI Gateway Name: finance-hub
