@@ -12,6 +12,9 @@ Reading the @Finance Hub Web App PRD.md then implement them all until complete t
 
 Git repo: git@github.com:duyet/finance-hub.git
 Commit as duyetbot: duyetbot@users.noreply.github.com
+Use semantic commit.
+Always keep the codebase is CLEAN, FORMATTED, TESTED, and DEPLOYED. Do not keep trash file on the repo, please clean up when you found them, or just ignore them. Keep the status docs on the docs/ folders. 
+Keep the archtecture diagram updated when you have any changes on the archtecture.
 
 Make sure project is clean. No docs during working. Only code. Write docs at the end if need.
 No need back compatible, no deprecated code. Use latest tech stack.
@@ -20,7 +23,12 @@ Update this file to track progress.
 
 Please commit and push for each iter of work for checkpoint.
 
-Please create / update CLAUDE.md, TODO.md as needed during working for each iter.
+Please create / update CLAUDE.md, TODO.md, README.md as needed during working for each iter.
+
+Keep the README.md up to date with latest setup, install, usage, deploy, test, ... instructions but keep it clean and professional.
 
 Please use all avaiable CLI tools to help you work faster, deploy to cloudflare (bun wrangler), test.
-Using Github CLI to checking the PRs, repo status, issues, create commit, push, ...
+Using Github CLI to checking the PRs, repo status, issues, github actions status, logs, ...
+
+Using context7 for docs best practice.
+Using zread for any codebase understand.
