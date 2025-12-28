@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 45
+iteration: 47
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -148,6 +148,18 @@ started_at: "2025-12-28T17:17:15Z"
     - Gateway ID is optional - AI calls work without it (graceful degradation)
     - All AI inference now routed through AI Gateway when ID is configured
 
+19. **OpenRouter Integration with Free-First Strategy** (Iteration 41)
+    - Created openrouter.server.ts service for multi-provider AI access
+    - Added free model support: Google Gemma 2 9B, Meta Llama 3 8B (no cost)
+    - Added premium model fallback: OpenAI GPT-4o Mini, Anthropic Claude 3 Haiku
+    - Updated ai-insights.server.ts with three-tier provider strategy:
+      1. OpenRouter free models (no cost)
+      2. Workers AI Llama 3.1 8B (Cloudflare free tier)
+      3. OpenRouter premium models (paid fallback)
+    - Added environment variables: OPENROUTER_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, AI_GATEWAY_NAME
+    - Automatic fallback between providers ensures high availability
+    - All providers routed through AI Gateway for unified observability
+
 ### Things to consider to brainstorm later
 
 - ~~Further bundle optimizations~~ ✅ Done (Iteration 38 - granular vendor chunking)
@@ -160,8 +172,8 @@ started_at: "2025-12-28T17:17:15Z"
 - ~~Progressive Web App (PWA) features~~ ✅ Done (Iteration 35)
 - ~~Offline support~~ ✅ Done (Iteration 35)
 - ~~Using Cloudflare AI Gateway + Workers for serverless functions~~ ✅ Done (Iteration 40)
-- OpenRouter via AI binding
-- AI Agents consider using free models first
+- ~~OpenRouter via AI binding~~ ✅ Done (Iteration 41)
+- ~~AI Agents consider using free models first~~ ✅ Done (Iteration 41 - free-first strategy)
 
 ### Pending
 

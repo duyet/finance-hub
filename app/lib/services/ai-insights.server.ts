@@ -1,9 +1,8 @@
 /**
  * AI Insights Service
  *
- * Provides AI-powered financial insights using Cloudflare Workers AI.
- * Generates intelligent analysis of spending patterns, recommendations,
- * and answers natural language questions about finances.
+ * Provides AI-powered financial insights using multiple AI providers.
+ * Provider preference: OpenRouter free models → Workers AI → OpenRouter premium
  *
  * Uses Cloudflare AI Gateway for observability, caching, and cost optimization.
  *
@@ -11,6 +10,7 @@
  */
 
 import type { CloudflareRequest } from "~/lib/auth/db.server";
+import { generateWithFreeModel, generateWithFallback } from "./openrouter.server";
 
 // ============================================================================
 // Types
@@ -52,6 +52,11 @@ export interface InsightRequest {
 
 /**
  * Generate spending analysis using AI
+ *
+ * Provider strategy:
+ * 1. OpenRouter free models (Llama 3 8B, Gemma 2 9B) - no cost
+ * 2. Workers AI (Llama 3.1 8B) - free tier on Cloudflare
+ * 3. OpenRouter premium models (GPT-4o, Claude) - paid fallback
  */
 export async function generateSpendingAnalysis(
   request: CloudflareRequest,
@@ -62,46 +67,69 @@ export async function generateSpendingAnalysis(
     currency: string;
   }
 ): Promise<TransactionAnalysis> {
-  const ai = request.context?.cloudflare?.env?.AI;
-
-  if (!ai) {
-    throw new Error("AI binding not available");
-  }
+  const env = request.context?.cloudflare?.env;
+  const openRouterToken = env?.OPENROUTER_API_TOKEN as string;
+  const workersAI = env?.AI;
 
   // Build analysis prompt
   const prompt = buildAnalysisPrompt(transactionData);
+  const systemPrompt = "You are a financial advisor assistant. Analyze spending data and provide clear, actionable insights. Keep responses concise and practical.";
 
-  try {
-    // Use Cloudflare Workers AI for analysis
-    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
-    const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+  let text = "";
 
-    const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
-      messages: [
-        {
-          role: "system",
-          content: "You are a financial advisor assistant. Analyze spending data and provide clear, actionable insights. Keep responses concise and practical.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      max_tokens: 1024,
-    }, gatewayOptions as any);
-
-    // Parse AI response
-    const text = (response as any).response || (response as any).text || "";
-    return parseAnalysisResponse(text, transactionData);
-  } catch (error) {
-    console.error("AI analysis failed:", error);
-    // Fallback to basic analysis
-    return generateBasicAnalysis(transactionData);
+  // Strategy 1: Try OpenRouter free models first (if token available)
+  if (openRouterToken) {
+    try {
+      text = await generateWithFreeModel(request, systemPrompt, prompt, { maxTokens: 1024 });
+      return parseAnalysisResponse(text, transactionData);
+    } catch (error) {
+      console.warn("OpenRouter free model failed, trying Workers AI:", error);
+    }
   }
+
+  // Strategy 2: Fallback to Workers AI (Llama 3.1 8B)
+  if (workersAI) {
+    try {
+      const gatewayId = env?.AI_GATEWAY_ID;
+      const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
+      const response = await workersAI.run("@cf/meta/llama-3.1-8b-instruct", {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        max_tokens: 1024,
+      }, gatewayOptions as any);
+
+      text = (response as any).response || (response as any).text || "";
+      return parseAnalysisResponse(text, transactionData);
+    } catch (error) {
+      console.warn("Workers AI failed, trying OpenRouter premium:", error);
+    }
+  }
+
+  // Strategy 3: Fallback to OpenRouter premium models (if token available)
+  if (openRouterToken) {
+    try {
+      text = await generateWithFallback(request, systemPrompt, prompt, { maxTokens: 1024 });
+      return parseAnalysisResponse(text, transactionData);
+    } catch (error) {
+      console.error("All AI providers failed:", error);
+    }
+  }
+
+  // Final fallback: Basic analysis without AI
+  console.warn("All AI providers unavailable, using basic analysis");
+  return generateBasicAnalysis(transactionData);
 }
 
 /**
  * Answer financial question using AI
+ *
+ * Provider strategy:
+ * 1. OpenRouter free models (Llama 3 8B, Gemma 2 9B) - no cost
+ * 2. Workers AI (Llama 3.1 8B) - free tier on Cloudflare
+ * 3. OpenRouter premium models (GPT-4o, Claude) - paid fallback
  */
 export async function answerFinancialQuestion(
   request: CloudflareRequest,
@@ -111,38 +139,59 @@ export async function answerFinancialQuestion(
     accounts: Array<{ name: string; type: string; balance: number }>;
   }
 ): Promise<string> {
-  const ai = request.context?.cloudflare?.env?.AI;
-
-  if (!ai) {
-    throw new Error("AI binding not available");
-  }
+  const env = request.context?.cloudflare?.env;
+  const openRouterToken = env?.OPENROUTER_API_TOKEN as string;
+  const workersAI = env?.AI;
 
   // Build context-aware prompt
   const prompt = buildQuestionPrompt(question, userContext);
+  const systemPrompt = "You are a helpful financial assistant. Answer questions about personal finance clearly and accurately. If you don't have enough information, ask for clarification.";
 
-  try {
-    const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
-    const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+  let answer = "";
 
-    const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful financial assistant. Answer questions about personal finance clearly and accurately. If you don't have enough information, ask for clarification.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      max_tokens: 512,
-    }, gatewayOptions as any);
-
-    return (response as any).response || (response as any).text || "I couldn't generate a response. Please try again.";
-  } catch (error) {
-    console.error("AI question answering failed:", error);
-    return "I'm having trouble processing your question right now. Please try again later.";
+  // Strategy 1: Try OpenRouter free models first
+  if (openRouterToken) {
+    try {
+      answer = await generateWithFreeModel(request, systemPrompt, prompt, { maxTokens: 512 });
+      return answer;
+    } catch (error) {
+      console.warn("OpenRouter free model failed, trying Workers AI:", error);
+    }
   }
+
+  // Strategy 2: Fallback to Workers AI
+  if (workersAI) {
+    try {
+      const gatewayId = env?.AI_GATEWAY_ID;
+      const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+
+      const response = await workersAI.run("@cf/meta/llama-3.1-8b-instruct", {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        max_tokens: 512,
+      }, gatewayOptions as any);
+
+      answer = (response as any).response || (response as any).text || "";
+      return answer;
+    } catch (error) {
+      console.warn("Workers AI failed, trying OpenRouter premium:", error);
+    }
+  }
+
+  // Strategy 3: Fallback to OpenRouter premium models
+  if (openRouterToken) {
+    try {
+      answer = await generateWithFallback(request, systemPrompt, prompt, { maxTokens: 512 });
+      return answer;
+    } catch (error) {
+      console.error("All AI providers failed:", error);
+    }
+  }
+
+  // Final fallback
+  return "I'm having trouble processing your question right now. Please try again later.";
 }
 
 /**

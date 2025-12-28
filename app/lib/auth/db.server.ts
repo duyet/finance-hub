@@ -12,6 +12,12 @@ export interface Env {
   OCR_MODEL?: string;
   /** Cloudflare AI Gateway ID for observability and caching */
   AI_GATEWAY_ID?: string;
+  /** Cloudflare Account ID for AI Gateway */
+  CLOUDFLARE_ACCOUNT_ID?: string;
+  /** AI Gateway name (configured in Cloudflare dashboard) */
+  AI_GATEWAY_NAME?: string;
+  /** OpenRouter API token for model provider diversity */
+  OPENROUTER_API_TOKEN?: string;
   // Other bindings...
 }
 
