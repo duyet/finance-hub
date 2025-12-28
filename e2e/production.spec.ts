@@ -550,8 +550,9 @@ test.describe('Data Flow Edge Cases', () => {
       await page.waitForLoadState('networkidle');
 
       // Page should handle gracefully (either default to valid values or show error)
-      const status = page.context().request?.?.failure || 'success';
-      expect(status).toBe('success');
+      // Just verify page loads without crashing
+      const bodyText = await page.textContent('body').catch(() => null);
+      expect(bodyText).not.toBeNull();
     }
   });
 
