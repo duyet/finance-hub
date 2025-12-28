@@ -117,12 +117,18 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
     <Card className="flex flex-col h-[500px]">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center space-x-2">
-        <Sparkles className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">Financial Insights</h3>
+        <Sparkles className="h-5 w-5 text-blue-600" aria-hidden="true" />
+        <h3 className="font-semibold" id="chat-heading">Financial Insights</h3>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-label="Chat messages"
+      >
         {messages.map((message) => (
           <div
             key={message.id}
@@ -134,27 +140,30 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-900"
               }`}
+              role={message.role === "assistant" ? "status" : undefined}
+              aria-label={`${message.role === "user" ? "You" : "Assistant"} message`}
             >
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-              <span className="text-xs opacity-70 mt-1 block">
+              <span className="text-xs opacity-70 mt-1 block" aria-hidden="true">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           </div>
         ))}
         {isLoading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" role="status" aria-live="polite" aria-label="Assistant is typing">
             <div className="bg-gray-100 rounded-lg px-4 py-2">
               <Spinner size="sm" />
+              <span className="sr-only">Assistant is typing...</span>
             </div>
           </div>
         )}
         {/* Quick Questions - Show only on welcome */}
         {messages.length === 1 && !isLoading && (
-          <div className="space-y-2 pt-2">
+          <div className="space-y-2 pt-2" role="region" aria-label="Quick question suggestions">
             <p className="text-xs text-gray-500">Quick questions:</p>
             <div className="flex flex-wrap gap-2">
-              {quickQuestions.map((question) => (
+              {quickQuestions.map((question, index) => (
                 <button
                   key={question}
                   onClick={(e) => {
@@ -162,6 +171,7 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
                     handleSend(question);
                   }}
                   className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full transition-colors"
+                  aria-label={`Ask: ${question}`}
                 >
                   {question}
                 </button>
@@ -182,11 +192,16 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
             placeholder="Ask about your finances..."
             disabled={isLoading}
             className="flex-1"
+            id="chat-input"
+            aria-label="Type your question"
+            autoComplete="off"
           />
           <Button
             onClick={handleSendClick}
             disabled={!input.trim() || isLoading}
             size="icon"
+            aria-label="Send message"
+            type="submit"
           >
             {isLoading ? (
               <Spinner size="sm" className="text-white" />
@@ -253,10 +268,10 @@ export function SpendingInsightCard({
     return (
       <Card className="p-6">
         <div className="flex items-center space-x-2 mb-4">
-          <Sparkles className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold">AI Insights</h3>
+          <Sparkles className="h-5 w-5 text-blue-600" aria-hidden="true" />
+          <h3 className="font-semibold" id="insights-heading">AI Insights</h3>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3" role="status" aria-live="polite" aria-label="Loading insights">
           <div className="h-4 bg-gray-200 rounded animate-pulse" />
           <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
           <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse" />
@@ -268,8 +283,8 @@ export function SpendingInsightCard({
   return (
     <Card className="p-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Sparkles className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">AI Insights</h3>
+        <Sparkles className="h-5 w-5 text-blue-600" aria-hidden="true" />
+        <h3 className="font-semibold" id="insights-heading">AI Insights</h3>
       </div>
 
       {summary && (
@@ -279,10 +294,10 @@ export function SpendingInsightCard({
       {trends && trends.length > 0 && (
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-900 mb-2">Trends</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
+          <ul className="text-sm text-gray-600 space-y-1" role="list">
             {trends.map((trend, i) => (
               <li key={i} className="flex items-start">
-                <span className="mr-2">•</span>
+                <span className="mr-2" aria-hidden="true">•</span>
                 <span>{trend}</span>
               </li>
             ))}
@@ -293,10 +308,10 @@ export function SpendingInsightCard({
       {recommendations && recommendations.length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-gray-900 mb-2">Recommendations</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
+          <ul className="text-sm text-gray-600 space-y-1" role="list">
             {recommendations.map((rec, i) => (
               <li key={i} className="flex items-start">
-                <span className="mr-2">💡</span>
+                <span className="mr-2" aria-hidden="true">💡</span>
                 <span>{rec}</span>
               </li>
             ))}

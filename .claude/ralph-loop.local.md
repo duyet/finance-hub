@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 33
+iteration: 34
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -78,14 +78,25 @@ started_at: "2025-12-28T17:17:15Z"
     - Fixed TypeScript type safety for onClick handlers
     - Created handleSendClick wrapper for proper Button component integration
 
+12. **Accessibility Enhancements** (Iteration 34)
+    - Added ARIA labels to AI chat component for screen reader support
+    - role="log" on messages container for proper live region semantics
+    - aria-live="polite" for non-intrusive message announcements
+    - aria-hidden="true" on decorative icons (Sparkles, timestamps)
+    - aria-label on interactive elements (buttons, inputs)
+    - role="status" on loading states with sr-only text
+    - type="submit" on Send button for proper form behavior
+    - Added role="list" to trends and recommendations lists
+    - Enhanced SpendingInsightCard with same accessibility patterns
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
 - More E2E tests for edge cases
 - Better model OCR (Qwen2.5-VL, Mistral OCR, DeepSeek-VL2)
 - ~~Chat AI Agents for financial insights~~ ✅ Done (Iteration 4)
-- UX/UI improvements - simple but powerful design
-- Accessibility enhancements
+- ~~UX/UI improvements - simple but powerful design~~ ✅ Done (Iterations 33-34)
+- ~~Accessibility enhancements~~ ✅ Done (Iteration 34)
 - Performance optimizations
 - Progressive Web App (PWA) features
 - Offline support
