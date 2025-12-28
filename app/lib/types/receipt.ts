@@ -25,6 +25,8 @@ export interface ReceiptData {
   taxAmount?: number | null;
   confidence?: number;
   rawText?: string;
+  /** OCR model used for extraction (e.g., "gemma-3", "llama-3.2") */
+  modelUsed?: string;
 }
 
 /**

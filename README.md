@@ -10,7 +10,7 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 - **Credit Cards**: Billing cycle management with grace period calculations
 - **Loans**: Floating interest rate tracking with amortization schedules
 - **CSV Import**: AI-powered column mapping using Cloudflare Workers AI
-- **Receipt OCR**: Automatic data extraction from receipts using Llama 3.2 Vision
+- **Receipt OCR**: Automatic data extraction from receipts using Gemma 3 multimodal AI
 - **Bank Sync**: Webhook integration with Casso and SePay (Vietnamese payment gateways)
 - **PDF Reports**: Client-side report generation with Vietnamese character support
 - **Authentication**: Google and GitHub OAuth
@@ -24,7 +24,7 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 - **Runtime**: Cloudflare Workers (Edge)
 - **Database**: Cloudflare D1 (SQLite)
 - **Storage**: Cloudflare R2 (S3-compatible)
-- **AI**: Cloudflare Workers AI (Llama 3.1 8B, Llama 3.2 Vision, Llama 3.3)
+- **AI**: Cloudflare Workers AI (Gemma 3 12B, Llama 3.1 8B, Llama 3.3)
 - **Queue**: Cloudflare Queues (async processing)
 - **UI**: Shadcn UI + Tailwind CSS v4
 - **Charts**: Recharts

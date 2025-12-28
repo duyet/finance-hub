@@ -1,6 +1,10 @@
 /**
  * OCR Service for receipt processing using Cloudflare Workers AI
- * Uses Llama 3.2 Vision model for text extraction
+ * Supports multiple vision models: Gemma 3 (recommended), Llama 3.2 Vision
+ *
+ * Model Selection (via env.OCR_MODEL or default):
+ * - gemma-3: @cf/google/gemma-3-12b-it (multimodal, 140+ languages, 128K context)
+ * - llama-3.2: @cf/meta/llama-3.2-11b-vision-instruct (fallback)
  */
 
 import type { CloudflareRequest } from "../auth/db.server";
@@ -11,6 +15,18 @@ import type {
   ReceiptProcessingStatus,
   OcrProcessingOptions,
 } from "../types/receipt";
+
+type OcrModel = "gemma-3" | "llama-3.2";
+
+const DEFAULT_MODEL: OcrModel = "gemma-3";
+
+function getOcrModel(request: CloudflareRequest): OcrModel {
+  const envModel = request.context?.cloudflare?.env?.OCR_MODEL as string;
+  if (envModel === "llama-3.2" || envModel === "gemma-3") {
+    return envModel;
+  }
+  return DEFAULT_MODEL;
+}
 
 /**
  * Get AI binding from request context
@@ -34,8 +50,8 @@ function getQueue(request: CloudflareRequest) {
 }
 
 /**
- * Process receipt image with Workers AI (Llama 3.2 Vision)
- * Extracts structured data from receipt image
+ * Process receipt image with Workers AI
+ * Supports Gemma 3 (multimodal) and Llama 3.2 Vision models
  */
 export async function processReceiptWithAI(
   request: CloudflareRequest,
@@ -55,17 +71,10 @@ export async function processReceiptWithAI(
     locale = "en",
   } = options;
 
-  // Build prompt for receipt extraction
-  const prompt = buildExtractionPrompt(
-    detectCurrency,
-    defaultCurrency,
-    extractLineItems,
-    locale
-  );
+  const model = getOcrModel(request);
 
   try {
-    // Call Workers AI with Llama 3.2 Vision model
-    // Note: We need to fetch the image and convert to base64
+    // Fetch and convert image to base64
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -74,16 +83,48 @@ export async function processReceiptWithAI(
     const imageBuffer = await imageResponse.arrayBuffer();
     const base64Image = Buffer.from(imageBuffer).toString("base64");
     const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
+    const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
 
-    // Use @cf/meta/llama-3.2-11b-vision-instruct model
-    const modelResponse = await ai.run("@cf/meta/llama-3.2-11b-vision-instruct", {
-      image: [`data:${mimeType};base64,${base64Image}`],
-      prompt: prompt,
-      max_tokens: 2048,
-    });
+    // Build prompt for receipt extraction
+    const prompt = buildExtractionPrompt(
+      detectCurrency,
+      defaultCurrency,
+      extractLineItems,
+      locale
+    );
+
+    let extractedText: string;
+
+    if (model === "gemma-3") {
+      // Use Gemma 3 with messages API for multimodal input
+      const modelResponse = await ai.run("@cf/google/gemma-3-12b-it", {
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              {
+                type: "image_url",
+                image_url: { url: imageDataUrl }
+              }
+            ]
+          }
+        ],
+        max_tokens: 2048,
+        temperature: 0.2, // Lower temperature for more consistent extraction
+      });
+      extractedText = modelResponse.response || modelResponse.text || "";
+    } else {
+      // Use Llama 3.2 Vision as fallback
+      const modelResponse = await ai.run("@cf/meta/llama-3.2-11b-vision-instruct", {
+        image: [imageDataUrl],
+        prompt: prompt,
+        max_tokens: 2048,
+      });
+      extractedText = modelResponse.response || modelResponse.text || "";
+    }
 
     // Parse the response
-    const extractedText = modelResponse.response || modelResponse.text || "";
     const parsedData = parseReceiptResponse(extractedText, defaultCurrency);
 
     // Calculate confidence score
@@ -93,6 +134,7 @@ export async function processReceiptWithAI(
       ...parsedData,
       confidence,
       rawText: extractedText,
+      modelUsed: model,
     };
   } catch (error) {
     console.error("OCR processing error:", error);
@@ -105,7 +147,7 @@ export async function processReceiptWithAI(
 }
 
 /**
- * Build extraction prompt for Llama 3.2 Vision
+ * Build extraction prompt for OCR models
  */
 function buildExtractionPrompt(
   detectCurrency: boolean,

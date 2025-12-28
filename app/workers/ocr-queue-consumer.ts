@@ -1,10 +1,23 @@
 /**
  * OCR Queue Consumer Worker
- * Processes receipt OCR jobs asynchronously
+ * Processes receipt OCR jobs asynchronously using Gemma 3 or Llama 3.2 Vision
  *
- * This worker is triggered by messages in the OCR processing queue
- * and handles heavy OCR processing without blocking the main request
+ * Model Selection (via env.OCR_MODEL or default):
+ * - gemma-3: @cf/google/gemma-3-12b-it (multimodal, 140+ languages, 128K context)
+ * - llama-3.2: @cf/meta/llama-3.2-11b-vision-instruct (fallback)
  */
+
+type OcrModel = "gemma-3" | "llama-3.2";
+
+const DEFAULT_MODEL: OcrModel = "gemma-3";
+
+function getOcrModel(env: any): OcrModel {
+  const envModel = env.OCR_MODEL as string;
+  if (envModel === "llama-3.2" || envModel === "gemma-3") {
+    return envModel;
+  }
+  return DEFAULT_MODEL;
+}
 
 export interface OcrJob {
   type: "process_receipt";
@@ -128,6 +141,7 @@ async function processReceiptWithAI(
   options: OcrJob["options"]
 ): Promise<any> {
   const { detectCurrency, defaultCurrency, extractLineItems, locale } = options;
+  const model = getOcrModel(env);
 
   // Build prompt
   const prompt = buildExtractionPrompt(
@@ -142,16 +156,41 @@ async function processReceiptWithAI(
   const imageBuffer = await imageResponse.arrayBuffer();
   const base64Image = Buffer.from(imageBuffer).toString("base64");
   const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
+  const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
 
-  // Call AI
-  const modelResponse = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
-    image: [`data:${mimeType};base64,${base64Image}`],
-    prompt: prompt,
-    max_tokens: 2048,
-  });
+  let extractedText: string;
 
-  const extractedText = modelResponse.response || modelResponse.text || "";
-  return parseReceiptResponse(extractedText, defaultCurrency);
+  if (model === "gemma-3") {
+    // Use Gemma 3 with messages API for multimodal input
+    const modelResponse = await env.AI.run("@cf/google/gemma-3-12b-it", {
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            {
+              type: "image_url",
+              image_url: { url: imageDataUrl }
+            }
+          ]
+        }
+      ],
+      max_tokens: 2048,
+      temperature: 0.2, // Lower temperature for more consistent extraction
+    });
+    extractedText = modelResponse.response || modelResponse.text || "";
+  } else {
+    // Use Llama 3.2 Vision as fallback
+    const modelResponse = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
+      image: [imageDataUrl],
+      prompt: prompt,
+      max_tokens: 2048,
+    });
+    extractedText = modelResponse.response || modelResponse.text || "";
+  }
+
+  const parsed = parseReceiptResponse(extractedText, defaultCurrency);
+  return { ...parsed, modelUsed: model };
 }
 
 function buildExtractionPrompt(

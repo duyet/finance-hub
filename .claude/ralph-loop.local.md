@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 37
+iteration: 39
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -107,11 +107,22 @@ started_at: "2025-12-28T17:17:15Z"
     - Separate chart chunks created: 4.91 kB and 4.65 kB
     - ChartSkeleton component provides loading state during lazy import
 
+15. **Gemma 3 OCR Model Integration** (Iteration 37)
+    - Upgraded from Llama 3.2 Vision to Gemma 3 12B for receipt OCR
+    - Gemma 3 advantages: 140+ language support (including Vietnamese), 128K context window, better multimodal understanding
+    - Implemented model abstraction with `getOcrModel()` function
+    - Added OCR_MODEL environment variable for model selection (gemma-3, llama-3.2)
+    - Updated both ocr.server.ts and ocr-queue-consumer.ts with Gemma 3 messages API
+    - Gemma 3 uses messages API with image_url content blocks for multimodal input
+    - Lower temperature (0.2) for more consistent structured JSON extraction
+    - Added modelUsed field to ReceiptData type for tracking which model processed each receipt
+    - Llama 3.2 Vision remains as fallback option
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
 - More E2E tests for edge cases
-- Better model OCR (Qwen2.5-VL, Mistral OCR, DeepSeek-VL2)
+- ~~Better model OCR~~ ✅ Done (Iteration 37 - Gemma 3 12B multimodal)
 - ~~Chat AI Agents for financial insights~~ ✅ Done (Iteration 4)
 - ~~UX/UI improvements - simple but powerful design~~ ✅ Done (Iterations 33-34)
 - ~~Accessibility enhancements~~ ✅ Done (Iteration 34)

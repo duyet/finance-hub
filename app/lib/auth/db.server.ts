@@ -8,6 +8,8 @@ export interface Env {
   RECEIPTS_BUCKET?: any;
   R2_PUBLIC_URL?: string;
   BUCKET_NAME?: string;
+  /** OCR model selection: "gemma-3" (default) or "llama-3.2" */
+  OCR_MODEL?: string;
   // Other bindings...
 }
 
