@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 39
+iteration: 41
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -118,9 +118,19 @@ started_at: "2025-12-28T17:17:15Z"
     - Added modelUsed field to ReceiptData type for tracking which model processed each receipt
     - Llama 3.2 Vision remains as fallback option
 
+16. **Advanced Bundle Chunking** (Iteration 38)
+    - Added granular vendor library chunking in vite.config.ts
+    - Separated Radix UI components into 128.66 kB chunk
+    - Separated date-fns into 20.37 kB chunk
+    - Separated zod validation into 56.80 kB chunk
+    - Separated React Router framework into dedicated chunk
+    - Improved browser caching: stable vendor chunks change less frequently than app code
+    - Better parallel loading: smaller chunks can load simultaneously
+    - Enhanced tree-shaking for individual vendor libraries
+
 ### Things to consider to brainstorm later
 
-- Further bundle optimizations (analyze with rollup-plugin-visualizer)
+- ~~Further bundle optimizations~~ ✅ Done (Iteration 38 - granular vendor chunking)
 - More E2E tests for edge cases
 - ~~Better model OCR~~ ✅ Done (Iteration 37 - Gemma 3 12B multimodal)
 - ~~Chat AI Agents for financial insights~~ ✅ Done (Iteration 4)
