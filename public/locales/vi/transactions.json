@@ -1,0 +1,209 @@
+{
+  "title": "Giao dịch",
+  "description": "Quản lý và theo dõi các giao dịch tài chính của bạn",
+  "add": "Thêm Giao dịch",
+  "edit": "Chỉnh sửa Giao dịch",
+  "delete": "Xóa Giao dịch",
+  "view": "Xem Giao dịch",
+  "bulkEdit": "Chỉnh sửa hàng loạt",
+  "bulkDelete": "Xóa hàng loạt",
+  "filters": {
+    "title": "Bộ lọc",
+    "description": "Lọc giao dịch của bạn bằng các bộ lọc bên dưới",
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm theo mô tả hoặc người bán...",
+    "type": "Loại",
+    "typeAll": "Tất cả",
+    "typeIncome": "Thu nhập",
+    "typeExpense": "Chi tiêu",
+    "status": "Trạng thái",
+    "statusAll": "Tất cả trạng thái",
+    "statusPending": "Đang chờ",
+    "statusPosted": "Đã đăng",
+    "statusCleared": "Đã thanh toán",
+    "statusReconciled": "Đã đối soát",
+    "dateRange": "Khoảng ngày",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "accounts": "Tài khoản",
+    "categories": "Danh mục",
+    "clearFilters": "Xóa bộ lọc",
+    "applyFilters": "Áp dụng bộ lọc"
+  },
+  "table": {
+    "date": "Ngày",
+    "description": "Mô tả",
+    "merchant": "Người bán",
+    "category": "Danh mục",
+    "account": "Tài khoản",
+    "amount": "Số tiền",
+    "status": "Trạng thái",
+    "actions": "Hành động",
+    "selectAll": "Chọn tất cả",
+    "selected": "{{count}} giao dịch được chọn",
+    "noTransactions": "Không tìm thấy giao dịch nào",
+    "noTransactionsHint": "Thử điều chỉnh bộ lọc hoặc thêm giao dịch mới.",
+    "showing": "Hiển thị {{start}} đến {{end}} của {{total}} giao dịch"
+  },
+  "form": {
+    "date": "Ngày",
+    "amount": "Số tiền",
+    "amountHint": "Số dương cho thu nhập, số âm cho chi tiêu",
+    "account": "Tài khoản",
+    "accountPlaceholder": "Chọn tài khoản",
+    "category": "Danh mục",
+    "categoryPlaceholder": "Chọn danh mục",
+    "categoryOptional": "Danh mục (Tùy chọn)",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "ví dụ: Mua nhu yếu phẩm",
+    "merchant": "Người bán",
+    "merchantOptional": "Người bán (Tùy chọn)",
+    "merchantPlaceholder": "ví dụ: VinMart, Tiki",
+    "status": "Trạng thái",
+    "referenceNumber": "Số tham chiếu",
+    "referenceNumberOptional": "Số tham chiếu (Tùy chọn)",
+    "referenceNumberPlaceholder": "ví dụ: Séc #1234",
+    "receiptUrl": "URL Biên lai",
+    "receiptUrlOptional": "URL Biên lai (Tùy chọn)",
+    "receiptUrlPlaceholder": "https://example.com/bienlai.pdf",
+    "notes": "Ghi chú",
+    "notesOptional": "Ghi chú (Tùy chọn)",
+    "notesPlaceholder": "Ghi chú thêm...",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "create": "Tạo Giao dịch",
+    "update": "Cập nhật Giao dịch",
+    "saving": "Đang lưu...",
+    "createSuccess": "Tạo giao dịch thành công",
+    "updateSuccess": "Cập nhật giao dịch thành công",
+    "deleteSuccess": "Xóa giao dịch thành công",
+    "deleteConfirm": "Bạn có chắc muốn xóa giao dịch này?",
+    "bulkDeleteConfirm": "Bạn có chắc muốn xóa {{count}} giao dịch?",
+    "bulkUpdateCategorySuccess": "Đã cập nhật {{count}} giao dịch"
+  },
+  "status": {
+    "pending": "Đang chờ",
+    "posted": "Đã đăng",
+    "cleared": "Đã thanh toán",
+    "reconciled": "Đã đối soát"
+  },
+  "detail": {
+    "title": "Chi tiết Giao dịch",
+    "back": "Quay lại Giao dịch",
+    "basicInformation": "Thông tin cơ bản",
+    "categorization": "Phân loại",
+    "reference": "Tham chiếu",
+    "notes": "Ghi chú",
+    "quickActions": "Hành động nhanh",
+    "metadata": "Metadata",
+    "created": "Đã tạo",
+    "lastUpdated": "Cập nhật lần cuối",
+    "id": "ID",
+    "viewReceipt": "Xem Biên lai"
+  },
+  "validation": {
+    "amountRequired": "Số tiền là bắt buộc",
+    "amountInvalid": "Số tiền phải là một số",
+    "amountDecimals": "Số tiền chỉ có tối đa 2 chữ số thập phân",
+    "dateRequired": "Ngày là bắt buộc",
+    "descriptionRequired": "Mô tả là bắt buộc",
+    "descriptionTooLong": "Mô tả phải ít hơn 500 ký tự",
+    "accountRequired": "Tài khoản là bắt buộc",
+    "statusInvalid": "Trạng thái không hợp lệ",
+    "receiptUrlInvalid": "URL biên lai phải hợp lệ"
+  },
+  "csv": {
+    "title": "Nhập Giao dịch",
+    "subtitle": "Nhập giao dịch từ file CSV với ánh xạ cột hỗ trợ bởi AI",
+    "backToTransactions": "Quay lại Giao dịch",
+    "steps": {
+      "upload": "Tải lên",
+      "mapping": "Ánh xạ Cột",
+      "options": "Tùy chọn",
+      "review": "Xem lại"
+    },
+    "dropzone": {
+      "title": "Kéo thả file CSV vào đây",
+      "subtitle": "hoặc nhấp để duyệt",
+      "accepted": "Chấp nhận: file .csv tối đa 10MB"
+    },
+    "mapping": {
+      "title": "Ánh xạ Cột",
+      "subtitle": "Khớp các cột CSV của bạn với các trường giao dịch tiêu chuẩn",
+      "required": "Bắt buộc",
+      "placeholder": "Chọn cột...",
+      "none": "-- Không --",
+      "tip": {
+        "title": "Mẹo: Ánh xạ bằng AI",
+        "description": "Nhấn nút 'Tự động phát hiện bằng AI' để AI tự động ánh xạ các cột. Bạn vẫn có thể điều chỉnh sau đó."
+      }
+    },
+    "preview": {
+      "title": "Xem trước",
+      "showing": "Hiển thị {{count}} dòng đầu tiên",
+      "ofTotal": "của {{total}} tổng",
+      "mapped": "Đã ánh xạ",
+      "empty": "(trống)",
+      "noData": "Không có dữ liệu để xem trước"
+    },
+    "options": {
+      "title": "Tùy chọn Nhập",
+      "subtitle": "Cấu hình cách nhập giao dịch",
+      "targetAccount": "Tài khoản đích",
+      "selectAccount": "Chọn tài khoản...",
+      "defaultCategory": "Danh mục mặc định",
+      "selectCategory": "Chọn danh mục...",
+      "noCategory": "Không có danh mục",
+      "dateFormat": "Định dạng Ngày",
+      "skipHeader": "Bỏ qua dòng đầu tiên (tiêu đề)",
+      "dryRun": "Chạy thử (xem trước mà không nhập)"
+    },
+    "summary": {
+      "title": "Tóm tắt Nhập",
+      "subtitle": "Xem lại những gì sẽ được nhập trước khi xác nhận",
+      "totalRows": "Tổng số dòng",
+      "toBeImported": "Sẽ nhập",
+      "duplicates": "Trùng lặp",
+      "errors": "Lỗi",
+      "errorsTitle": "Lỗi",
+      "warningsTitle": "Cảnh báo",
+      "row": "Dòng",
+      "moreErrors": "...và {{count}} lỗi khác",
+      "moreWarnings": "...và {{count}} cảnh báo khác",
+      "ready": "Sẵn sàng nhập {{count}} giao dịch",
+      "importing": "Đang nhập...",
+      "confirm": "Xác nhận Nhập",
+      "back": "Quay lại"
+    },
+    "ai": {
+      "button": "Tự động phát hiện bằng AI",
+      "loading": "AI đang ánh xạ...",
+      "success": "Ánh xạ AI Hoàn thành",
+      "successDescription": "Các cột đã được tự động ánh xạ. Vui lòng xem lại và điều chỉnh nếu cần.",
+      "error": "Ánh xạ AI Thất bại",
+      "errorDescription": "Không thể ánh xạ cột bằng AI. Vui lòng ánh xạ thủ công."
+    },
+    "instructions": {
+      "title": "Yêu cầu File CSV",
+      "format": "File phải ở định dạng CSV với tiêu đề ở dòng đầu tiên",
+      "columns": "Bao gồm các cột: ngày, số tiền, và mô tả",
+      "optional": "Cột tùy chọn: người bán, danh mục, tài khoản",
+      "size": "Kích thước file tối đa: 10MB"
+    },
+    "actions": {
+      "back": "Quay lại",
+      "next": "Tiếp",
+      "review": "Xem lại"
+    },
+    "errors": {
+      "parseFailed": "Phân tích Thất bại",
+      "mappingFailed": "Ánh xạ Thất bại",
+      "validationFailed": "Xác nhận Thất bại",
+      "importFailed": "Nhập Thất bại"
+    },
+    "success": {
+      "title": "Nhập Thành công",
+      "description": "Đã nhập thành công {{count}} giao dịch"
+    }
+  }
+}

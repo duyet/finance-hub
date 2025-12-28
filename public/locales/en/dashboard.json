@@ -1,0 +1,72 @@
+{
+  "title": "Dashboard",
+  "description": "Overview of your financial health",
+  "netWorth": {
+    "title": "Net Worth",
+    "description": "Total assets minus total liabilities",
+    "assets": "Assets",
+    "liabilities": "Liabilities",
+    "netWorth": "Net Worth",
+    "change": "{{change}} from last month"
+  },
+  "cashFlow": {
+    "title": "Cash Flow",
+    "description": "Money coming in and going out",
+    "income": "Income",
+    "expenses": "Expenses",
+    "netCashFlow": "Net Cash Flow",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month"
+  },
+  "runway": {
+    "title": "Runway",
+    "description": "How long your savings will last",
+    "months": "{{months}} months",
+    "basedOnExpenses": "Based on average monthly expenses",
+    "burnRate": "Burn Rate: {{amount}}/month"
+  },
+  "incomeVsExpenses": {
+    "title": "Income vs Expenses",
+    "description": "Compare your income and expenses over time",
+    "income": "Income",
+    "expenses": "Expenses",
+    "net": "Net",
+    "last30Days": "Last 30 Days",
+    "last60Days": "Last 60 Days",
+    "last90Days": "Last 90 Days",
+    "thisYear": "This Year"
+  },
+  "expenseBreakdown": {
+    "title": "Expense Breakdown",
+    "description": "Where your money goes",
+    "byCategory": "By Category",
+    "byAccount": "By Account",
+    "topCategories": "Top Categories",
+    "other": "Other",
+    "noExpenses": "No expenses for this period"
+  },
+  "recentTransactions": {
+    "title": "Recent Transactions",
+    "description": "Your latest financial activity",
+    "viewAll": "View All",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "noTransactions": "No recent transactions"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "addTransaction": "Add Transaction",
+    "importReceipt": "Import Receipt",
+    "syncAccounts": "Sync Accounts",
+    "viewReports": "View Reports"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "lowBalance": "Low balance warning",
+    "upcomingBills": "Upcoming bills",
+    "budgetExceeded": "Budget exceeded",
+    "noAlerts": "No alerts"
+  }
+}

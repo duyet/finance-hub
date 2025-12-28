@@ -1,0 +1,24 @@
+name = "finance-hub"
+compatibility_date = "2024-04-05"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./build/client"
+
+# Database Binding for Pages Functions
+[[d1_databases]]
+binding = "DB"
+database_name = "finance-hub-prod"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Object Storage for Receipts (Pages Functions)
+[[r2_buckets]]
+binding = "RECEIPTS_BUCKET"
+bucket_name = "finance-hub-receipts"
+
+# AI Binding (Pages Functions)
+[ai]
+binding = "AI"
+
+# KV for caching (Pages Functions)
+[[kv_namespaces]]
+binding = "CACHE"
+id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

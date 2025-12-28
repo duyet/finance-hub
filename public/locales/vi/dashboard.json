@@ -1,0 +1,72 @@
+{
+  "title": "Dashboard",
+  "description": "Tổng quan về tình hình tài chính của bạn",
+  "netWorth": {
+    "title": "Giá trị ròng",
+    "description": "Tổng tài sản trừ đi tổng nợ phải trả",
+    "assets": "Tài sản",
+    "liabilities": "Nợ phải trả",
+    "netWorth": "Giá trị ròng",
+    "change": "{{change}} so với tháng trước"
+  },
+  "cashFlow": {
+    "title": "Dòng tiền",
+    "description": "Tiền vào và tiền ra",
+    "income": "Thu nhập",
+    "expenses": "Chi tiêu",
+    "netCashFlow": "Dòng tiền ròng",
+    "thisMonth": "Tháng này",
+    "lastMonth": "Tháng trước"
+  },
+  "runway": {
+    "title": "Thời gian tồn tại",
+    "description": "Tiết kiệm của bạn sẽ kéo dài bao lâu",
+    "months": "{{months}} tháng",
+    "basedOnExpenses": "Dựa trên chi tiêu hàng tháng trung bình",
+    "burnRate": "Tỷ lệ đốt tiền: {{amount}}/tháng"
+  },
+  "incomeVsExpenses": {
+    "title": "Thu nhập so với Chi tiêu",
+    "description": "So sánh thu nhập và chi tiêu theo thời gian",
+    "income": "Thu nhập",
+    "expenses": "Chi tiêu",
+    "net": "Ròng",
+    "last30Days": "30 ngày qua",
+    "last60Days": "60 ngày qua",
+    "last90Days": "90 ngày qua",
+    "thisYear": "Năm nay"
+  },
+  "expenseBreakdown": {
+    "title": "Phân tích Chi tiêu",
+    "description": "Tiền của bạn đi đâu",
+    "byCategory": "Theo Danh mục",
+    "byAccount": "Theo Tài khoản",
+    "topCategories": "Danh mục chính",
+    "other": "Khác",
+    "noExpenses": "Không có chi tiêu cho giai đoạn này"
+  },
+  "recentTransactions": {
+    "title": "Giao dịch gần đây",
+    "description": "Hoạt động tài chính mới nhất của bạn",
+    "viewAll": "Xem tất cả",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "thisWeek": "Tuần này",
+    "lastWeek": "Tuần trước",
+    "noTransactions": "Không có giao dịch gần đây"
+  },
+  "quickActions": {
+    "title": "Hành động nhanh",
+    "addTransaction": "Thêm Giao dịch",
+    "importReceipt": "Nhập Hóa đơn",
+    "syncAccounts": "Đồng bộ Tài khoản",
+    "viewReports": "Xem Báo cáo"
+  },
+  "alerts": {
+    "title": "Cảnh báo",
+    "lowBalance": "Cảnh báo số dư thấp",
+    "upcomingBills": "Hóa đơn sắp đến hạn",
+    "budgetExceeded": "Vượt ngân sách",
+    "noAlerts": "Không có cảnh báo"
+  }
+}
