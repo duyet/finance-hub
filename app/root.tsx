@@ -5,11 +5,15 @@ import { getLocaleFromRequest } from "./lib/i18n/i18n.server";
 import type { Locale } from "./lib/i18n/i18n.config";
 import { useNavigation } from "react-router";
 import { FullPageLoading } from "./components/ui/loading";
+import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
 
 const { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+  { rel: "manifest", href: "/app.webmanifest" },
+  { rel: "apple-touch-icon", href: "/icon-192.png" },
+  { rel: "theme-color", href: "#2563eb" },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -93,6 +97,7 @@ export default function App() {
     <div className="min-h-full">
       {isLoading && <FullPageLoading />}
       <Outlet />
+      <PWAInstallPrompt />
     </div>
   );
 }

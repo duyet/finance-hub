@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 34
+iteration: 35
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -89,6 +89,16 @@ started_at: "2025-12-28T17:17:15Z"
     - Added role="list" to trends and recommendations lists
     - Enhanced SpendingInsightCard with same accessibility patterns
 
+13. **PWA Features** (Iteration 35)
+    - Created web app manifest (app.webmanifest) for installability
+    - Added PWA links to root.tsx (manifest, theme-color, apple-touch-icon)
+    - Created service worker (entry.worker.ts) for offline support
+    - Implements network-first for API routes, cache-first for static assets
+    - Created PWAInstallPrompt component with install banner UI
+    - Created PWAInstallButton for settings menu integration
+    - App can now be installed on desktop and mobile devices
+    - Offline support for cached static assets and locales
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
@@ -98,8 +108,8 @@ started_at: "2025-12-28T17:17:15Z"
 - ~~UX/UI improvements - simple but powerful design~~ ✅ Done (Iterations 33-34)
 - ~~Accessibility enhancements~~ ✅ Done (Iteration 34)
 - Performance optimizations
-- Progressive Web App (PWA) features
-- Offline support
+- ~~Progressive Web App (PWA) features~~ ✅ Done (Iteration 35)
+- ~~Offline support~~ ✅ Done (Iteration 35)
 - Using Cloudflare AI Gateway + Workers for serverless functions
 - OpenRouter via AI binding
 - AI Agents consider using free models first
