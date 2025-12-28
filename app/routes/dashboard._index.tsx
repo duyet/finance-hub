@@ -16,6 +16,7 @@ import { useState } from "react";
 import { requireAuth } from "../lib/auth/session.server";
 import { getDashboardData } from "../lib/db/transactions.server";
 import { getUnpaidStatements } from "~/lib/db/credit-cards.server";
+import { getDb } from "~/lib/auth/db.server";
 import { Sidebar } from "~/components/layout/Sidebar";
 import {
   NetWorthCard,
@@ -26,15 +27,63 @@ import {
   QuickActions,
 } from "~/components/dashboard";
 import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
+import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
+  const db = getDb(request);
 
   // Get dashboard data
   const dashboardData = await getDashboardData(request, user.id, 12);
 
   // Get unpaid credit card statements for alerts
   const unpaidStatements = await getUnpaidStatements(request, user.id);
+
+  // Get recent transactions for AI context
+  const recentTransactionsResult = await db
+    .prepare(
+      `SELECT date, amount, description, category_id
+       FROM transactions
+       WHERE user_id = ? AND status = 'POSTED'
+       ORDER BY date DESC
+       LIMIT 10`
+    )
+    .bind(user.id)
+    .all();
+
+  // Get accounts for AI context
+  const accountsResult = await db
+    .prepare(
+      `SELECT name, type, balance
+       FROM financial_accounts
+       WHERE user_id = ? AND is_archived = 0
+       ORDER BY name`
+    )
+    .bind(user.id)
+    .all();
+
+  // Get category names
+  const categoriesResult = await db
+    .prepare(`SELECT id, name FROM categories WHERE user_id = ?`)
+    .bind(user.id)
+    .all();
+
+  const categories = categoriesResult.results || [];
+  const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+
+  // Enrich transactions with category names
+  const aiContextTransactions = (recentTransactionsResult.results || []).map((t: any) => ({
+    date: t.date,
+    amount: t.amount,
+    description: t.description,
+    category: categoryMap.get(t.category_id) || "Uncategorized",
+  }));
+
+  const aiContextAccounts = (accountsResult.results || []).map((a: any) => ({
+    name: a.name,
+    type: a.type,
+    balance: a.balance,
+  }));
 
   return {
     user: {
@@ -45,12 +94,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
     dashboard: dashboardData,
     unpaidStatements,
+    aiContext: {
+      recentTransactions: aiContextTransactions,
+      accounts: aiContextAccounts,
+    },
   };
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements } = useLoaderData<typeof loader>();
+  const { user, dashboard, unpaidStatements, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
   // Filter transactions by selected month
   const filteredTransactions = selectedMonth
@@ -227,6 +281,17 @@ export default function DashboardPage() {
             <ExpenseBreakdownChart
               data={dashboard.expenseByCategory}
               currency="VND"
+            />
+          </div>
+
+          {/* AI Financial Insights */}
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              AI Financial Insights
+            </h2>
+            <FinancialInsightsChat
+              userId={user.id}
+              initialContext={aiContext}
             />
           </div>
 

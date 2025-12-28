@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 4
+iteration: 6
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -63,6 +63,13 @@ started_at: "2025-12-28T17:17:15Z"
    - Added API route at /api/ai/insights for POST requests
    - Context-aware responses using user's transactions and accounts
 
+10. **AI Chat Dashboard Integration** (Iteration 5)
+    - Integrated FinancialInsightsChat component into dashboard
+    - Added AI context data loading (recent transactions, accounts)
+    - Fetches and enriches transaction data with category names for context
+    - AI chat section positioned between charts and transactions
+    - Users can now ask natural language questions about their finances
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
@@ -93,11 +100,6 @@ started_at: "2025-12-28T17:17:15Z"
 3. **Tests Against Production**
    - E2E tests ready to run once deployed
    - Set PRODUCTION_URL environment variable
-
-4. **AI Chat Integration** (Iteration 4)
-   - Components created, not yet integrated into dashboard
-   - Add FinancialInsightsChat to a dedicated route or dashboard
-   - Consider adding AI insights button to transaction list
 
 ### Account/Category Routes Status
 
