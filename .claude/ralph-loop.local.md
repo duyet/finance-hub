@@ -55,12 +55,20 @@ started_at: "2025-12-28T17:17:15Z"
    - Does NOT affect production bundle
    - Dependencies already up to date
 
+9. **AI-Powered Financial Insights** (Iteration 4)
+   - Created ai-insights.server.ts service using Cloudflare Workers AI (Llama 3.1 8B)
+   - Supports spending analysis, natural language Q&A, and anomaly detection
+   - Created FinancialInsightsChat component with full chat interface
+   - Created QuickInsightQuestions and SpendingInsightCard components
+   - Added API route at /api/ai/insights for POST requests
+   - Context-aware responses using user's transactions and accounts
+
 ### Things to consider to brainstorm later
 
 - Further bundle optimizations (analyze with rollup-plugin-visualizer)
 - More E2E tests for edge cases
 - Better model OCR (Qwen2.5-VL, Mistral OCR, DeepSeek-VL2)
-- Chat AI Agents for financial insights
+- ~~Chat AI Agents for financial insights~~ ✅ Done (Iteration 4)
 - UX/UI improvements - simple but powerful design
 - Accessibility enhancements
 - Performance optimizations
@@ -85,6 +93,11 @@ started_at: "2025-12-28T17:17:15Z"
 3. **Tests Against Production**
    - E2E tests ready to run once deployed
    - Set PRODUCTION_URL environment variable
+
+4. **AI Chat Integration** (Iteration 4)
+   - Components created, not yet integrated into dashboard
+   - Add FinancialInsightsChat to a dedicated route or dashboard
+   - Consider adding AI insights button to transaction list
 
 ### Account/Category Routes Status
 
