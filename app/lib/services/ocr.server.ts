@@ -211,9 +211,9 @@ function parseReceiptResponse(
 
     // Extract and validate fields
     let merchantName: string | null = parsed.merchantName || null;
-    let date: string | null = parsed.date || null;
+    const date: string | null = parsed.date || null;
     let totalAmount: number | null = parsed.totalAmount || null;
-    let currency: string | null = parsed.currency || defaultCurrency;
+    const currency: string | null = parsed.currency || defaultCurrency;
     let taxAmount: number | null = parsed.taxAmount || null;
     const lineItems = parsed.lineItems || [];
 

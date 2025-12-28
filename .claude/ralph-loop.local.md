@@ -24,6 +24,7 @@ Update this file to track progress.
 Please commit and push for each iter of work for checkpoint.
 
 Please create / update CLAUDE.md, TODO.md, README.md as needed during working for each iter.
+Rewrite / keep this file is clean and tracking progress: .claude/ralph-loop.local.md
 
 Keep the README.md up to date with latest setup, install, usage, deploy, test, ... instructions but keep it clean and professional.
 
@@ -32,3 +33,6 @@ Using Github CLI to checking the PRs, repo status, issues, github actions status
 
 Using context7 for docs best practice.
 Using zread for any codebase understand.
+
+Model: try to use openrouter via Cloudflare AI Gateway. 
+OCR models consider to use: Mistral OCR, Qwen VL. 

@@ -200,7 +200,7 @@ export function getStatementsInRange(
   const statements: Array<{ start: Date; end: Date; statement: Date; due: Date }> = [];
 
   // Start with the first cycle on or after startDate
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
   currentDate.setDate(1); // Start from first of month
 
   // Find first statement date
@@ -228,7 +228,7 @@ export function getStatementsInRange(
       const dueDate = calculateDueDate(cycleEnd, config.payment_due_day_offset);
 
       // Calculate cycle start
-      let cycleStart = new Date(cycleEnd);
+      const cycleStart = new Date(cycleEnd);
       cycleStart.setMonth(cycleStart.getMonth() - 1);
       cycleStart.setDate(Math.min(config.statement_day, daysInMonth(cycleStart.getFullYear(), cycleStart.getMonth())) + 1);
 
@@ -271,7 +271,7 @@ export function getNextCycle(currentCycle: BillingCycle): BillingCycle {
  */
 export function getPreviousCycle(config: BillingCycleConfig): BillingCycle {
   const today = new Date();
-  let prevMonth = new Date(today);
+  const prevMonth = new Date(today);
   prevMonth.setMonth(prevMonth.getMonth() - 1);
 
   return getBillingCycle(prevMonth, config);

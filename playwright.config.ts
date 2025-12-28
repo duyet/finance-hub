@@ -41,8 +41,6 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    // Disable local server - we test against production
-    enabled: false,
-  },
+  // Disable webServer - we test against production URL
+  webServer: undefined as any,
 });

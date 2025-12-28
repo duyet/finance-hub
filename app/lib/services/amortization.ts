@@ -216,7 +216,7 @@ export function calculateAmortizationSchedule(
 
     // Calculate interest for this month (Reducing Balance)
     // I_n = P_{n-1} × (r / 12)
-    let interestComponent = calculateInterest(outstandingPrincipal, annualRate);
+    const interestComponent = calculateInterest(outstandingPrincipal, annualRate);
 
     // Calculate principal component
     // For fixed EMI: Principal = EMI - Interest
