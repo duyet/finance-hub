@@ -3,6 +3,8 @@ import * as ReactRouter from "react-router";
 import "./tailwind.css";
 import { getLocaleFromRequest } from "./lib/i18n/i18n.server";
 import type { Locale } from "./lib/i18n/i18n.config";
+import { useNavigation } from "react-router";
+import { FullPageLoading } from "./components/ui/loading";
 
 const { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
 
@@ -84,8 +86,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+
   return (
     <div className="min-h-full">
+      {isLoading && <FullPageLoading />}
       <Outlet />
     </div>
   );

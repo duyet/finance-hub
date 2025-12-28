@@ -85,6 +85,27 @@ Verified - Already fully implemented:
 ✓ Build successful: 3039 client modules + 120 server modules
 ✓ Build time: ~5s client, ~400ms server
 
+PLEASE take note to README.md / CLAUDE.md as this project is running non-stop Ralph Loop process to continuously improve itself. Self planning, self coding, self testing, self deploying, self monitoring, self documenting, self learning.
+
+Please self update / rewrite this 
+
 Git repo: git@github.com:duyet/finance-hub.git
 Commit as duyetbot: duyetbot@users.noreply.github.com
+Cloudflare ID: 23050adb6c92e313643a29e1ba64c88a
 AI Gateway Name: finance-hub
+
+```
+import OpenAI from "openai";
+
+const host = "https://gateway.ai.cloudflare.com";
+const endpoint = "/v1/23050adb6c92e313643a29e1ba64c88a/finance-hub/compat";
+const client = new OpenAI({
+  apiKey: "YOUR_PROVIDER_API_KEY",
+  baseURL: host + endpoint,
+});
+
+const response = await client.chat.completions.create({
+  model: "openai/gpt-5",
+  messages: [{ role: "user", content: "What is Cloudflare?" }],
+});
+```
