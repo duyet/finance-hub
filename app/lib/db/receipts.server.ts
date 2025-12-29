@@ -9,7 +9,26 @@ import type {
   ReceiptRecord,
   ReceiptWithTransaction,
   ReceiptProcessingStatus,
+  ReceiptData,
 } from "../types/receipt";
+
+/**
+ * Database row format for receipts (snake_case)
+ */
+interface ReceiptRow {
+  id: string;
+  user_id: string;
+  image_url: string;
+  thumbnail_url: string | null;
+  status: ReceiptProcessingStatus;
+  extracted_data: string; // JSON string
+  confidence: number;
+  error_message: string | null;
+  transaction_id: string | null;
+  created_at: string;
+  updated_at: string;
+  processed_at: string | null;
+}
 
 /**
  * Create receipts table
@@ -54,7 +73,7 @@ export const receiptsCrud = {
     const result = await db
       .prepare(`SELECT * FROM receipts WHERE id = ? AND user_id = ?`)
       .bind(receiptId, userId)
-      .first<any>();
+      .first<ReceiptRow>();
 
     if (!result) {
       return null;
@@ -125,7 +144,7 @@ export const receiptsCrud = {
       .all();
 
     const mappedReceipts =
-      receipts.results?.map((row: any) => mapReceiptRow(row)) || [];
+      receipts.results?.map((row: ReceiptRow) => mapReceiptRow(row)) || [];
 
     return {
       receipts: mappedReceipts,
@@ -156,7 +175,13 @@ export const receiptsCrud = {
         WHERE r.id = ? AND r.user_id = ?`
       )
       .bind(receiptId, userId)
-      .first<any>();
+      .first<ReceiptRow & {
+        transaction_id: string;
+        transaction_date: string;
+        transaction_description: string;
+        transaction_amount: number;
+        category_name: string | null;
+      }>();
 
     if (!result) {
       return null;
@@ -188,7 +213,7 @@ export const receiptsCrud = {
       imageUrl: string;
       thumbnailUrl?: string;
       status: ReceiptProcessingStatus;
-      extractedData: any;
+      extractedData: ReceiptData;
       confidence: number;
       errorMessage?: string;
     }
@@ -228,7 +253,7 @@ export const receiptsCrud = {
     userId: string,
     updates: {
       status?: ReceiptProcessingStatus;
-      extractedData?: any;
+      extractedData?: ReceiptData;
       confidence?: number;
       errorMessage?: string;
       transactionId?: string | null;
@@ -371,14 +396,14 @@ export const receiptsCrud = {
 /**
  * Helper function to map database row to ReceiptRecord
  */
-function mapReceiptRow(row: any): ReceiptRecord {
+function mapReceiptRow(row: ReceiptRow): ReceiptRecord {
   return {
     id: row.id,
     userId: row.user_id,
     imageUrl: row.image_url,
     thumbnailUrl: row.thumbnail_url || undefined,
     status: row.status,
-    extractedData: JSON.parse(row.extracted_data),
+    extractedData: JSON.parse(row.extracted_data) as ReceiptData,
     confidence: row.confidence,
     errorMessage: row.error_message || undefined,
     transactionId: row.transaction_id || undefined,

@@ -142,8 +142,8 @@ export async function validateGitHubCallback(
   let emailVerified = !!githubUser.email;
 
   if (githubEmailsRequest.ok) {
-    const emails = await githubEmailsRequest.json();
-    const primary = (emails as any[]).find((e: any) => e.primary && e.verified);
+    const emails = await githubEmailsRequest.json<GithubEmailResponse[]>();
+    const primary = emails.find((e) => e.primary && e.verified);
     if (primary) {
       primaryEmail = primary.email;
       emailVerified = primary.verified;
@@ -381,6 +381,13 @@ interface GithubUserResponse {
   name: string | null;
   email: string | null;
   avatar_url: string | null;
+}
+
+interface GithubEmailResponse {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility: string | null;
 }
 
 interface GoogleUserResponse {

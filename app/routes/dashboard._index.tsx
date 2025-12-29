@@ -28,6 +28,27 @@ import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
 import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
 import { ChartSkeleton } from "~/components/ui/skeleton";
 
+/**
+ * Database row types for AI context queries
+ */
+interface CategoryRow {
+  id: string;
+  name: string;
+}
+
+interface TransactionRow {
+  date: string;
+  amount: number;
+  description: string;
+  category_id: string | null;
+}
+
+interface AccountRow {
+  name: string;
+  type: string;
+  balance: number;
+}
+
 // Lazy load chart components to defer recharts loading (425KB)
 const IncomeExpenseChart = lazy(() =>
   import("~/components/dashboard/IncomeExpenseChart").then(m => ({ default: m.IncomeExpenseChart }))
@@ -76,17 +97,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     .all();
 
   const categories = categoriesResult.results || [];
-  const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+  const categoryMap = new Map(categories.map((c: CategoryRow) => [c.id, c.name]));
 
   // Enrich transactions with category names
-  const aiContextTransactions = (recentTransactionsResult.results || []).map((t: any) => ({
+  const aiContextTransactions = (recentTransactionsResult.results || []).map((t: TransactionRow) => ({
     date: t.date,
     amount: t.amount,
     description: t.description,
     category: categoryMap.get(t.category_id) || "Uncategorized",
   }));
 
-  const aiContextAccounts = (accountsResult.results || []).map((a: any) => ({
+  const aiContextAccounts = (accountsResult.results || []).map((a: AccountRow) => ({
     name: a.name,
     type: a.type,
     balance: a.balance,

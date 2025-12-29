@@ -7,11 +7,14 @@
  * - llama-3.2: @cf/meta/llama-3.2-11b-vision-instruct (fallback)
  */
 
+import type { Env } from "../lib/auth/db.server";
+import type { ReceiptData } from "../lib/types/receipt";
+
 type OcrModel = "gemma-3" | "llama-3.2";
 
 const DEFAULT_MODEL: OcrModel = "gemma-3";
 
-function getOcrModel(env: any): OcrModel {
+function getOcrModel(env: Env): OcrModel {
   const envModel = env.OCR_MODEL as string;
   if (envModel === "llama-3.2" || envModel === "gemma-3") {
     return envModel;
@@ -46,7 +49,7 @@ export interface QueueBatch {
 }
 
 export default {
-  async queue(batch: QueueBatch, env: any): Promise<void> {
+  async queue(batch: QueueBatch, env: Env): Promise<void> {
     for (const message of batch.messages) {
       try {
         const job: OcrJob = JSON.parse(message.body);
@@ -67,7 +70,7 @@ export default {
   },
 };
 
-async function processReceiptJob(job: OcrJob, env: any) {
+async function processReceiptJob(job: OcrJob, env: Env) {
   const { receiptId, imageUrl, userId, options } = job;
 
   // Update status to processing
@@ -136,10 +139,10 @@ async function processReceiptJob(job: OcrJob, env: any) {
 }
 
 async function processReceiptWithAI(
-  env: any,
+  env: Env,
   imageUrl: string,
   options: OcrJob["options"]
-): Promise<any> {
+): Promise<ReceiptData> {
   const { detectCurrency, defaultCurrency, extractLineItems, locale } = options;
   const model = getOcrModel(env);
 
@@ -235,7 +238,7 @@ function buildExtractionPrompt(
   return basePrompt + lineItemsPrompt + jsonFormatPrompt;
 }
 
-function parseReceiptResponse(responseText: string, defaultCurrency: string): any {
+function parseReceiptResponse(responseText: string, defaultCurrency: string): Partial<ReceiptData> {
   try {
     const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/) ||
                      responseText.match(/\{[\s\S]*\}/);
@@ -268,7 +271,7 @@ function parseReceiptResponse(responseText: string, defaultCurrency: string): an
 }
 
 async function suggestCategories(
-  env: any,
+  env: Env,
   merchantName: string,
   userId: string
 ): Promise<Array<{ categoryId: string; categoryName: string; confidence: number }>> {
@@ -296,7 +299,7 @@ async function suggestCategories(
 
   // Calculate similarities
   const suggestions = await Promise.all(
-    categories.results.map(async (category: any) => {
+    categories.results.map(async (category: { id: string; name: string }) => {
       const categoryResponse = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
         text: category.name,
       });

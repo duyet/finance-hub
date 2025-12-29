@@ -10,6 +10,27 @@ import { requireAuth } from "~/lib/auth/session.server";
 import { answerFinancialQuestion } from "~/lib/services/ai-insights.server";
 import { getDb } from "~/lib/auth/db.server";
 
+/**
+ * Database row types for AI context queries
+ */
+interface CategoryRow {
+  id: string;
+  name: string;
+}
+
+interface TransactionRow {
+  date: string;
+  amount: number;
+  description: string;
+  category_id: string | null;
+}
+
+interface AccountRow {
+  name: string;
+  type: string;
+  balance: number;
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   const { user } = await requireAuth(request);
   const db = getDb(request);
@@ -62,11 +83,11 @@ export async function action({ request }: ActionFunctionArgs) {
       .all();
 
     const categories = categoriesResult.results || [];
-    const categoryMap = new Map(categories.map((c: any) => [c.id, c.name]));
+    const categoryMap = new Map(categories.map((c: CategoryRow) => [c.id, c.name]));
 
     // Enrich transaction data with category names
     const recentTransactions = recentTransactionsResult.results || [];
-    const enrichedTransactions = recentTransactions.map((t: any) => ({
+    const enrichedTransactions = recentTransactions.map((t: TransactionRow) => ({
       date: t.date,
       amount: t.amount,
       description: t.description,
@@ -79,7 +100,7 @@ export async function action({ request }: ActionFunctionArgs) {
       { question, context },
       {
         recentTransactions: enrichedTransactions,
-        accounts: (accountsResult.results || []).map((a: any) => ({
+        accounts: (accountsResult.results || []).map((a: AccountRow) => ({
           name: a.name,
           type: a.type,
           balance: a.balance,

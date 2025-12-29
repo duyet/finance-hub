@@ -23,7 +23,7 @@ const PRECACHE_ASSETS = [
 ];
 
 // Install event - precache static assets
-self.addEventListener("install", (event: any) => {
+self.addEventListener("install", (event: ExtendableEvent) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE);
@@ -34,7 +34,7 @@ self.addEventListener("install", (event: any) => {
 });
 
 // Activate event - clean up old caches
-self.addEventListener("activate", (event: any) => {
+self.addEventListener("activate", (event: ExtendableEvent) => {
   event.waitUntil(
     (async () => {
       const cacheNames = await caches.keys();
@@ -50,7 +50,7 @@ self.addEventListener("activate", (event: any) => {
 
 // Fetch event - network first, then cache strategy for API,
 // cache first for static assets
-self.addEventListener("fetch", (event: any) => {
+self.addEventListener("fetch", (event: FetchEvent) => {
   const { request } = event;
   const url = new URL(request.url);
 

@@ -1,12 +1,24 @@
-import type { D1Database } from "@cloudflare/workers-types";
+import type {
+  D1Database,
+  Fetcher,
+  R2Bucket,
+  KVNamespace,
+  Queue,
+} from "@cloudflare/workers-types";
 
 export interface Env {
   DB: D1Database;
-  AI?: any;
-  CACHE?: any;
-  QUEUE?: any;
-  RECEIPTS_BUCKET?: any;
+  /** Cloudflare Workers AI binding for text/image inference */
+  AI?: Fetcher;
+  /** KV namespace for caching */
+  CACHE?: KVNamespace;
+  /** Queue for async tasks (OCR processing) */
+  QUEUE?: Queue<unknown>;
+  /** R2 bucket for receipt image storage */
+  RECEIPTS_BUCKET?: R2Bucket;
+  /** Public URL for R2 bucket (e.g., https://pub-xxx.r2.dev) */
   R2_PUBLIC_URL?: string;
+  /** Bucket name for receipts */
   BUCKET_NAME?: string;
   /** OCR model selection: "gemma-3" (default) or "llama-3.2" */
   OCR_MODEL?: string;

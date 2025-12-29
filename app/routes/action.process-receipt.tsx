@@ -13,7 +13,7 @@ import {
 } from "../lib/services/ocr.server";
 import { receiptsCrud } from "../lib/db/receipts.server";
 import { suggestCategoryCombined } from "../lib/services/category-suggestion.server";
-import type { ReceiptData } from "../lib/types/receipt";
+import type { ReceiptData, CategorySuggestion } from "../lib/types/receipt";
 
 export async function action({ request }: ActionFunctionArgs) {
   const user = await getUserFromSession(request);
@@ -55,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     // Generate category suggestions if merchant name found
-    let categorySuggestions: any[] = [];
+    let categorySuggestions: CategorySuggestion[] = [];
     if (extractedData.merchantName) {
       categorySuggestions = await suggestCategoryCombined(
         request,
