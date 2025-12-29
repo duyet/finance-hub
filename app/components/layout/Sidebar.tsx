@@ -35,6 +35,7 @@ import {
   DollarSign,
   AlertTriangle,
   Sparkles,
+  Network,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -132,6 +133,11 @@ const navItems: NavItem[] = [
     label: "Smart Categorization",
     href: "/settings/smart-categorization",
     icon: Sparkles,
+  },
+  {
+    label: "Correlations",
+    href: "/settings/correlations",
+    icon: Network,
   },
   {
     label: "Settings",
