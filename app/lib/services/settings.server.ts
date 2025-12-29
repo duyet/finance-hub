@@ -30,6 +30,30 @@ export interface UserPreferences {
 }
 
 /**
+ * Dashboard configuration data
+ */
+export interface DashboardConfig {
+  showFinancialHealth: boolean;
+  showFinancialGoals: boolean;
+  showIncomeExpenseChart: boolean;
+  showExpenseBreakdownChart: boolean;
+  showAIInsights: boolean;
+  showQuickActions: boolean;
+}
+
+/**
+ * Default dashboard configuration
+ */
+export const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
+  showFinancialHealth: true,
+  showFinancialGoals: true,
+  showIncomeExpenseChart: true,
+  showExpenseBreakdownChart: true,
+  showAIInsights: true,
+  showQuickActions: true,
+};
+
+/**
  * Get user profile data
  */
 export async function getUserProfile(db: D1Database, userId: string): Promise<UserProfile | null> {
@@ -158,6 +182,46 @@ export async function updateUserPreferences(
   }
 
   return getUserPreferences(db, userId);
+}
+
+/**
+ * Get dashboard configuration
+ */
+export async function getDashboardConfig(db: D1Database, userId: string): Promise<DashboardConfig> {
+  const result = await db
+    .prepare(`SELECT COALESCE(dashboard_config, ?) as config FROM users WHERE id = ?`)
+    .bind(JSON.stringify(DEFAULT_DASHBOARD_CONFIG), userId)
+    .first<{ config: string }>();
+
+  if (!result?.config) {
+    return DEFAULT_DASHBOARD_CONFIG;
+  }
+
+  try {
+    const parsed = JSON.parse(result.config);
+    return { ...DEFAULT_DASHBOARD_CONFIG, ...parsed };
+  } catch {
+    return DEFAULT_DASHBOARD_CONFIG;
+  }
+}
+
+/**
+ * Update dashboard configuration
+ */
+export async function updateDashboardConfig(
+  db: D1Database,
+  userId: string,
+  config: Partial<DashboardConfig>
+): Promise<DashboardConfig> {
+  const current = await getDashboardConfig(db, userId);
+  const updated = { ...current, ...config };
+
+  await db
+    .prepare(`UPDATE users SET dashboard_config = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .bind(JSON.stringify(updated), userId)
+    .run();
+
+  return updated;
 }
 
 /**

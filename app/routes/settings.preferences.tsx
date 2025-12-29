@@ -15,6 +15,8 @@ import { getDb } from "../lib/auth/db.server";
 import {
   getUserPreferences,
   updateUserPreferences,
+  getDashboardConfig,
+  updateDashboardConfig,
   DATE_FORMATS,
   CURRENCY_FORMATS,
   THEME_OPTIONS,
@@ -24,6 +26,7 @@ import { Sidebar } from "~/components/layout/Sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -37,6 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const db = getDb(request);
 
   const preferences = await getUserPreferences(db, user.id);
+  const dashboardConfig = await getDashboardConfig(db, user.id);
 
   return {
     user: {
@@ -46,6 +50,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       avatarUrl: user.avatarUrl,
     },
     preferences,
+    dashboardConfig,
   };
 }
 
@@ -107,11 +112,43 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
+  if (intent === "update-dashboard-config") {
+    const showFinancialHealth = formData.get("showFinancialHealth") === "true";
+    const showFinancialGoals = formData.get("showFinancialGoals") === "true";
+    const showIncomeExpenseChart = formData.get("showIncomeExpenseChart") === "true";
+    const showExpenseBreakdownChart = formData.get("showExpenseBreakdownChart") === "true";
+    const showAIInsights = formData.get("showAIInsights") === "true";
+    const showQuickActions = formData.get("showQuickActions") === "true";
+
+    try {
+      const updatedConfig = await updateDashboardConfig(db, user.id, {
+        showFinancialHealth,
+        showFinancialGoals,
+        showIncomeExpenseChart,
+        showExpenseBreakdownChart,
+        showAIInsights,
+        showQuickActions,
+      });
+
+      return {
+        success: true,
+        message: "Dashboard configuration updated successfully",
+        dashboardConfig: updatedConfig,
+      };
+    } catch (error) {
+      console.error("Error updating dashboard config:", error);
+      return {
+        success: false,
+        errors: { form: "Failed to update dashboard configuration. Please try again." },
+      };
+    }
+  }
+
   return { success: false, errors: { form: "Invalid action" } };
 }
 
 export default function PreferencesSettingsPage() {
-  const { user, preferences } = useLoaderData<typeof loader>();
+  const { user, preferences, dashboardConfig } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   const errors = actionData?.errors || {};
@@ -119,6 +156,7 @@ export default function PreferencesSettingsPage() {
 
   // Use updated preferences if available, otherwise use loader data
   const currentPreferences = actionData?.preferences || preferences;
+  const currentDashboardConfig = actionData?.dashboardConfig || dashboardConfig;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -278,6 +316,139 @@ export default function PreferencesSettingsPage() {
                 <div className="flex items-center gap-4 pt-4 border-t">
                   <Button type="submit" size="lg">
                     Save Preferences
+                  </Button>
+                  <Button type="button" variant="outline" size="lg" onClick={() => window.location.reload()}>
+                    Reset
+                  </Button>
+                </div>
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Dashboard Configuration */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Dashboard Customization</CardTitle>
+              <CardDescription>
+                Choose which cards and sections to display on your dashboard
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form method="post" className="space-y-4">
+                <input type="hidden" name="intent" value="update-dashboard-config" />
+
+                {/* Financial Health Score */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showFinancialHealth" className="cursor-pointer">
+                      Financial Health Score
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Your overall financial health rating with recommendations
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showFinancialHealth"
+                    name="showFinancialHealth"
+                    defaultChecked={currentDashboardConfig.showFinancialHealth}
+                    value="true"
+                  />
+                </div>
+
+                {/* Financial Goals */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showFinancialGoals" className="cursor-pointer">
+                      Financial Goals
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Progress tracking for savings and debt payoff goals
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showFinancialGoals"
+                    name="showFinancialGoals"
+                    defaultChecked={currentDashboardConfig.showFinancialGoals}
+                    value="true"
+                  />
+                </div>
+
+                {/* Income vs Expense Chart */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showIncomeExpenseChart" className="cursor-pointer">
+                      Income vs Expense Chart
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Monthly income and expense comparison bar chart
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showIncomeExpenseChart"
+                    name="showIncomeExpenseChart"
+                    defaultChecked={currentDashboardConfig.showIncomeExpenseChart}
+                    value="true"
+                  />
+                </div>
+
+                {/* Expense Breakdown Chart */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showExpenseBreakdownChart" className="cursor-pointer">
+                      Expense Breakdown Chart
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Category-wise expense distribution pie chart
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showExpenseBreakdownChart"
+                    name="showExpenseBreakdownChart"
+                    defaultChecked={currentDashboardConfig.showExpenseBreakdownChart}
+                    value="true"
+                  />
+                </div>
+
+                {/* AI Insights */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showAIInsights" className="cursor-pointer">
+                      AI Financial Insights
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Chat with AI to get personalized financial advice
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showAIInsights"
+                    name="showAIInsights"
+                    defaultChecked={currentDashboardConfig.showAIInsights}
+                    value="true"
+                  />
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex-1">
+                    <Label htmlFor="showQuickActions" className="cursor-pointer">
+                      Quick Actions
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Quick add buttons for transactions and accounts
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="showQuickActions"
+                    name="showQuickActions"
+                    defaultChecked={currentDashboardConfig.showQuickActions}
+                    value="true"
+                  />
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex items-center gap-4 pt-4 border-t">
+                  <Button type="submit" size="lg">
+                    Save Dashboard Configuration
                   </Button>
                   <Button type="button" variant="outline" size="lg" onClick={() => window.location.reload()}>
                     Reset

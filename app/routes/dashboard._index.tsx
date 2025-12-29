@@ -30,6 +30,7 @@ import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/Fi
 import { FinancialHealthCard } from "~/components/dashboard/FinancialHealthCard";
 import { ChartSkeleton } from "~/components/ui/skeleton";
 import { calculateFinancialHealthScore } from "~/lib/services/financial-health.server";
+import { getDashboardConfig } from "~/lib/services/settings.server";
 import { getGoalsForDashboard } from "~/lib/db/financial-goals.server";
 import { GoalCardCompact } from "~/components/goals";
 import { categoriesCrud } from "~/lib/db/categories.server";
@@ -128,6 +129,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     balance: a.balance,
   }));
 
+  // Get dashboard configuration
+  const dashboardConfig = await getDashboardConfig(db, user.id);
+
   return {
     user: {
       id: user.id,
@@ -140,6 +144,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     healthScore,
     goals: goalsData,
     overBudgetCategories,
+    dashboardConfig,
     aiContext: {
       recentTransactions: aiContextTransactions,
       accounts: aiContextAccounts,
@@ -148,7 +153,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements, healthScore, goals, overBudgetCategories, aiContext } = useLoaderData<typeof loader>();
+  const { user, dashboard, unpaidStatements, healthScore, goals, overBudgetCategories, dashboardConfig, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
@@ -225,9 +230,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Financial Health Score Card */}
-          <div className="mb-8">
-            <FinancialHealthCard health={healthScore} />
-          </div>
+          {dashboardConfig.showFinancialHealth && (
+            <div className="mb-8">
+              <FinancialHealthCard health={healthScore} />
+            </div>
+          )}
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -330,7 +337,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Financial Goals Section */}
-          {goals.topGoals.length > 0 && (
+          {dashboardConfig.showFinancialGoals && goals.topGoals.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -360,31 +367,37 @@ export default function DashboardPage() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Suspense fallback={<ChartSkeleton />}>
-              <IncomeExpenseChart
-                data={dashboard.incomeVsExpense}
-                currency="VND"
-                onBarClick={handleBarClick}
-              />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <ExpenseBreakdownChart
-                data={dashboard.expenseByCategory}
-                currency="VND"
-              />
-            </Suspense>
+            {dashboardConfig.showIncomeExpenseChart && (
+              <Suspense fallback={<ChartSkeleton />}>
+                <IncomeExpenseChart
+                  data={dashboard.incomeVsExpense}
+                  currency="VND"
+                  onBarClick={handleBarClick}
+                />
+              </Suspense>
+            )}
+            {dashboardConfig.showExpenseBreakdownChart && (
+              <Suspense fallback={<ChartSkeleton />}>
+                <ExpenseBreakdownChart
+                  data={dashboard.expenseByCategory}
+                  currency="VND"
+                />
+              </Suspense>
+            )}
           </div>
 
           {/* AI Financial Insights */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              AI Financial Insights
-            </h2>
-            <FinancialInsightsChat
-              userId={user.id}
-              initialContext={aiContext}
-            />
-          </div>
+          {dashboardConfig.showAIInsights && (
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                AI Financial Insights
+              </h2>
+              <FinancialInsightsChat
+                userId={user.id}
+                initialContext={aiContext}
+              />
+            </div>
+          )}
 
           {/* Recent Transactions */}
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
@@ -417,12 +430,14 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Quick Actions
-            </h2>
-            <QuickActions />
-          </div>
+          {dashboardConfig.showQuickActions && (
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Quick Actions
+              </h2>
+              <QuickActions />
+            </div>
+          )}
         </div>
       </main>
     </div>
