@@ -8,7 +8,7 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Progress Summary
 
-**Completed (Dec 28-29, 2025): 47/40 Year 1-2 features (7 ahead)**
+**Completed (Dec 28-29, 2025): 48/40 Year 1-2 features (8 ahead)**
 
 | # | Feature | Category | Status |
 |---|---------|----------|--------|
@@ -16,13 +16,22 @@ started_at: "2025-12-28T17:17:15Z"
 | 11-20 | Cloudflare AI Gateway, Accessibility, Thumbnails, Security Headers, Error Boundaries, Optimistic UI, Type Safety, Export, Batch Ops, Dark Mode | UX/QA | ✅ |
 | 21-30 | Health Score, Goals, Budget Alerts, Dashboard Customization, Recurring Tx, Budgets, Debt Planner, Notifications, Investments, Taxes | Core | ✅ |
 | 31-40 | Calendar Sync, Net Worth, Cash Flow, Heatmaps, Anomaly Detection, Smart Categorization, Correlations, Voice Input*, Predictive Spending*, Pattern Recognition* | Analytics | ✅ 7/10 |
-| 41-47 | Bank Sync, Spending Insights, Categorization Settings, Net Worth Settings, Cash Flow Settings, Correlations Settings, Household Sharing | Settings | ✅ |
+| 41-48 | Bank Sync, Spending Insights, Categorization Settings, Net Worth Settings, Cash Flow Settings, Correlations Settings, Household Sharing, Automation Rules | Settings | ✅ |
 
 \* Pending from AI/ML: Voice Input, advanced Predictive Spending, Pattern Recognition extensions
 
 ---
 
 ## Recently Completed
+
+### Automation Rules Engine (Iteration 190)
+- **User-defined rules** with IF-THEN logic for transaction automation
+- **Condition builder**: field + operator + value (contains, equals, greater_than, regex, etc.)
+- **Action system**: categorize, add_tag, send_notification, round_amount, skip_budget
+- **Triggers**: transaction_created, transaction_updated, category_changed, amount_changed, scheduled
+- **Priority execution**: Rules run by priority (highest first), stop on first match
+- **UI**: AutomationStatsCard, AutomationRulesCard, CreateRuleDialog
+- **Route**: `/settings/automation`
 
 ### Household Sharing (Iteration 189)
 - **Multi-user households** with role-based permissions (owner/admin/member/viewer)
@@ -57,22 +66,23 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Completed Brainstorm Items
 
-✅ Bundle optimization, E2E tests, Gemma 3 OCR, AI insights, accessibility, PWA, offline mode, Cloudflare AI Gateway, OpenRouter, free-first AI, batch ops, dark mode, health score, goals, budget alerts, dashboard customization, recurring tx, budgets, debt planner, reminders, investments, taxes, calendar sync, net worth, cash flow, heatmaps, anomaly detection, smart categorization, **correlations, household sharing**
+✅ Bundle optimization, E2E tests, Gemma 3 OCR, AI insights, accessibility, PWA, offline mode, Cloudflare AI Gateway, OpenRouter, free-first AI, batch ops, dark mode, health score, goals, budget alerts, dashboard customization, recurring tx, budgets, debt planner, reminders, investments, taxes, calendar sync, net worth, cash flow, heatmaps, anomaly detection, smart categorization, **correlations, household sharing, automation rules**
 
 ---
 
 ## 10-Year Roadmap (160+ features)
 
-### Year 1-2: Foundation (40) ✅ 47 complete
+### Year 1-2: Foundation (40) ✅ 48 complete
 - **AI/ML** (8): 7/8 - Missing: Voice Input
 - **Analytics** (8): 8/8 - Complete
 - **Core** (8): 8/8 - Complete
 - **Integrations** (8): 8/8 - Complete
 - **UX/UI** (8): 8/8 - Complete
-- **Collaboration** (1/6 from Year 3-4): Household Sharing ✅
+- **Collaboration** (1/6): Household Sharing ✅
+- **Automation** (1/8): Rules Engine ✅
 
 ### Year 3-4: Advanced Ecosystem (32)
-- Collaboration (5 remaining), Advanced Analytics (8), Automation (8), Security (6), Business (8)
+- Collaboration (5 remaining), Advanced Analytics (8), Automation (7 remaining), Security (6), Business (8)
 
 ### Year 5-6: Platform & Ecosystem (24)
 - Platform (8), Mobile (8), Advanced AI (8), Enterprise (8)
