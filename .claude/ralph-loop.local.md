@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 102
+iteration: 103
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -60,7 +60,6 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Pending (External Blockers)
 
-1. **Deployment** - API Token with `Workers & Pages → Edit` permission needed
 2. **Queue Worker Deployment** - Configure and deploy queue consumer
 3. **Production E2E Tests** - Require deployed production URL
 
@@ -79,13 +78,21 @@ started_at: "2025-12-28T17:17:15Z"
 - **Cloudflare ID**: 23050adb6c92e313643a29e1ba64c88a
 - **AI Gateway**: finance-hub
 
+## Note
+
+- Using wrangler without CLOUDFLARE_API_TOKEN set.
+- Semantic commits with `Co-Authored-By: duyetbot <duyetbot@users.noreply.github.com>`
+- No backward compatibility shims (early development)
+- Please do not commit if only this file is changed. Try to find something to improve.
+- Move all documentation to ./docs
+
 ---
 
 ## Philosophy
 
 **Self-working, self-documenting, self-improving autonomous system.**
 Plan for next improvements, implement, test, deploy, monitor, repeat.
-Pick the tasks from TODO.md based on priority and impact.
-
+Pick the tasks from @TODO.md based on priority and impact.
+Koieep CLAUDE.md and README.md up to date. Create if missing.
 
 ⚠️ **Never commit secrets, API tokens, or sensitive data.**

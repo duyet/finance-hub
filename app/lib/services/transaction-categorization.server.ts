@@ -200,7 +200,7 @@ async function getCachedEmbedding(
  * Calculate cosine similarity between two vectors
  * Formula: dot(a,b) / (norm(a) * norm(b))
  */
-function cosineSimilarity(a: number[], b: number[]): number {
+export function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) {
     throw new Error("Vector dimensions must match");
   }

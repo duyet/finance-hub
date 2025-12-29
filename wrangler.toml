@@ -6,8 +6,8 @@ pages_build_output_dir = "./build/client"
 # Database Binding for Pages Functions
 [[d1_databases]]
 binding = "DB"
-database_name = "finance-hub-prod"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+database_name = "finance-hub"
+database_id = "8d36d5b8-94a7-49a3-a16e-514d89859099"
 
 # Object Storage for Receipts (Pages Functions)
 [[r2_buckets]]
@@ -21,7 +21,7 @@ binding = "AI"
 # KV for caching (Pages Functions)
 [[kv_namespaces]]
 binding = "CACHE"
-id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+id = "9ec7b28367c14caf90bb300ae2d3216f"
 
 # Queue Producer for OCR/CSV jobs (Pages Functions can send, Worker consumes)
 [[queues.producers]]
