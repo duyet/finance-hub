@@ -14,21 +14,35 @@ import {
   disableTwoFactor,
   getTwoFactorStatus,
   regenerateBackupCodes,
-  isTwoFactorEnabled,
 } from "~/lib/services/two-factor.server";
+import {
+  getUserSessions,
+  revokeSession,
+  revokeAllOtherSessions,
+  getLoginHistory,
+  getSecurityEvents,
+} from "~/lib/services/session-management.server";
 import { Sidebar } from "~/components/layout/Sidebar";
 import { TwoFactorStatusCard } from "~/components/two-factor";
 import { TwoFactorSetupCard } from "~/components/two-factor";
 import { TwoFactorBackupCodesCard } from "~/components/two-factor";
+import { ActiveSessionsCard } from "~/components/session";
+import { LoginHistoryCard } from "~/components/session";
+import { SecurityEventsCard } from "~/components/session";
 import { Shield } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireUser(request);
   const db = getDb();
 
-  const status = await getTwoFactorStatus(db, user.id);
+  const [status, sessions, loginHistory, securityEvents] = await Promise.all([
+    getTwoFactorStatus(db, user.id),
+    getUserSessions(db, user.id),
+    getLoginHistory(db, user.id, 10),
+    getSecurityEvents(db, user.id, 20),
+  ]);
 
-  return json({ status });
+  return json({ status, sessions, loginHistory, securityEvents });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -58,6 +72,18 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ success: true, backupCodes: newCodes });
   }
 
+  if (intent === "revoke-session") {
+    const sessionId = formData.get("sessionId") as string;
+    await revokeSession(db, sessionId);
+    return json({ success: true });
+  }
+
+  if (intent === "revoke-all-sessions") {
+    const currentSessionId = formData.get("currentSessionId") as string;
+    await revokeAllOtherSessions(db, user.id, currentSessionId);
+    return json({ success: true });
+  }
+
   return json({ success: false });
 }
 
@@ -85,7 +111,7 @@ export default function SecuritySettingsPage() {
 }
 
 function SecuritySettingsContent() {
-  const { status } = JSON.parse(
+  const { status, sessions, loginHistory, securityEvents } = JSON.parse(
     document.getElementById("__loader_data")?.textContent || "{}"
   );
 
@@ -95,6 +121,20 @@ function SecuritySettingsContent() {
     qrCodeUrl: string;
   } | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+
+  // Get current session from cookie
+  const getCurrentSessionId = () => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "session") {
+        return value;
+      }
+    }
+    return "";
+  };
+
+  const currentSessionId = getCurrentSessionId();
 
   const handleEnable = async () => {
     const formData = new FormData();
@@ -158,6 +198,36 @@ function SecuritySettingsContent() {
     return [];
   };
 
+  const handleRevokeSession = async (sessionId: string) => {
+    const formData = new FormData();
+    formData.set("intent", "revoke-session");
+    formData.set("sessionId", sessionId);
+
+    await fetch("/settings/security", {
+      method: "POST",
+      body: formData,
+    });
+
+    window.location.reload();
+  };
+
+  const handleRevokeAllSessions = async () => {
+    if (!confirm("Are you sure you want to revoke all other sessions? You will be logged out of all other devices.")) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("intent", "revoke-all-sessions");
+    formData.set("currentSessionId", currentSessionId);
+
+    await fetch("/settings/security", {
+      method: "POST",
+      body: formData,
+    });
+
+    window.location.reload();
+  };
+
   return (
     <div className="space-y-6">
       {/* Setup Mode */}
@@ -187,6 +257,20 @@ function SecuritySettingsContent() {
               onRegenerate={handleRegenerateCodes}
             />
           )}
+
+          {/* Active Sessions */}
+          <ActiveSessionsCard
+            sessions={sessions || []}
+            currentSessionId={currentSessionId}
+            onRevoke={handleRevokeSession}
+            onRevokeAll={handleRevokeAllSessions}
+          />
+
+          {/* Login History */}
+          <LoginHistoryCard history={loginHistory || []} />
+
+          {/* Security Events */}
+          <SecurityEventsCard events={securityEvents || []} />
         </>
       )}
 
