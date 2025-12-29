@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 194
+iteration: 195
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -149,7 +149,8 @@ Plan → Implement → Test → Deploy → Monitor → Repeat
 
 - Pick tasks from @TODO.md by priority/impact
 - Keep CLAUDE.md and README.md current
-- Focus: core functions, UX, reliability > fancy features
+- **Core principle**: Keep features working and functional > many half-broken features
+- **Quality over quantity**: Each feature must be complete and tested before moving on
 - Self-deploy each iteration, verify live
 - Mobile-first, performance-first, security-first
 
