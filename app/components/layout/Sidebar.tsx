@@ -34,6 +34,7 @@ import {
   Trophy,
   DollarSign,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -126,6 +127,11 @@ const navItems: NavItem[] = [
     label: "Anomaly Detection",
     href: "/settings/anomaly-detection",
     icon: AlertTriangle,
+  },
+  {
+    label: "Smart Categorization",
+    href: "/settings/smart-categorization",
+    icon: Sparkles,
   },
   {
     label: "Settings",
