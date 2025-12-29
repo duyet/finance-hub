@@ -26,7 +26,9 @@ import {
 } from "~/components/dashboard";
 import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
 import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
+import { FinancialHealthCard } from "~/components/dashboard/FinancialHealthCard";
 import { ChartSkeleton } from "~/components/ui/skeleton";
+import { calculateFinancialHealthScore } from "~/lib/services/financial-health.server";
 
 /**
  * Database row types for AI context queries
@@ -66,6 +68,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   // Get unpaid credit card statements for alerts
   const unpaidStatements = await getUnpaidStatements(request, user.id);
+
+  // Calculate financial health score
+  const healthScore = await calculateFinancialHealthScore(db, user.id);
 
   // Get recent transactions for AI context
   const recentTransactionsResult = await db
@@ -122,6 +127,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
     dashboard: dashboardData,
     unpaidStatements,
+    healthScore,
     aiContext: {
       recentTransactions: aiContextTransactions,
       accounts: aiContextAccounts,
@@ -130,7 +136,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements, aiContext } = useLoaderData<typeof loader>();
+  const { user, dashboard, unpaidStatements, healthScore, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
@@ -197,6 +203,11 @@ export default function DashboardPage() {
               months={dashboard.runway.months}
               health={dashboard.runway.health}
             />
+          </div>
+
+          {/* Financial Health Score Card */}
+          <div className="mb-8">
+            <FinancialHealthCard health={healthScore} />
           </div>
 
           {/* Summary Cards */}
