@@ -25,12 +25,14 @@ import {
   QuickActions,
 } from "~/components/dashboard";
 import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
+import { BudgetAlert } from "~/components/dashboard/BudgetAlert";
 import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
 import { FinancialHealthCard } from "~/components/dashboard/FinancialHealthCard";
 import { ChartSkeleton } from "~/components/ui/skeleton";
 import { calculateFinancialHealthScore } from "~/lib/services/financial-health.server";
 import { getGoalsForDashboard } from "~/lib/db/financial-goals.server";
 import { GoalCardCompact } from "~/components/goals";
+import { categoriesCrud } from "~/lib/db/categories.server";
 
 /**
  * Database row types for AI context queries
@@ -76,6 +78,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   // Get goals for dashboard
   const goalsData = await getGoalsForDashboard(db, user.id);
+
+  // Get over-budget categories for alerts
+  const overBudgetCategories = await categoriesCrud.getOverBudgetCategories(db, user.id);
 
   // Get recent transactions for AI context
   const recentTransactionsResult = await db
@@ -134,6 +139,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     unpaidStatements,
     healthScore,
     goals: goalsData,
+    overBudgetCategories,
     aiContext: {
       recentTransactions: aiContextTransactions,
       accounts: aiContextAccounts,
@@ -142,7 +148,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements, healthScore, goals, aiContext } = useLoaderData<typeof loader>();
+  const { user, dashboard, unpaidStatements, healthScore, goals, overBudgetCategories, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
@@ -196,6 +202,13 @@ export default function DashboardPage() {
           {unpaidStatements && unpaidStatements.length > 0 && (
             <div className="mb-8">
               <PaymentDueAlert unpaidStatements={unpaidStatements} />
+            </div>
+          )}
+
+          {/* Budget Alert */}
+          {overBudgetCategories && overBudgetCategories.length > 0 && (
+            <div className="mb-8">
+              <BudgetAlert overBudgetCategories={overBudgetCategories} />
             </div>
           )}
 

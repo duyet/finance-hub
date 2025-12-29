@@ -530,4 +530,60 @@ export const categoriesCrud = {
       overBudgetCategories: overBudgetResult.results?.length || 0,
     };
   },
+
+  /**
+   * Get categories that are approaching or exceeding budget limits
+   * Returns categories with budget_usage_percentage >= 80% for alerts
+   */
+  async getOverBudgetCategories(db: D1Database, userId: string): Promise<Array<{
+    id: string;
+    name: string;
+    budget_limit: number;
+    monthly_spending: number;
+    budget_usage_percentage: number;
+    icon: string | null;
+    color_theme: string | null;
+  }>> {
+    const currentMonthStart = new Date();
+    currentMonthStart.setDate(1);
+    currentMonthStart.setHours(0, 0, 0, 0);
+
+    const result = await db
+      .prepare(`
+        SELECT
+          c.id,
+          c.name,
+          c.budget_limit,
+          c.icon,
+          c.color_theme,
+          COALESCE(SUM(ABS(t.amount)), 0) as monthly_spending,
+          CASE
+            WHEN c.budget_limit > 0
+            THEN ROUND((COALESCE(SUM(ABS(t.amount)), 0) * 100.0 / c.budget_limit), 2)
+            ELSE NULL
+          END as budget_usage_percentage
+        FROM categories c
+        LEFT JOIN transactions t ON t.category_id = c.id
+          AND t.date >= ?
+          AND t.status IN ('POSTED', 'CLEARED', 'RECONCILED')
+        WHERE c.user_id = ?
+          AND c.budget_limit IS NOT NULL
+          AND c.type = 'EXPENSE'
+        GROUP BY c.id
+        HAVING budget_usage_percentage >= 80
+        ORDER BY budget_usage_percentage DESC
+      `)
+      .bind(currentMonthStart.toISOString(), userId)
+      .all();
+
+    return (result.results || []) as Array<{
+      id: string;
+      name: string;
+      budget_limit: number;
+      monthly_spending: number;
+      budget_usage_percentage: number;
+      icon: string | null;
+      color_theme: string | null;
+    }>;
+  },
 };
