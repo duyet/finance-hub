@@ -33,6 +33,7 @@ import {
   Calendar,
   Trophy,
   DollarSign,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -120,6 +121,11 @@ const navItems: NavItem[] = [
     label: "Spending Insights",
     href: "/settings/spending-insights",
     icon: Target,
+  },
+  {
+    label: "Anomaly Detection",
+    href: "/settings/anomaly-detection",
+    icon: AlertTriangle,
   },
   {
     label: "Settings",
