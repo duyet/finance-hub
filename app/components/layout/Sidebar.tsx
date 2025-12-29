@@ -28,6 +28,7 @@ import {
   Receipt,
   Target,
   Bell,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -55,6 +56,11 @@ const navItems: NavItem[] = [
     label: "Goals",
     href: "/goals",
     icon: Target,
+  },
+  {
+    label: "Investments",
+    href: "/investments",
+    icon: TrendingUp,
   },
   {
     label: "Notifications",
