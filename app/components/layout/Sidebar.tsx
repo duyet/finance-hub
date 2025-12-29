@@ -117,6 +117,11 @@ const navItems: NavItem[] = [
     icon: DollarSign,
   },
   {
+    label: "Spending Insights",
+    href: "/settings/spending-insights",
+    icon: Target,
+  },
+  {
     label: "Settings",
     href: "/settings",
     icon: Settings,
