@@ -24,3 +24,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# claude - local development loop state
+.claude/ralph-loop.local.md

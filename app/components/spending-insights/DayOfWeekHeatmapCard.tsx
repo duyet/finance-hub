@@ -27,7 +27,7 @@ export function DayOfWeekHeatmapCard({
   };
 
   // Get intensity color based on amount relative to max
-  const maxAmount = Math.max(...data.map((d) =>.totalAmount), 1);
+  const maxAmount = Math.max(...data.map((d) => d.totalAmount), 1);
 
   const getIntensityColor = (amount: number) => {
     const intensity = amount / maxAmount;

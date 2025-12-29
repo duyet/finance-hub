@@ -87,7 +87,7 @@ export default function SmartCategorizationPage() {
 
 function SmartCategorizationPageContent() {
   const { stats, patterns } = JSON.parse(
-    document.getElementById "__loader_data"?.textContent || "{}"
+    document.getElementById("__loader_data")?.textContent || "{}"
   );
 
   const handleAutoCategorize = async () => {

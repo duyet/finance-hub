@@ -184,7 +184,7 @@ function AutomationPageContent() {
           <div>
             <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">2. Set Conditions</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Define IF conditions like "description contains Netflix" or "amount > 100".
+              Define IF conditions like "description contains Netflix" or "amount {'>'} 100".
               Multiple conditions must all match.
             </p>
           </div>
