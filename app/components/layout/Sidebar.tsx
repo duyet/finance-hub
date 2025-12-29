@@ -31,6 +31,7 @@ import {
   TrendingUp,
   FileText,
   Calendar,
+  Trophy,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -103,6 +104,11 @@ const navItems: NavItem[] = [
     label: "Calendar Sync",
     href: "/settings/calendar",
     icon: Calendar,
+  },
+  {
+    label: "Net Worth",
+    href: "/settings/net-worth",
+    icon: Trophy,
   },
   {
     label: "Settings",
