@@ -8,7 +8,7 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Progress Summary
 
-**Completed (Dec 28-29, 2025): 46/40 Year 1-2 features (6 ahead)**
+**Completed (Dec 28-29, 2025): 47/40 Year 1-2 features (7 ahead)**
 
 | # | Feature | Category | Status |
 |---|---------|----------|--------|
@@ -16,13 +16,22 @@ started_at: "2025-12-28T17:17:15Z"
 | 11-20 | Cloudflare AI Gateway, Accessibility, Thumbnails, Security Headers, Error Boundaries, Optimistic UI, Type Safety, Export, Batch Ops, Dark Mode | UX/QA | ✅ |
 | 21-30 | Health Score, Goals, Budget Alerts, Dashboard Customization, Recurring Tx, Budgets, Debt Planner, Notifications, Investments, Taxes | Core | ✅ |
 | 31-40 | Calendar Sync, Net Worth, Cash Flow, Heatmaps, Anomaly Detection, Smart Categorization, Correlations, Voice Input*, Predictive Spending*, Pattern Recognition* | Analytics | ✅ 7/10 |
-| 41-46 | Bank Sync, Spending Insights, Categorization Settings, Net Worth Settings, Cash Flow Settings, Correlations Settings | Settings | ✅ |
+| 41-47 | Bank Sync, Spending Insights, Categorization Settings, Net Worth Settings, Cash Flow Settings, Correlations Settings, Household Sharing | Settings | ✅ |
 
 \* Pending from AI/ML: Voice Input, advanced Predictive Spending, Pattern Recognition extensions
 
 ---
 
 ## Recently Completed
+
+### Household Sharing (Iteration 189)
+- **Multi-user households** with role-based permissions (owner/admin/member/viewer)
+- **Invite flow**: Token-based invites with 72h expiration, email acceptance
+- **Data isolation**: Transactions/accounts owned by creator, household grants access
+- **Service**: createHousehold(), acceptInvite(), leaveHousehold(), removeMember()
+- **UI**: HouseholdSummaryCard, HouseholdMembersCard, HouseholdInvitesCard
+- **Route**: `/settings/household`
+- **Cloudflare Workers migration**: wrangler.toml with [assets] binding, app/entry.server.tsx
 
 ### Correlations Analysis (Iteration 188)
 - **Pearson correlation** coefficient for category relationships: r = Σ((x-μₓ)(y-μᵧ)) / √(Σ(x-μₓ)² × Σ(y-μᵧ)²)
@@ -48,21 +57,22 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Completed Brainstorm Items
 
-✅ Bundle optimization, E2E tests, Gemma 3 OCR, AI insights, accessibility, PWA, offline mode, Cloudflare AI Gateway, OpenRouter, free-first AI, batch ops, dark mode, health score, goals, budget alerts, dashboard customization, recurring tx, budgets, debt planner, reminders, investments, taxes, calendar sync, net worth, cash flow, heatmaps, anomaly detection, smart categorization, **correlations**
+✅ Bundle optimization, E2E tests, Gemma 3 OCR, AI insights, accessibility, PWA, offline mode, Cloudflare AI Gateway, OpenRouter, free-first AI, batch ops, dark mode, health score, goals, budget alerts, dashboard customization, recurring tx, budgets, debt planner, reminders, investments, taxes, calendar sync, net worth, cash flow, heatmaps, anomaly detection, smart categorization, **correlations, household sharing**
 
 ---
 
 ## 10-Year Roadmap (160+ features)
 
-### Year 1-2: Foundation (40) ✅ 46 complete
+### Year 1-2: Foundation (40) ✅ 47 complete
 - **AI/ML** (8): 7/8 - Missing: Voice Input
 - **Analytics** (8): 8/8 - Complete
 - **Core** (8): 8/8 - Complete
 - **Integrations** (8): 8/8 - Complete
 - **UX/UI** (8): 8/8 - Complete
+- **Collaboration** (1/6 from Year 3-4): Household Sharing ✅
 
 ### Year 3-4: Advanced Ecosystem (32)
-- Collaboration (6), Advanced Analytics (8), Automation (8), Security (6), Business (8)
+- Collaboration (5 remaining), Advanced Analytics (8), Automation (8), Security (6), Business (8)
 
 ### Year 5-6: Platform & Ecosystem (24)
 - Platform (8), Mobile (8), Advanced AI (8), Enterprise (8)
@@ -85,6 +95,7 @@ started_at: "2025-12-28T17:17:15Z"
 ## Build Status
 
 ✅ 3065 client + 146 server modules (~1m 20s build time)
+🔄 **Workers Migration**: Deploy using `wrangler deploy` (requires authentication)
 
 ---
 
