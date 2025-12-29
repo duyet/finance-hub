@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 95
+iteration: 96
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -84,5 +84,8 @@ started_at: "2025-12-28T17:17:15Z"
 ## Philosophy
 
 **Self-working, self-documenting, self-improving autonomous system.**
+Plan for next improvements, implement, test, deploy, monitor, repeat.
+Pick the tasks from TODO.md based on priority and impact.
+
 
 ⚠️ **Never commit secrets, API tokens, or sensitive data.**
