@@ -1,29 +1,46 @@
 name = "finance-hub"
 compatibility_date = "2024-04-05"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "./build/client"
 
-# Database Binding for Pages Functions
+# Worker entry point (Cloudflare Workers using React Router v7)
+# The entry.server.tsx exports the Cloudflare request handler
+main = "./build/server/index.js"
+
+# Static assets binding (serves ./build/client as static files)
+[assets]
+directory = "./build/client"
+binding = "ASSETS"
+
+# Database Binding
 [[d1_databases]]
 binding = "DB"
 database_name = "finance-hub"
 database_id = "8d36d5b8-94a7-49a3-a16e-514d89859099"
 
-# Object Storage for Receipts (Pages Functions)
+# Object Storage for Receipts
 [[r2_buckets]]
 binding = "RECEIPTS_BUCKET"
 bucket_name = "finance-hub-receipts"
 
-# AI Binding (Pages Functions)
+# AI Binding
 [ai]
 binding = "AI"
 
-# KV for caching (Pages Functions)
+# KV for caching
 [[kv_namespaces]]
 binding = "CACHE"
 id = "9ec7b28367c14caf90bb300ae2d3216f"
 
-# Queue Producer for OCR/CSV jobs (Pages Functions can send, Worker consumes)
+# Queue Producer for OCR/CSV jobs
 [[queues.producers]]
 queue = "finance-hub-jobs"
 binding = "QUEUE"
+
+# Environment variables (non-sensitive)
+[vars]
+ENVIRONMENT = "production"
+
+# Route for custom domain (uncomment and configure)
+# routes = [
+#   { pattern = "your-domain.com/*", zone_name = "your-domain.com" }
+# ]
