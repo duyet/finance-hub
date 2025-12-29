@@ -27,9 +27,12 @@ import {
   Link2,
   Receipt,
   Target,
+  Bell,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
+import { NotificationBell } from "~/components/notifications";
+import type { NotificationStats } from "~/lib/services/notifications.server";
 
 interface NavItem {
   label: string;
@@ -52,6 +55,11 @@ const navItems: NavItem[] = [
     label: "Goals",
     href: "/goals",
     icon: Target,
+  },
+  {
+    label: "Notifications",
+    href: "/notifications",
+    icon: Bell,
   },
   {
     label: "Receipts",
@@ -91,9 +99,16 @@ interface SidebarProps {
     email?: string;
     avatarUrl?: string;
   };
+  notificationStats?: NotificationStats;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, notificationStats }: SidebarProps) {
+  // Default stats if not provided
+  const stats: NotificationStats = notificationStats || {
+    total: 0,
+    unread: 0,
+    unreadActionRequired: 0,
+  };
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -197,6 +212,7 @@ export function Sidebar({ user }: SidebarProps) {
                     {user?.email}
                   </p>
                 </div>
+                <NotificationBell stats={stats} />
                 <ThemeToggle />
               </div>
               <SheetClose asChild>
@@ -263,6 +279,7 @@ export function Sidebar({ user }: SidebarProps) {
                 {user?.email}
               </p>
             </div>
+            <NotificationBell stats={stats} />
             <ThemeToggle />
           </div>
           <Link
