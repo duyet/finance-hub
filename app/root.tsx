@@ -6,6 +6,7 @@ import type { Locale } from "./lib/i18n/i18n.config";
 import { useNavigation } from "react-router";
 import { FullPageLoading } from "./components/ui/loading";
 import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
+import { ErrorBoundary } from "./components/error/ErrorBoundary";
 
 const { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
 
@@ -180,10 +181,12 @@ export default function App() {
   const isLoading = navigation.state === "loading";
 
   return (
-    <div className="min-h-full">
-      {isLoading && <FullPageLoading />}
-      <Outlet />
-      <PWAInstallPrompt />
-    </div>
+    <ErrorBoundary onError={(error) => console.error("Application error:", error)}>
+      <div className="min-h-full">
+        {isLoading && <FullPageLoading />}
+        <Outlet />
+        <PWAInstallPrompt />
+      </div>
+    </ErrorBoundary>
   );
 }
