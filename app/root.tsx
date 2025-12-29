@@ -1,4 +1,4 @@
-import type { LinksFunction, LoaderFunctionArgs } from "react-router";
+import type { LinksFunction, LoaderFunctionArgs, HeadersFunction } from "react-router";
 import * as ReactRouter from "react-router";
 import "./tailwind.css";
 import { getLocaleFromRequest } from "./lib/i18n/i18n.server";
@@ -28,6 +28,92 @@ export async function loader({ request }: LoaderFunctionArgs) {
     translations,
   };
 }
+
+/**
+ * Security headers for all responses
+ *
+ * Implements OWASP recommended security headers:
+ * - Content-Security-Policy: Restricts resource sources
+ * - X-Frame-Options: Prevents clickjacking
+ * - X-Content-Type-Options: Prevents MIME sniffing
+ * - Referrer-Policy: Controls referrer information
+ * - Permissions-Policy: Controls browser features
+ * - Strict-Transport-Security: Enforces HTTPS (production only)
+ */
+export const headers: HeadersFunction = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Content Security Policy
+  // Allows resources from same origin, Cloudflare, and common CDNs
+  const cspDirectives = [
+    // Default to same-origin
+    "default-src 'self'",
+    // Scripts from same origin and inline for PWA/i18n data
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    // Styles from same origin and inline (Tailwind)
+    "style-src 'self' 'unsafe-inline'",
+    // Images from same origin, data URLs, and Cloudflare R2
+    "img-src 'self' data: https: *.r2.dev *.workers.dev",
+    // Connect to same origin and OAuth providers
+    "connect-src 'self' https://github.com https://accounts.google.com",
+    // Fonts from same origin and Google Fonts
+    "font-src 'self' data: https://fonts.gstatic.com",
+    // Media from same origin and R2
+    "media-src 'self' https: *.r2.dev",
+    // Objects (none allowed)
+    "object-src 'none'",
+    // Base URI for relative URLs
+    "base-uri 'self'",
+    // Form targets to same origin only
+    "form-action 'self'",
+    // Frame ancestors (prevent embedding)
+    "frame-ancestors 'none'",
+    // Report only (in development) or enforce (in production)
+    isProduction ? "" : "report-uri /csp-report",
+  ].join("; ");
+
+  return {
+    // Content Security Policy
+    "Content-Security-Policy": cspDirectives,
+
+    // Prevent clickjacking - superseded by CSP frame-ancestors but kept for compatibility
+    "X-Frame-Options": "DENY",
+
+    // Prevent MIME type sniffing
+    "X-Content-Type-Options": "nosniff",
+
+    // Prevent XSS via Reflective XSS attack
+    "X-XSS-Protection": "1; mode=block",
+
+    // Referrer Policy - strict origin, cross-origin
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+
+    // Permissions Policy (formerly Feature Policy)
+    // Disable unused features, enable only what's needed
+    "Permissions-Policy": [
+      "camera=(self)",
+      "microphone=()",
+      "geolocation=(self)",
+      "payment=()",
+      "usb=()",
+      "magnetometer=()",
+      "gyroscope=()",
+      "accelerometer=()",
+    ].join(", "),
+
+    // HSTS (HTTPS enforcement) - only in production
+    ...(isProduction
+      ? {
+          "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        }
+      : {}),
+
+    // Cross-Origin policies
+    "Cross-Origin-Embedder-Policy": "require-corp",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Resource-Policy": "same-origin",
+  };
+};
 
 /**
  * Load translations from public/locales
