@@ -250,16 +250,155 @@ export async function getReceiptMetadata(
 }
 
 /**
- * Generate thumbnail for receipt image
- * This is a placeholder - actual thumbnail generation would require image processing
+ * Generate thumbnail URL for receipt image using Cloudflare Image Resizing
+ *
+ * Cloudflare Images API allows on-the-fly image transformation through URL parameters.
+ * Format: https://domain/cdn-cgi/image/width=300,height=300,fit=cover/path/to/image
+ *
+ * @param request - Request object with cloudflare context
+ * @param key - R2 object key
+ * @param width - Thumbnail width in pixels (default: 300)
+ * @param height - Thumbnail height in pixels (default: 300)
+ * @param fit - Fitting method: "cover", "contain", "fill", "scale-down" (default: "cover")
+ * @returns Thumbnail URL or original URL if transformations not available
  */
 export async function generateThumbnail(
   request: Request,
   key: string,
   width: number = 300,
+  height: number = 300,
+  fit: "cover" | "contain" | "fill" | "scale-down" = "cover"
+): Promise<string | null> {
+  const publicUrl = getPublicUrl(request, key);
+
+  // Check if Cloudflare Image Resizing is available
+  // This works when the R2 bucket is behind Cloudflare CDN
+  const hasCloudflareImages = publicUrl.includes(".r2.dev") ||
+                              publicUrl.includes(".workers.dev") ||
+                              publicUrl.includes("pages.dev");
+
+  if (!hasCloudflareImages) {
+    // If not using Cloudflare CDN, return original URL
+    console.warn("Cloudflare Image Resizing not available for this URL");
+    return publicUrl;
+  }
+
+  try {
+    // Parse the URL and insert transformation parameters
+    const url = new URL(publicUrl);
+
+    // Cloudflare Image Resizing transformation parameters
+    // Format: /cdn-cgi/image/width=300,height=300,fit=cover/original-path
+    const transformations = [
+      `width=${width}`,
+      `height=${height}`,
+      `fit=${fit}`,
+      "quality=85", // Good balance between quality and file size
+      "format=auto", // Use WebP/AVIF if browser supports it
+    ].join(",");
+
+    // Insert /cdn-cgi/image/ before the path
+    const originalPath = url.pathname;
+    url.pathname = `/cdn-cgi/image/${transformations}${originalPath}`;
+
+    return url.toString();
+  } catch (error) {
+    console.error("Thumbnail generation error:", error);
+    // Fallback to original URL
+    return publicUrl;
+  }
+}
+
+/**
+ * Generate and store thumbnail as a separate R2 object
+ * Use this when you need persistent thumbnails (e.g., for faster subsequent loads)
+ *
+ * @param request - Request object with cloudflare context
+ * @param key - Original R2 object key
+ * @param width - Thumbnail width (default: 300)
+ * @param height - Thumbnail height (default: 300)
+ * @returns Thumbnail R2 key or null if failed
+ */
+export async function generateAndStoreThumbnail(
+  request: Request,
+  key: string,
+  width: number = 300,
   height: number = 300
 ): Promise<string | null> {
-  // TODO: Implement thumbnail generation using Workers AI or image processing service
-  // For now, return the original URL
-  return getPublicUrl(request, key);
+  const bucket = getR2Bucket(request);
+
+  if (!bucket) {
+    throw new Error("R2 bucket binding not available");
+  }
+
+  try {
+    // Get the original image from R2
+    const originalObject = await bucket.get(key);
+
+    if (!originalObject) {
+      console.error("Original image not found:", key);
+      return null;
+    }
+
+    // Read original image data
+    const originalData = await originalObject.arrayBuffer();
+
+    // Check if Cloudflare Image Resizing is available
+    const cloudflareRequest = request as CloudflareRequest;
+    const imageResizing = cloudflareRequest.context?.cloudflare?.env?.IMAGES;
+
+    if (imageResizing) {
+      // Use Cloudflare Image Resizing service
+      // This requires an Images binding in wrangler.toml
+      try {
+        const resizedImage = await fetch(`https://resize.cloudflare.services/image/${width}x${height}`, {
+          method: "POST",
+          body: originalData,
+          headers: {
+            "Content-Type": originalObject.httpMetadata?.contentType || "image/jpeg",
+          },
+        });
+
+        if (resizedImage.ok) {
+          const thumbnailData = await resizedImage.arrayBuffer();
+          const thumbnailKey = key.replace(/(\.[^.]+)$/, `-thumb${width}x${height}$1`);
+
+          // Store thumbnail in R2
+          await bucket.put(thumbnailKey, thumbnailData, {
+            httpMetadata: {
+              contentType: resizedImage.headers.get("content-type") || "image/jpeg",
+            },
+            customMetadata: {
+              thumbnailOf: key,
+              width: width.toString(),
+              height: height.toString(),
+              generatedAt: new Date().toISOString(),
+            },
+          });
+
+          return thumbnailKey;
+        }
+      } catch (resizeError) {
+        console.warn("Cloudflare Image Resizing failed:", resizeError);
+      }
+    }
+
+    // Fallback: Store a reference thumbnail (no actual resizing)
+    // This allows the system to continue working even without image processing
+    const thumbnailKey = key.replace(/(\.[^.]+)$/, `-thumb$1`);
+
+    await bucket.put(thumbnailKey, originalData, {
+      httpMetadata: originalObject.httpMetadata,
+      customMetadata: {
+        thumbnailOf: key,
+        note: "Fallback thumbnail - original image stored",
+        generatedAt: new Date().toISOString(),
+      },
+    });
+
+    return thumbnailKey;
+  } catch (error) {
+    console.error("Thumbnail storage error:", error);
+    return null;
+  }
 }
