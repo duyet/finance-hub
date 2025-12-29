@@ -36,6 +36,7 @@ import {
   AlertTriangle,
   Sparkles,
   Network,
+  Shield,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -138,6 +139,11 @@ const navItems: NavItem[] = [
     label: "Correlations",
     href: "/settings/correlations",
     icon: Network,
+  },
+  {
+    label: "Security",
+    href: "/settings/security",
+    icon: Shield,
   },
   {
     label: "Settings",
