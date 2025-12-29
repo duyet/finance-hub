@@ -29,6 +29,8 @@ import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/Fi
 import { FinancialHealthCard } from "~/components/dashboard/FinancialHealthCard";
 import { ChartSkeleton } from "~/components/ui/skeleton";
 import { calculateFinancialHealthScore } from "~/lib/services/financial-health.server";
+import { getGoalsForDashboard } from "~/lib/db/financial-goals.server";
+import { GoalCardCompact } from "~/components/goals";
 
 /**
  * Database row types for AI context queries
@@ -71,6 +73,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   // Calculate financial health score
   const healthScore = await calculateFinancialHealthScore(db, user.id);
+
+  // Get goals for dashboard
+  const goalsData = await getGoalsForDashboard(db, user.id);
 
   // Get recent transactions for AI context
   const recentTransactionsResult = await db
@@ -128,6 +133,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     dashboard: dashboardData,
     unpaidStatements,
     healthScore,
+    goals: goalsData,
     aiContext: {
       recentTransactions: aiContextTransactions,
       accounts: aiContextAccounts,
@@ -136,7 +142,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements, healthScore, aiContext } = useLoaderData<typeof loader>();
+  const { user, dashboard, unpaidStatements, healthScore, goals, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
@@ -309,6 +315,35 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Financial Goals Section */}
+          {goals.topGoals.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Financial Goals</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Track progress toward your savings and debt payoff goals
+                  </p>
+                </div>
+                <a
+                  href="/goals"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  View all →
+                </a>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {goals.topGoals.map((goal) => (
+                  <GoalCardCompact
+                    key={goal.id}
+                    goal={goal}
+                    onClick={() => (window.location.href = `/goals/${goal.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

@@ -26,6 +26,7 @@ import {
   LogOut,
   Link2,
   Receipt,
+  Target,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -46,6 +47,11 @@ const navItems: NavItem[] = [
     label: "Transactions",
     href: "/transactions",
     icon: ArrowLeftRight,
+  },
+  {
+    label: "Goals",
+    href: "/goals",
+    icon: Target,
   },
   {
     label: "Receipts",
