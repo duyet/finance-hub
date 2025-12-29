@@ -32,6 +32,7 @@ import {
   FileText,
   Calendar,
   Trophy,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -109,6 +110,11 @@ const navItems: NavItem[] = [
     label: "Net Worth",
     href: "/settings/net-worth",
     icon: Trophy,
+  },
+  {
+    label: "Cash Flow",
+    href: "/settings/cash-flow",
+    icon: DollarSign,
   },
   {
     label: "Settings",
