@@ -30,6 +30,7 @@ import {
   Bell,
   TrendingUp,
   FileText,
+  Calendar,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
@@ -97,6 +98,11 @@ const navItems: NavItem[] = [
     label: "Bank Sync",
     href: "/settings/bank-sync",
     icon: Link2,
+  },
+  {
+    label: "Calendar Sync",
+    href: "/settings/calendar",
+    icon: Calendar,
   },
   {
     label: "Settings",
