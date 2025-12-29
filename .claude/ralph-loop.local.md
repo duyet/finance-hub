@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 119
+iteration: 120
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-28T17:17:15Z"
@@ -10,7 +10,7 @@ started_at: "2025-12-28T17:17:15Z"
 
 ### Completed (Dec 28-29, 2025)
 
-1-30. All features complete - E2E Tests, CI/CD, i18n, Bundle Optimization, Code Quality, Queue Worker, Loading States, AI Insights (free-first: OpenRouter → Workers AI), PWA, Gemma 3 OCR, Advanced Chunking, Cloudflare AI Gateway, Accessibility, Thumbnail Generation (Cloudflare Images API), Security Headers (OWASP CSP, X-Frame-Options, HSTS), Error Boundaries (React error catching, fallback UI, route-specific handling), Optimistic UI Updates (immediate feedback, automatic error reversion, concurrent operation management, 31 unit tests, 10 integration examples), Type Safety Improvements (replaced `any` with proper Cloudflare types: Env interface with Fetcher/R2Bucket/KVNamespace/Queue, Service Worker event types, database row interfaces, reduced from 39 to 13 occurrences), Export Options (CSV/Excel/JSON transaction export with field selection, filtering, and UI dialog component), Batch Operations (bulk categorize/delete/mark reconciled/posted/pending with ownership validation, toolbar UI, API endpoint, 23 unit tests), Dark Mode (ThemeProvider with localStorage persistence, system preference detection, theme toggle with Light/Dark/System options, proper CSS variables for dark theme colors), Financial Health Score (5-factor weighted algorithm: Savings Rate 25%, Spending Consistency 15%, Debt Management 25%, Income Stability 15%, Emergency Fund 20%, score categories with recommendations, integrated into dashboard).
+1-31. All features complete - E2E Tests, CI/CD, i18n, Bundle Optimization, Code Quality, Queue Worker, Loading States, AI Insights (free-first: OpenRouter → Workers AI), PWA, Gemma 3 OCR, Advanced Chunking, Cloudflare AI Gateway, Accessibility, Thumbnail Generation (Cloudflare Images API), Security Headers (OWASP CSP, X-Frame-Options, HSTS), Error Boundaries (React error catching, fallback UI, route-specific handling), Optimistic UI Updates (immediate feedback, automatic error reversion, concurrent operation management, 31 unit tests, 10 integration examples), Type Safety Improvements (replaced `any` with proper Cloudflare types: Env interface with Fetcher/R2Bucket/KVNamespace/Queue, Service Worker event types, database row interfaces, reduced from 39 to 13 occurrences), Export Options (CSV/Excel/JSON transaction export with field selection, filtering, and UI dialog component), Batch Operations (bulk categorize/delete/mark reconciled/posted/pending with ownership validation, toolbar UI, API endpoint, 23 unit tests), Dark Mode (ThemeProvider with localStorage persistence, system preference detection, theme toggle with Light/Dark/System options, proper CSS variables for dark theme colors), Financial Health Score (5-factor weighted algorithm: Savings Rate 25%, Spending Consistency 15%, Debt Management 25%, Income Stability 15%, Emergency Fund 20%, score categories with recommendations, integrated into dashboard), Financial Goals (savings, debt payoff, expense limit goals with progress tracking, auto-tracking from transactions, target dates, priority, category linking, dashboard integration).
 
 ---
 
@@ -54,7 +54,7 @@ started_at: "2025-12-28T17:17:15Z"
 
 ## Completed Brainstorm Items
 
-✅ Bundle optimization, E2E edge case tests, Gemma 3 OCR, AI chat insights, UX/UI improvements, accessibility, PWA, offline support, Cloudflare AI Gateway, OpenRouter integration, free-first AI strategy, batch operations, dark mode, financial health score
+✅ Bundle optimization, E2E edge case tests, Gemma 3 OCR, AI chat insights, UX/UI improvements, accessibility, PWA, offline support, Cloudflare AI Gateway, OpenRouter integration, free-first AI strategy, batch operations, dark mode, financial health score, financial goals
 
 ---
 
@@ -93,6 +93,9 @@ started_at: "2025-12-28T17:17:15Z"
 **Self-working, self-documenting, self-improving autonomous system.**
 Plan for next improvements, implement, test, deploy, monitor, repeat.
 Pick the tasks from @TODO.md based on priority and impact.
-Koieep CLAUDE.md and README.md up to date. Create if missing.
+Keoep CLAUDE.md and README.md up to date. Create if missing.
+Focus on core functions first, core UX, first-class reliability, no need too much fancy features.
+Self deploy for each iteration if possible then test if everything works as expected.
+Mobile-first, performance-first, security-first.
 
 ⚠️ **Never commit secrets, API tokens, or sensitive data.**
