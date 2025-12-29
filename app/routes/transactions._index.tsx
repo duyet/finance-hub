@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { redirect, useLoaderData, useNavigation, useSearchParams } from "react-router";
 import { useState } from "react";
-import { Plus, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
 import { transactionsCrud, type TransactionFilters, type PaginationOptions, type TransactionStatus } from "../lib/db/transactions.server";
@@ -15,24 +15,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { TransactionFilters as TransactionFiltersComponent } from "~/components/transactions/TransactionFilters";
 import { TransactionsTable } from "~/components/transactions/TransactionsTable";
 import { TransactionDialog } from "~/components/transactions/TransactionDialog";
+import { BatchOperationsToolbar } from "~/components/transactions/batch-operations-toolbar";
 import { useToast } from "~/components/ui/use-toast";
 
 /**
@@ -171,8 +157,6 @@ export default function TransactionsListPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isBulkCategoryDialogOpen, setIsBulkCategoryDialogOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
 
   const isPending = navigation.state === "submitting";
 
@@ -225,34 +209,6 @@ export default function TransactionsListPage() {
         window.location.reload();
       }, 500);
     }
-  };
-
-  // Handle bulk delete
-  const handleBulkDelete = () => {
-    if (confirm(`Are you sure you want to delete ${selectedIds.length} transaction(s)?`)) {
-      const formData = new FormData();
-      formData.set("intent", "bulk-delete");
-      formData.set("transactionIds", selectedIds.join(","));
-      toast({ title: "Deleting transactions..." });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    }
-  };
-
-  // Handle bulk category update
-  const handleBulkCategoryUpdate = () => {
-    const formData = new FormData();
-    formData.set("intent", "bulk-update-category");
-    formData.set("transactionIds", selectedIds.join(","));
-    formData.set("categoryId", selectedCategoryId || "");
-    toast({ title: "Updating category..." });
-    setIsBulkCategoryDialogOpen(false);
-    setSelectedCategoryId(undefined);
-    setSelectedIds([]);
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
   };
 
   return (
@@ -313,27 +269,19 @@ export default function TransactionsListPage() {
           </CardContent>
         </Card>
 
-        {/* Bulk Actions */}
-        {selectedIds.length > 0 && (
-          <Card className="mb-6 border-yellow-200 bg-yellow-50">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {selectedIds.length} transaction(s) selected
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setIsBulkCategoryDialogOpen(true)}>
-                    Bulk Edit Category
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Selected
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Batch Operations Toolbar */}
+        <div className="mb-6">
+          <BatchOperationsToolbar
+            selectedIds={selectedIds}
+            totalCount={data.total}
+            onClear={() => setSelectedIds([])}
+            disabled={isPending}
+            availableCategories={data.filterOptions.categories.map((c) => ({
+              id: c.id,
+              name: c.name,
+            }))}
+          />
+        </div>
 
         {/* Transactions Table */}
         <Card>
@@ -392,48 +340,6 @@ export default function TransactionsListPage() {
           setIsDialogOpen(false);
         }}
       />
-
-      {/* Bulk Category Edit Dialog */}
-      <Dialog open={isBulkCategoryDialogOpen} onOpenChange={setIsBulkCategoryDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Bulk Edit Category</DialogTitle>
-            <DialogDescription>
-              {selectedIds.length} transaction(s) selected
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium mb-2 block">Category</label>
-            <Select value={selectedCategoryId ?? ""} onValueChange={setSelectedCategoryId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Uncategorized</SelectItem>
-                {data.filterOptions.categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsBulkCategoryDialogOpen(false);
-                setSelectedCategoryId(undefined);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleBulkCategoryUpdate} disabled={selectedCategoryId === undefined}>
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
