@@ -7,6 +7,7 @@ import { useNavigation } from "react-router";
 import { FullPageLoading } from "./components/ui/loading";
 import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
 import { ErrorBoundary } from "./components/error/ErrorBoundary";
+import { ThemeProvider } from "./components/theme/theme-provider";
 
 const { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
 
@@ -159,8 +160,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="h-full bg-gray-50">
-        {children}
+      <body className="h-full bg-background text-foreground">
+        <ThemeProvider defaultTheme="system" storageKey="finance-hub-theme">
+          {children}
+        </ThemeProvider>
         <ScrollRestoration />
         {/* Pass locale and translations to client */}
         <script
