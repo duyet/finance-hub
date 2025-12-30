@@ -91,8 +91,9 @@ export async function getDashboardData(
 /**
  * Calculate net worth from all financial accounts
  * Sum of all account balances (assets - liabilities)
+ * Internal: Used by getDashboardData
  */
-export async function getNetWorth(
+async function getNetWorth(
   db: D1Database,
   userId: string
 ): Promise<number> {
@@ -180,8 +181,9 @@ function calculateAverageMonthlyBurn(
 /**
  * Get income vs expenses for the last N months
  * Returns monthly aggregated data for chart visualization
+ * Internal: Used by getDashboardData
  */
-export async function getIncomeVsExpense(
+async function getIncomeVsExpense(
   db: D1Database,
   userId: string,
   months: number = 12
@@ -220,8 +222,9 @@ export async function getIncomeVsExpense(
 /**
  * Get expense breakdown by category for a date range
  * Returns percentage and amount for each category
+ * Internal: Used by getDashboardData
  */
-export async function getExpenseByCategory(
+async function getExpenseByCategory(
   db: D1Database,
   userId: string,
   startDate: Date,
@@ -266,8 +269,9 @@ export async function getExpenseByCategory(
 /**
  * Get recent transactions with account and category details
  * Returns the most recent transactions for the dashboard
+ * Internal: Used by getDashboardData
  */
-export async function getRecentTransactions(
+async function getRecentTransactions(
   db: D1Database,
   userId: string,
   limit: number = 10
