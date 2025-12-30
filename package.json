@@ -31,7 +31,6 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "oslo": "^1.2.1",
-    "papaparse": "^5.5.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.69.0",
@@ -43,7 +42,6 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@react-router/dev": "^7.11.0",
-    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.2",
