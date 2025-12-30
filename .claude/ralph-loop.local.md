@@ -35,10 +35,10 @@ f5ca2b5 chore: remove unused optimistic-updates utility
 | TypeScript errors | 0 |
 | Lint warnings | 0 |
 | Tests | 119 passing |
-| Build time | ~210ms |
+| Build time | ~200ms |
 | TypeScript files | 101 |
-| Lines of code | 11,513 |
-| Lines removed | ~30,000+ |
+| Lines of code | 17,746 (excl. tests) |
+| Lines removed | ~22,500+ |
 
 ### Latest Updates (Iteration 500):
 - Removed unused CRUD methods from accounts.server.ts (42 lines)
@@ -46,6 +46,7 @@ f5ca2b5 chore: remove unused optimistic-updates utility
 - Removed unused exports from transactions.server.ts (62 lines)
 - Simplified ai-insights.server.ts (244 lines removed)
 - Simplified settings.server.ts (209 lines removed)
+- Cleaned up auth.server.ts exports (14 lines)
 
 ### Session Accomplishments:
 1. **Massive Code Cleanup** (~22,500+ lines removed)
