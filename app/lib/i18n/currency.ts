@@ -170,7 +170,7 @@ export function formatUSD(
  */
 function getCurrencyLocale(
   currency: CurrencyCode,
-  userLocale: Locale
+  _userLocale: Locale
 ): {
   locale: string;
   minimumFractionDigits: number;

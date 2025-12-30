@@ -10,7 +10,6 @@ import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
 import {
   executeBatchOperation,
-  previewBatchOperation,
   validateBatchOperationRequest,
   type BatchOperationRequest,
   type BatchOperationType,
@@ -21,7 +20,7 @@ import {
  * Get batch operation limits and available operations
  */
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user } = await requireAuth(request);
+  await requireAuth(request);
 
   return Response.json({
     availableOperations: [

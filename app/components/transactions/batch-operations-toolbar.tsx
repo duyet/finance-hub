@@ -136,7 +136,7 @@ export function BatchOperationsToolbar({
   totalCount,
   onClear,
   disabled = false,
-  availableCategories = [],
+  availableCategories: _availableCategories = [],
 }: BatchOperationsToolbarProps) {
   const [confirmDialog, setConfirmDialog] = useState<{
     operation: BatchOperation;

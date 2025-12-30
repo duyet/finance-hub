@@ -11,7 +11,7 @@
  *   - r is annual interest rate (as percentage)
  */
 
-import { addMonths, differenceInMonths, startOfMonth, isSameMonth } from "~/lib/utils/date";
+import { addMonths, startOfMonth } from "~/lib/utils/date";
 
 // ============================================================================
 // Type Definitions
@@ -380,7 +380,7 @@ export function recalculateAfterRateChange(
  */
 export function calculateLoanSummary(
   installments: Installment[],
-  originalPrincipal: number
+  _originalPrincipal: number
 ): LoanSummary {
   const paidInstallments = installments.filter((i) => i.status === "PAID");
   const pendingInstallments = installments.filter((i) => i.status !== "PAID");

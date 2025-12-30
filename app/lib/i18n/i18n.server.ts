@@ -3,7 +3,6 @@ import type { Locale } from "./i18n.config";
 import {
   getLocale,
   isSupportedLocale,
-  SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
 } from "./i18n.config";
 
