@@ -12,8 +12,8 @@
 |------|-------------|
 | [AUTH_QUICKSTART.md](AUTH_QUICKSTART.md) | Quick Reference - Authentication setup and usage |
 | [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) | Detailed authentication implementation guide |
-| [I18N_IMPLEMENTATION.md](I18N_IMPLEMENTATION.md) | Internationalization (EN/VI) setup guide |
 | [UI_COMPONENTS.md](UI_COMPONENTS.md) | UI Components Reference |
+| [app/lib/i18n/README.md](../app/lib/i18n/README.md) | Internationalization (EN/VI) setup guide |
 
 ---
 
