@@ -7,7 +7,7 @@
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { AlertTriangle, DollarSign, ChevronRight, ArrowRight } from "lucide-react";
+import { AlertTriangle, DollarSign, ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 
 export interface OverBudgetCategory {
@@ -149,40 +149,5 @@ export function BudgetAlert({ overBudgetCategories, currency = "VND" }: BudgetAl
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-/**
- * Compact budget alert for dashboard summary
- */
-export function BudgetAlertCompact({ overBudgetCategories }: { overBudgetCategories: OverBudgetCategory[] }) {
-  const alertCount = overBudgetCategories.filter((c) => c.budget_usage_percentage >= 80).length;
-
-  if (alertCount === 0) {
-    return null;
-  }
-
-  const overBudgetCount = overBudgetCategories.filter((c) => c.budget_usage_percentage >= 100).length;
-
-  return (
-    <Link
-      to="/categories"
-      className="block p-4 rounded-lg border bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800 hover:shadow-sm transition-shadow"
-    >
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
-          <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
-            {overBudgetCount > 0 ? `${overBudgetCount} budget${overBudgetCount === 1 ? "" : "s"} exceeded` : "Budget alerts"}
-          </p>
-          <p className="text-xs text-yellow-700 dark:text-yellow-300">
-            {alertCount} categor{alertCount === 1 ? "y" : "ies"} need attention
-          </p>
-        </div>
-        <ArrowRight className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-      </div>
-    </Link>
   );
 }

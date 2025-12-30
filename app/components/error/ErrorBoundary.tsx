@@ -193,35 +193,3 @@ export function ErrorFallback({
     </div>
   );
 }
-
-/**
- * WithErrorBoundary HOC
- *
- * Higher-order component that wraps a component with an error boundary.
- *
- * @example
- * ```tsx
- * const SafeComponent = withErrorBoundary(RiskyComponent);
- * ```
- */
-export function withErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<Props, "children">
-): React.ComponentType<P> {
-  const WrappedComponent = (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <Component {...props} />
-    </ErrorBoundary>
-  );
-
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name || "Component"})`;
-
-  return WrappedComponent;
-}
-
-/**
- * Use Error Boundary Props
- *
- * Re-exports the ErrorBoundary props type for use in other components.
- */
-export type ErrorBoundaryProps = Props;
