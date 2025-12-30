@@ -159,17 +159,6 @@ export async function invalidateSession(
 }
 
 /**
- * Invalidate all sessions for a user
- */
-export async function invalidateUserSessions(
-  request: Request,
-  userId: string
-): Promise<void> {
-  const db = getDb(request);
-  await sessionDb.deleteUserSessions(db, userId);
-}
-
-/**
  * Get current user from session
  */
 export async function getUserFromSession(
@@ -196,41 +185,4 @@ export async function requireAuth(
   }
 
   return session;
-}
-
-/**
- * Get user ID from request (convenience function)
- */
-export async function getUserId(request: Request): Promise<string | null> {
-  const session = await validateSession(request);
-  return session ? session.user.id : null;
-}
-
-/**
- * Create a response with session cookie
- */
-export async function createSessionResponse<T>(
-  request: Request,
-  userId: string,
-  data: T,
-  redirectUrl: string
-): Promise<Response> {
-  const { headers } = await createSession(request, userId);
-
-  const responseHeaders = new Headers();
-  for (const [key, value] of headers.entries()) {
-    responseHeaders.append(key, value);
-  }
-
-  return Response.redirect(redirectUrl, 302);
-}
-
-/**
- * Create a response with invalidated session
- */
-export async function createLogoutResponse(redirectUrl: string): Promise<Response> {
-  const headers = new Headers();
-  headers.append("Set-Cookie", createBlankSessionCookie());
-
-  return Response.redirect(redirectUrl, 302);
 }

@@ -98,7 +98,6 @@ import { Form } from "react-router";
 - `invalidateSession(request, sessionId)` - Destroy session
 - `requireAuth(request)` - Require auth or redirect
 - `getUserFromSession(request)` - Get user or null
-- `createLogoutResponse(redirectUrl)` - Logout response
 
 ### OAuth (`~/lib/auth/auth.server.ts`)
 - `createGitHubAuthorizationUrl()` - GitHub OAuth URL
