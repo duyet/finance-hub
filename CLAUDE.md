@@ -86,7 +86,7 @@ Environment bindings are defined in `app/lib/auth/db.server.ts`:
 ```typescript
 interface Env {
   DB: D1Database;
-  AI?: Fetcher;
+  AI?: Ai;
   CACHE?: KVNamespace;
   QUEUE?: Queue<unknown>;
   RECEIPTS_BUCKET?: R2Bucket;
@@ -189,7 +189,6 @@ AI bindings are optional - check for existence before use.
 
 ## Known Issues
 
-- 186 ESLint warnings (mostly `any` types), 0 errors
 - Queues disabled (requires paid Cloudflare plan)
 - Migrations use SQLite syntax (D1-specific)
 
