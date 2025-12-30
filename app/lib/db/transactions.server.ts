@@ -297,68 +297,6 @@ export async function getRecentTransactions(
   return result.results || [];
 }
 
-/**
- * Get runway calculation with detailed breakdown
- */
-export async function getRunway(
-  request: Request,
-  userId: string
-): Promise<{ months: number; health: "good" | "warning" | "critical" }> {
-  const db = getDb(request);
-
-  const [liquidAssets, incomeVsExpense] = await Promise.all([
-    getLiquidAccounts(db, userId),
-    getIncomeVsExpense(db, userId, 3), // Use last 3 months for burn rate
-  ]);
-
-  return calculateRunway(liquidAssets, incomeVsExpense);
-}
-
-/**
- * Get transaction statistics for a specific period
- */
-export async function getTransactionStats(
-  db: D1Database,
-  userId: string,
-  startDate: Date,
-  endDate: Date
-): Promise<{
-  income: number;
-  expenses: number;
-  net: number;
-  transactionCount: number;
-}> {
-  const result = await db
-    .prepare(`
-      SELECT
-        COALESCE(SUM(CASE WHEN c.type = 'INCOME' THEN t.amount ELSE 0 END), 0) as income,
-        COALESCE(SUM(CASE WHEN c.type = 'EXPENSE' THEN ABS(t.amount) ELSE 0 END), 0) as expenses,
-        COUNT(*) as transaction_count
-      FROM transactions t
-      LEFT JOIN categories c ON t.category_id = c.id
-      WHERE t.user_id = ?
-        AND t.date >= ?
-        AND t.date <= ?
-        AND t.status IN ('POSTED', 'CLEARED', 'RECONCILED')
-    `)
-    .bind(userId, startDate.toISOString(), endDate.toISOString())
-    .first<{
-      income: number;
-      expenses: number;
-      transaction_count: number;
-    }>();
-
-  const income = result?.income || 0;
-  const expenses = result?.expenses || 0;
-
-  return {
-    income,
-    expenses,
-    net: income - expenses,
-    transactionCount: result?.transaction_count || 0,
-  };
-}
-
 // ============================================================================
 // Transaction CRUD Operations
 // ============================================================================
