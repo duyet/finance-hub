@@ -1,5 +1,4 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
 import { parseCookies } from "oslo/cookie";
 import {
   validateGitHubCallback,
@@ -8,7 +7,6 @@ import {
   getOrCreateGoogleUser,
 } from "../lib/auth/auth.server";
 import { createSession } from "../lib/auth/session.server";
-import { getUserFromSession } from "../lib/auth/session.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const provider = params.provider;

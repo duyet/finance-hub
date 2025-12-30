@@ -619,7 +619,7 @@ export async function batchCategorizeTransactionsWithEnv(
  * Returns pattern-based suggestions as a simple string array for backward compatibility.
  * For AI-powered suggestions with confidence scores, use suggestCategoriesByEmbedding().
  */
-export function getCategorizationSuggestions(content: string, amount: number): string[] {
+export function getCategorizationSuggestions(content: string, _amount: number): string[] {
   const suggestions: string[] = [];
   const seen = new Set<string>();
 
@@ -637,10 +637,10 @@ export function getCategorizationSuggestions(content: string, amount: number): s
  * Add custom categorization rule for a user
  */
 export async function addCustomCategorizationRule(
-  db: D1Database,
-  userId: string,
-  pattern: string,
-  category: string
+  _db: D1Database,
+  _userId: string,
+  _pattern: string,
+  _category: string
 ): Promise<void> {
   // In a full implementation, this would store user-specific rules in the database
   // For now, we rely on the global rules
@@ -650,10 +650,10 @@ export async function addCustomCategorizationRule(
  * Learn from user's manual categorization
  */
 export async function learnFromCategorization(
-  db: D1Database,
-  userId: string,
-  content: string,
-  categoryId: string
+  _db: D1Database,
+  _userId: string,
+  _content: string,
+  _categoryId: string
 ): Promise<void> {
   // In a full implementation, this would:
   // 1. Extract patterns from the content

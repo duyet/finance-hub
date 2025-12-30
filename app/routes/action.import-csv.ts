@@ -8,7 +8,6 @@
  */
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { redirect } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
 import { accountDb } from "~/lib/db/accounts.server";

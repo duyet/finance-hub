@@ -117,7 +117,7 @@ export default function NewCategoryPage() {
           <CategoryForm
             onSubmit={(data) => {
               // Form submission will be handled by the Form component
-              const form = document.querySelector("form") as HTMLFormElement;
+              const _form = document.querySelector("form") as HTMLFormElement;
               const formData = new FormData();
 
               Object.entries(data).forEach(([key, value]) => {

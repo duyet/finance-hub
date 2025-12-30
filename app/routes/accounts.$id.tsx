@@ -13,8 +13,7 @@ import { redirect } from "react-router";
 import { useLoaderData, useActionData, useNavigate, useNavigation, Link, Form } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
-import { accountDb, type AccountWithTransactions } from "~/lib/db/accounts.server";
-import type { UpdateAccountData } from "~/lib/db/accounts.types";
+import { accountDb } from "~/lib/db/accounts.server";
 import { getAccountTypeConfig } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -119,7 +118,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       });
 
       return redirect(`/accounts/${accountId}`);
-    } catch (error) {
+    } catch {
       return { errors: { _form: "Failed to update account. Please try again." }, values: {} };
     }
   }

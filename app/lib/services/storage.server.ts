@@ -214,7 +214,7 @@ export async function checkReceiptExists(
   try {
     const object = await bucket.head(key);
     return object !== null;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

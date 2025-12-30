@@ -57,13 +57,11 @@ export interface OptimisticConfig<T> {
  */
 export async function performOptimisticUpdate<T>({
   originalData,
-  optimisticData,
+  optimisticData: _optimisticData,
   action,
   onSuccess,
   onError,
 }: OptimisticConfig<T>): Promise<void> {
-  // Show optimistic state
-  let hasError = false;
   let error: Error | undefined;
 
   try {
@@ -71,7 +69,6 @@ export async function performOptimisticUpdate<T>({
     const response = await action();
 
     if (!response.ok) {
-      hasError = true;
       error = new Error(`Action failed: ${response.status} ${response.statusText}`);
       throw error;
     }
@@ -79,7 +76,6 @@ export async function performOptimisticUpdate<T>({
     // If successful, the caller should handle server response
     onSuccess?.(originalData);
   } catch (e) {
-    hasError = true;
     error = e instanceof Error ? e : new Error(String(e));
     onError?.(error);
     throw error;

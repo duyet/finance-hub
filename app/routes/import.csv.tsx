@@ -6,11 +6,11 @@
 import { useState, useCallback, lazy, Suspense } from "react";
 import { useI18n } from "~/lib/i18n/client";
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useActionData, useNavigation } from "react-router";
+import { useLoaderData, useNavigation } from "react-router";
 import { FileSpreadsheet, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { Separator } from "~/components/ui/separator";
 import { toast } from "~/components/ui/use-toast";
 import type { ColumnMapping, ImportOptions as ImportOptionsType } from "../lib/types/csv-import";
@@ -46,7 +46,6 @@ export default function CsvImportRoute() {
   const { t } = useI18n();
   const navigation = useNavigation();
   const loaderData = useLoaderData<typeof importLoader>();
-  const actionData = useActionData<typeof importAction>();
 
   const [step, setStep] = useState<"upload" | "mapping" | "options" | "review">("upload");
   const [file, setFile] = useState<File | null>(null);

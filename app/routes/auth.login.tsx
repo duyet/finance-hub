@@ -82,7 +82,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function LoginPage() {
-  const { redirect } = useLoaderData<typeof loader>();
+  const { redirect: _redirect } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">

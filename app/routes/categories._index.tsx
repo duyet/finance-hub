@@ -96,7 +96,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function CategoriesIndexPage() {
   const { categories, parentOptions } = useLoaderData<typeof loader>();
-  const { t } = useI18n();
+  const { t: _t } = useI18n();
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { toast } = useToast();

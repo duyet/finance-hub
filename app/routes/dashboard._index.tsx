@@ -154,7 +154,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function DashboardPage() {
   const { user, dashboard, healthScore, overBudgetCategories, dashboardConfig, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
-  const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
   // Filter transactions by selected month
   const filteredTransactions = selectedMonth

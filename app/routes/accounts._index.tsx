@@ -10,7 +10,7 @@ import { useLoaderData, useNavigate, Form, Link } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
 import { accountDb } from "~/lib/db/accounts.server";
-import type { FinancialAccount, AccountType } from "~/lib/db/accounts.types";
+import type { AccountType } from "~/lib/db/accounts.types";
 import { getAccountTypeConfig } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -94,9 +94,6 @@ export default function AccountsIndexPage() {
 
   // Get unique account types from accounts
   const accountTypes = ["ALL", ...Array.from(new Set(accounts.map((a) => a.type)))];
-
-  // Calculate totals
-  const totalBalance = filteredAccounts.reduce((sum, acc) => sum + acc.current_balance, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

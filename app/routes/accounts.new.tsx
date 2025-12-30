@@ -10,7 +10,7 @@ import { useLoaderData, useActionData, useNavigate, Form, Link } from "react-rou
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
 import { accountDb } from "~/lib/db/accounts.server";
-import { ACCOUNT_TYPES, type CreateAccountData } from "~/lib/db/accounts.types";
+import { ACCOUNT_TYPES } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -109,7 +109,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     return redirect("/accounts");
-  } catch (error) {
+  } catch {
     return { errors: { _form: "Failed to create account. Please try again." }, values: {} };
   }
 }

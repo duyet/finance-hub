@@ -6,7 +6,7 @@ export const meta: MetaFunction = () => [
   { name: "description", content: "Personal Finance Management Platform" },
 ];
 
-export function clientLoader({ request }: ClientLoaderFunctionArgs) {
+export function clientLoader({ request: _request }: ClientLoaderFunctionArgs) {
   return { message: "Welcome to Finance Hub" };
 }
 

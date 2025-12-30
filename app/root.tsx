@@ -9,7 +9,7 @@ import { PWAInstallPrompt } from "./components/pwa/PWAInstallPrompt";
 import { ErrorBoundary } from "./components/error/ErrorBoundary";
 import { ThemeProvider } from "./components/theme/theme-provider";
 
-const { Link, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
+const { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } = ReactRouter;
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
