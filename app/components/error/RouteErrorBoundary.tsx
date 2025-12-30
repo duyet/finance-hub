@@ -6,7 +6,7 @@
 
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { ErrorBoundary as BaseErrorBoundary, ErrorFallback } from "./ErrorBoundary";
+import { ErrorBoundary as BaseErrorBoundary } from "./ErrorBoundary";
 
 interface RouteErrorBoundaryProps {
   children: ReactNode;

@@ -7,7 +7,7 @@
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { AlertTriangle, TrendingUp, DollarSign, ChevronRight, ArrowRight } from "lucide-react";
+import { AlertTriangle, DollarSign, ChevronRight, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 
 export interface OverBudgetCategory {

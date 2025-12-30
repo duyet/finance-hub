@@ -1,6 +1,5 @@
 import { Form, useNavigation } from "react-router";
 import type { Locale } from "~/lib/i18n/i18n.config";
-import { SUPPORTED_LOCALES } from "~/lib/i18n/i18n.config";
 
 interface LanguageSwitcherProps {
   currentLocale: Locale;
