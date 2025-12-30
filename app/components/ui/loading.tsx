@@ -45,27 +45,3 @@ export function FullPageLoading({ message = "Loading..." }: { message?: string }
     </div>
   );
 }
-
-/**
- * InlineLoading - inline loading indicator
- */
-export function InlineLoading({ message, className }: { message?: string; className?: string }) {
-  return (
-    <div className={cn("flex items-center space-x-2 text-gray-600", className)}>
-      <Spinner size="sm" />
-      {message && <span className="text-sm">{message}</span>}
-    </div>
-  );
-}
-
-/**
- * ButtonLoading - loading state for buttons
- */
-export function ButtonLoading({ className }: { className?: string }) {
-  return (
-    <div className={cn("flex items-center justify-center", className)}>
-      <Spinner size="sm" />
-      <span className="ml-2">Loading...</span>
-    </div>
-  );
-}
