@@ -121,7 +121,7 @@ export const headers: HeadersFunction = () => {
  * Load translations from public/locales
  */
 async function loadTranslations(locale: Locale, request: Request) {
-  const namespaces = ["common", "dashboard", "transactions", "credit_cards", "loans", "settings", "receipts"];
+  const namespaces = ["common", "dashboard", "transactions"];
   const mergedTranslations: Record<string, unknown> = {};
 
   try {
