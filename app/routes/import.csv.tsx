@@ -13,7 +13,7 @@ import { Card } from "~/components/ui/card";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { Separator } from "~/components/ui/separator";
 import { toast } from "~/components/ui/use-toast";
-import type { ColumnMapping, ImportOptions as ImportOptionsType } from "../lib/types/csv-import";
+import type { ColumnMapping, ImportOptions as ImportOptionsType, ImportResult } from "../lib/types/csv-import";
 import { action as importAction, loader as importLoader } from "./action.import-csv";
 
 // Lazy load CSV import components for code splitting
@@ -61,7 +61,7 @@ export default function CsvImportRoute() {
     skipHeaderRow: true,
     dryRun: false,
   });
-  const [importResult, setImportResult] = useState<any>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
   const isLoading = navigation.state === "submitting" || navigation.state === "loading";
 
@@ -205,7 +205,7 @@ export default function CsvImportRoute() {
         return;
       }
 
-      setImportResult(result);
+      setImportResult(result as unknown as ImportResult);
       setStep("review");
     } catch (error) {
       toast({
@@ -252,7 +252,7 @@ export default function CsvImportRoute() {
         return;
       }
 
-      setImportResult(result);
+      setImportResult(result as unknown as ImportResult);
 
       toast({
         title: t("import.csv.success.title", "Import Successful"),

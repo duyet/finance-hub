@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
 import { transactionsCrud } from "../lib/db/transactions.server";
-import type { TransactionFilters, PaginationOptions, TransactionStatus } from "../lib/db/transactions.types";
+import type { TransactionFilters, PaginationOptions, TransactionStatus, TransactionWithRelations } from "../lib/db/transactions.types";
 import { parseTransactionFilters } from "../lib/validations/transaction";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -161,7 +161,7 @@ export default function TransactionsListPage() {
 
   // Local state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [editingTransaction, setEditingTransaction] = useState<TransactionWithRelations | undefined>(undefined);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
@@ -358,7 +358,7 @@ export default function TransactionsListPage() {
           isOpen={isDialogOpen}
           onClose={() => {
             setIsDialogOpen(false);
-            setEditingTransaction(null);
+            setEditingTransaction(undefined);
           }}
           transaction={editingTransaction}
           filterOptions={data.filterOptions}
