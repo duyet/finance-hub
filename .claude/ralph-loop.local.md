@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 480
+iteration: 481
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-29T23:22:00Z"
@@ -11,13 +11,15 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 480 - Progress
+## Ralph Loop Iteration 481 - Progress
 
-### Commits This Session (4):
+### Commits This Session (5):
 ```
-2107eff fix: eliminate all remaining lint warnings (38 → 0)
-d06ded1 fix(deps): update vitest to v4 to resolve esbuild vulnerability
+f4e32d1 feat(import): add AI-powered column mapping for CSV imports
+6130a6b docs: update ralph-loop progress (iteration 480)
 9d95d1f fix(tests): update tests to match current implementation
+d06ded1 fix(deps): update vitest to v4 to resolve esbuild vulnerability
+2107eff fix: eliminate all remaining lint warnings (38 → 0)
 ```
 
 ### Session Stats:
@@ -35,17 +37,18 @@ d06ded1 fix(deps): update vitest to v4 to resolve esbuild vulnerability
 - Tests: 206 passing
 
 ### Latest Fixes:
+- Implemented AI-powered column mapping for CSV imports
+- Fixed Env.AI type (Fetcher → Ai) for Workers AI binding
+- Added Vietnamese header support in column mapping
 - Eliminated all 73 remaining lint warnings
 - Updated vitest 2.1.9 → 4.0.16 (fixes esbuild CVE)
 - Fixed 17 failing tests (currency formatting, categorization)
-- Updated E2E tests for current routes
-- Added vitest config to exclude e2e tests
 
 ### Core Features ✓:
 - Dashboard + Financial Health
 - Accounts/Categories/Transactions CRUD
-- CSV Import + AI Insights
+- CSV Import + AI Column Mapping
 - i18n (EN/VI) + OAuth
 - PWA Install Prompt
 
-### Next: Build optimization or new features
+### Next: Find more improvements (TODOs, optimizations)
