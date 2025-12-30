@@ -42,8 +42,8 @@ c966f1a chore: simplify settings.server.ts
 
 ### Latest Updates (Iteration 501):
 - Removed unused queue-consumer worker (629 lines)
-- Removed unused CRUD methods from accounts.server.ts (42 lines)
-- Removed unused CRUD methods from categories.server.ts (168 lines)
+- Removed unused date utilities (57 lines)
+- Removed unused CRUD methods from accounts/categories (210 lines)
 - Removed unused exports from transactions.server.ts (62 lines)
 - Simplified ai-insights.server.ts (244 lines removed)
 - Cleaned up auth.server.ts exports (14 lines)
