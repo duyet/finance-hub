@@ -20,18 +20,16 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 
 ## Tech Stack
 
-- **Framework**: React Router v7 (formerly Remix v7)
+- **Framework**: React Router v7 (SSR)
 - **Runtime**: Cloudflare Workers (Edge)
 - **Database**: Cloudflare D1 (SQLite)
 - **Storage**: Cloudflare R2 (S3-compatible)
-- **AI**: Cloudflare Workers AI (Gemma 3 12B, Llama 3.1 8B, Llama 3.3)
-- **Queue**: Cloudflare Queues (async processing)
+- **AI**: Cloudflare Workers AI (Llama 3.1 8B, Llama 3.3)
 - **UI**: Shadcn UI + Tailwind CSS v4
 - **Charts**: Recharts
-- **PDF**: @react-pdf/renderer
-- **i18n**: react-i18next
+- **i18n**: Custom implementation (EN/VI)
 - **Auth**: Arctic (OAuth) + Oslo (sessions)
-- **PWA**: Service Worker with offline caching
+- **Testing**: Vitest + Playwright
 
 ## Getting Started
 
@@ -45,21 +43,19 @@ A comprehensive, serverless Personal Finance Management (PFM) application built 
 
 ```bash
 # Install dependencies
-npm install --legacy-peer-deps
+bun install
 
 # Copy environment variables
 cp .dev.vars.example .dev.vars
 
-# Edit .dev.vars with your credentials
-# - OAuth credentials (Google, GitHub)
-# - Bank sync API keys (Casso, SePay)
+# Edit .dev.vars with your OAuth credentials (Google, GitHub)
 ```
 
 ### Local Development
 
 ```bash
 # Start development server
-npm run dev
+bun run dev
 
 # Visit http://localhost:5173
 ```
@@ -95,10 +91,10 @@ wrangler kv:namespace create CACHE
 
 ```bash
 # Build for production
-npm run build
+bun run build
 
 # Deploy to Cloudflare Pages
-npm run deploy
+bun run deploy
 ```
 
 ### CI/CD
@@ -186,9 +182,9 @@ finance-hub/
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests: `npm run test`
-5. Run linting: `npm run lint`
-6. Type check: `npm run typecheck`
+4. Run tests: `bun run test`
+5. Run linting: `bun run lint`
+6. Type check: `bun run typecheck`
 7. Submit a pull request
 
 ## License
