@@ -4,8 +4,7 @@
 
 | File | Description |
 |------|-------------|
-| [PRD.md](PRD.md) | Product Requirements Document - Complete feature specification |
-| [PRD_VERIFICATION.md](PRD_VERIFICATION.md) | PRD Implementation Verification Report |
+| [PRD.md](PRD.md) | Product Requirements Document - Original feature specification |
 
 ## Technical Guides
 
