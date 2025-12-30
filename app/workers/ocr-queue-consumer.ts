@@ -92,14 +92,9 @@ async function processReceiptJob(job: OcrJob, env: Env) {
     // Process with OCR AI
     const extractedData = await processReceiptWithAI(env, imageUrl, options);
 
-    // Generate category suggestions
-    let categorySuggestions = [];
+    // Generate category suggestions (for future use)
     if (extractedData.merchantName) {
-      categorySuggestions = await suggestCategories(
-        env,
-        extractedData.merchantName,
-        userId
-      );
+      await suggestCategories(env, extractedData.merchantName, userId);
     }
 
     // Update receipt with results

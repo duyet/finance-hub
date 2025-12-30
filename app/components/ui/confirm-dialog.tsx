@@ -11,7 +11,7 @@
  * - Supports custom titles, descriptions, and button labels
  */
 
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { forwardRef } from "react";
 import { AlertTriangle } from "lucide-react";
 import {
   Dialog,

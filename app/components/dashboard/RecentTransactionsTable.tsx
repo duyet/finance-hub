@@ -29,7 +29,7 @@ export function RecentTransactionsTable({
   transactions,
   currency = "VND",
 }: RecentTransactionsTableProps) {
-  const { formatCurrency, formatDate, locale } = useI18n();
+  const { formatCurrency, locale } = useI18n();
 
   if (transactions.length === 0) {
     return (

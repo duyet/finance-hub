@@ -1,8 +1,6 @@
 import { generateRandomString, alphabet } from "oslo/crypto";
 import { TimeSpan, createDate } from "oslo";
 import { serializeCookie, parseCookies } from "oslo/cookie";
-import { sha256 } from "oslo/crypto";
-import { encodeHex } from "oslo/encoding";
 import { getDb, sessionDb } from "./db.server";
 import type { User } from "./auth.server";
 

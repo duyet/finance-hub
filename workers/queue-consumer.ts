@@ -507,7 +507,7 @@ function mapRowToTransaction(
   row: string[],
   headers: string[],
   columnMapping: ColumnMapping | null,
-  importOptions: ImportOptions
+  _importOptions: ImportOptions
 ): {
   date: string;
   amount: number;

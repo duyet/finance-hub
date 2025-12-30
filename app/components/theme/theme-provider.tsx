@@ -72,8 +72,6 @@ export function ThemeProvider({
 
   // Update effective theme when theme changes
   useEffect(() => {
-    const root = document.documentElement;
-
     if (theme === "system") {
       const systemTheme = getSystemTheme();
       setEffectiveTheme(systemTheme);

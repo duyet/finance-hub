@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import { MoreHorizontal } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { StatusBadge, TransactionActions } from "./TransactionActions";
 import { CategoryBadgeMini } from "./CategoryBadge";
@@ -114,7 +112,6 @@ export function TransactionsTable({
   onDelete,
 }: TransactionsTableProps) {
   const allSelected = transactions.length > 0 && selectedIds.length === transactions.length;
-  const someSelected = selectedIds.length > 0 && !allSelected;
 
   const handleSort = (column: string) => {
     const newOrder: "asc" | "desc" =

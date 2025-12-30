@@ -50,8 +50,8 @@ export function CategoryForm({
 
   const [errors, setErrors] = useState<Partial<Record<keyof (CreateCategoryInput | UpdateCategoryInput), string>>>({});
 
-  // Update parent options when category type changes
-  const [categoryType, setCategoryType] = useState<"INCOME" | "EXPENSE">(
+  // Track category type for parent filtering (setter used in handleTypeChange)
+  const [_categoryType, setCategoryType] = useState<"INCOME" | "EXPENSE">(
     initialData?.type || "EXPENSE"
   );
 

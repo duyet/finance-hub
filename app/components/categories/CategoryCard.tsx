@@ -125,13 +125,6 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
         : "good"
       : null;
 
-  const budgetStatusColor =
-    budgetStatus === "over"
-      ? "bg-red-500"
-      : budgetStatus === "warning"
-      ? "bg-yellow-500"
-      : "bg-green-500";
-
   return (
     <Card
       className={cn(

@@ -140,58 +140,6 @@ export function TransactionFilters({ filterOptions, currentFilters }: Transactio
     });
   };
 
-  const buildQueryParams = () => {
-    const params = new URLSearchParams(searchParams);
-
-    // Update params based on local filters
-    if (localFilters.search) {
-      params.set("search", localFilters.search);
-    } else {
-      params.delete("search");
-    }
-
-    if (localFilters.type && localFilters.type !== "ALL") {
-      params.set("type", localFilters.type);
-    } else {
-      params.delete("type");
-    }
-
-    if (localFilters.status) {
-      params.set("status", localFilters.status);
-    } else {
-      params.delete("status");
-    }
-
-    if (localFilters.accountIds && localFilters.accountIds.length > 0) {
-      params.set("accountIds", localFilters.accountIds.join(","));
-    } else {
-      params.delete("accountIds");
-    }
-
-    if (localFilters.categoryIds && localFilters.categoryIds.length > 0) {
-      params.set("categoryIds", localFilters.categoryIds.join(","));
-    } else {
-      params.delete("categoryIds");
-    }
-
-    if (localFilters.startDate) {
-      params.set("startDate", localFilters.startDate);
-    } else {
-      params.delete("startDate");
-    }
-
-    if (localFilters.endDate) {
-      params.set("endDate", localFilters.endDate);
-    } else {
-      params.delete("endDate");
-    }
-
-    // Reset to page 1 when filters change
-    params.set("page", "1");
-
-    return params.toString();
-  };
-
   return (
     <div className="space-y-4">
       {/* Search and Quick Filters */}

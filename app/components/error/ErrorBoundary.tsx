@@ -8,7 +8,7 @@
  * Pattern: https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary
  */
 
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Component } from "react";
 
 interface Props {

@@ -6,7 +6,7 @@ import { formatDateLong, formatDateShort } from "~/lib/utils/date";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
 import { transactionsCrud } from "../lib/db/transactions.server";
-import type { TransactionWithRelations, TransactionStatus } from "../lib/db/transactions.types";
+import type { TransactionStatus } from "../lib/db/transactions.types";
 import { transactionIdSchema } from "../lib/validations/transaction";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
