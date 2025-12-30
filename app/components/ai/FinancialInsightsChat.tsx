@@ -105,7 +105,7 @@ export function FinancialInsightsChat({ initialContext }: ChatProps) {
 
   const handleSendClick = () => handleSend();
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -187,7 +187,7 @@ export function FinancialInsightsChat({ initialContext }: ChatProps) {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Ask about your finances..."
             disabled={isLoading}
             className="flex-1"
