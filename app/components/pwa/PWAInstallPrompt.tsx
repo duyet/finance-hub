@@ -5,7 +5,7 @@
  * Handles the beforeinstallprompt event and provides install UI.
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { X, Download } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
@@ -119,58 +119,5 @@ export function PWAInstallPrompt() {
         </div>
       </div>
     </div>
-  );
-}
-
-/**
- * PWA Install Button Component
- *
- * A simple button that can be placed in settings or menu
- * to trigger PWA installation.
- */
-export function PWAInstallButton({ className = "" }: { className?: string }) {
-  const [canInstall, setCanInstall] = useState(false);
-  const deferredPromptRef = useRef<Event | null>(null);
-
-  useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      return;
-    }
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      deferredPromptRef.current = e;
-      setCanInstall(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    const deferredPrompt = deferredPromptRef.current;
-    if (!deferredPrompt) return;
-
-    const promptEvent = deferredPrompt as BeforeInstallPromptEvent;
-    promptEvent.prompt();
-    await promptEvent.userChoice;
-    deferredPromptRef.current = null;
-    setCanInstall(false);
-  };
-
-  if (!canInstall) return null;
-
-  return (
-    <button
-      onClick={handleInstall}
-      className={`flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${className}`}
-    >
-      <Download className="w-4 h-4" />
-      <span>Install App</span>
-    </button>
   );
 }
