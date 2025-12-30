@@ -1,5 +1,5 @@
-import { Link, useSearchParams } from "react-router";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Link } from "react-router";
+import { MoreHorizontal } from "lucide-react";
 import {
   Table,
   TableBody,

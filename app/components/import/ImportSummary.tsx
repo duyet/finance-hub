@@ -5,7 +5,6 @@
 
 import { useI18n } from "~/lib/i18n/client";
 import { Card } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { AlertCircle, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import type { ImportResult } from "~/lib/types/csv-import";

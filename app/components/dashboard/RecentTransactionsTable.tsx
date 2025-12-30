@@ -18,7 +18,6 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { useI18n } from "~/lib/i18n/client";
 import type { RecentTransaction } from "~/lib/db/transactions.server";
-import { formatDateShort } from "~/lib/utils/date";
 import { Plus } from "lucide-react";
 
 interface RecentTransactionsTableProps {
