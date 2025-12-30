@@ -9,11 +9,16 @@ import { useEffect, useState, useRef } from "react";
 import { X, Download } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
+// BeforeInstallPromptEvent is not in standard TypeScript DOM types
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
-  const hasPrompted = useRef(false);
 
   useEffect(() => {
     // Check if user previously dismissed
@@ -52,15 +57,13 @@ export function PWAInstallPrompt() {
     if (!deferredPrompt) return;
 
     // Show the install prompt
-    (deferredPrompt as any).prompt();
+    const promptEvent = deferredPrompt as BeforeInstallPromptEvent;
+    promptEvent.prompt();
     // Wait for the user to respond to the prompt
-    const { outcome } = await (deferredPrompt as any).userChoice;
+    await promptEvent.userChoice;
     // The deferredPrompt can only be used once
     setDeferredPrompt(null);
     setShowPrompt(false);
-
-    // PWA installation handled by browser
-    // No action needed - userChoice outcome is available for analytics if needed
   };
 
   const handleDismiss = () => {
@@ -152,13 +155,11 @@ export function PWAInstallButton({ className = "" }: { className?: string }) {
     const deferredPrompt = deferredPromptRef.current;
     if (!deferredPrompt) return;
 
-    (deferredPrompt as any).prompt();
-    const { outcome } = await (deferredPrompt as any).userChoice;
+    const promptEvent = deferredPrompt as BeforeInstallPromptEvent;
+    promptEvent.prompt();
+    await promptEvent.userChoice;
     deferredPromptRef.current = null;
     setCanInstall(false);
-
-    // PWA installation handled by browser
-    // No action needed - userChoice outcome is available for analytics if needed
   };
 
   if (!canInstall) return null;
