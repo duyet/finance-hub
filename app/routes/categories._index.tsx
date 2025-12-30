@@ -13,7 +13,6 @@ import { getDb } from "~/lib/auth/db.server";
 import { categoriesCrud } from "~/lib/db/categories.server";
 import type { CategoryWithStats, CreateCategoryInput, UpdateCategoryInput } from "~/lib/db/categories.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { useI18n } from "~/lib/i18n/client";
 import { useToast } from "~/components/ui/use-toast";
 import { COLOR_THEMES, ICON_PRESETS_ARRAY } from "~/components/categories/category-presets";
 
@@ -96,7 +95,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function CategoriesIndexPage() {
   const { categories, parentOptions } = useLoaderData<typeof loader>();
-  const { t: _t } = useI18n();
   const navigate = useNavigate();
   const navigation = useNavigation();
   const { toast } = useToast();
