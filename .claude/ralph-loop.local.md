@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 488
+iteration: 489
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-29T23:22:00Z"
@@ -11,10 +11,14 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 488 - Progress
+## Ralph Loop Iteration 489 - Progress
 
-### Commits This Session (14):
+### Commits This Session (17):
 ```
+c1f2742 fix: add missing routes to routes.ts
+29753f9 docs: update TODO.md with accurate project state
+4025d26 chore: remove unused receipt type and validation files
+66dc2f5 docs: update ralph-loop to iteration 488
 ed5ca11 chore: remove unused service files
 dc152d3 docs: update CLAUDE.md with accurate info
 4795ebd docs: update TODO.md with completed items
@@ -41,12 +45,13 @@ f4e32d1 feat(import): add AI-powered column mapping for CSV imports
 - Tests: 206 passing
 
 ### Latest Improvements:
-- Removed 9 unused service files (3,571 lines deleted)
+- Fixed missing routes (api.ai.insights, action.import-csv)
+- Removed 9 unused service files (3,571 lines)
+- Removed unused receipt type/validation files (238 lines)
 - Simplified ai-insights.server.ts to Workers AI only
+- Updated TODO.md with accurate project state
 - AI-powered column mapping for CSV imports
 - Removed 4 unused dependencies
-- Updated typescript-eslint 8.50.1 to 8.51.0
-- Updated README, TODO.md, CLAUDE.md with accurate info
 
 ### Core Features:
 - Dashboard + Financial Health
