@@ -10,9 +10,6 @@ import type {
   MonthlyDataPoint,
   CategoryBreakdown,
   RecentTransaction,
-  TransactionStatus,
-  TransactionType,
-  TransactionRow,
   TransactionWithRelations,
   TransactionFilters,
   PaginationOptions,
@@ -22,23 +19,16 @@ import type {
   TransactionFilterOptions,
 } from "./transactions.types";
 
-// Re-export types for convenience
+// Re-export types that are imported from this module by consumers
 export type {
-  DashboardData,
-  MonthlyDataPoint,
-  CategoryBreakdown,
   RecentTransaction,
-  TransactionStatus,
-  TransactionType,
-  TransactionRow,
   TransactionWithRelations,
-  TransactionFilters,
   PaginationOptions,
-  PaginatedTransactions,
-  CreateTransactionInput,
-  UpdateTransactionInput,
   TransactionFilterOptions,
-};
+} from "./transactions.types";
+
+// Also re-export these for TransactionFilters.tsx
+export type { TransactionStatus, TransactionType } from "./transactions.types";
 
 /**
  * Get complete dashboard data for a user
