@@ -109,53 +109,11 @@ export const updateTransactionSchema = z.object({
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
 
 /**
- * Bulk update category schema
- */
-export const bulkUpdateCategorySchema = z.object({
-  transactionIds: z
-    .array(z.string())
-    .min(1, "At least one transaction must be selected"),
-  categoryId: z.string().nullable(),
-});
-
-export type BulkUpdateCategoryInput = z.infer<typeof bulkUpdateCategorySchema>;
-
-/**
- * Bulk delete schema
- */
-export const bulkDeleteSchema = z.object({
-  transactionIds: z
-    .array(z.string())
-    .min(1, "At least one transaction must be selected"),
-});
-
-export type BulkDeleteInput = z.infer<typeof bulkDeleteSchema>;
-
-/**
  * Transaction ID parameter schema
  */
 export const transactionIdSchema = z.object({
   id: z.string().min(1, "Transaction ID is required"),
 });
-
-/**
- * Query parameter schemas for URL parsing
- */
-export const transactionQuerySchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(50),
-  sortBy: z.string().optional(),
-  sortOrder: z.enum(["asc", "desc"]).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  accountIds: z.string().optional(), // Comma-separated
-  categoryIds: z.string().optional(), // Comma-separated
-  type: TransactionTypeEnum.optional(),
-  status: TransactionStatusEnum.optional(),
-  search: z.string().optional(),
-});
-
-export type TransactionQueryInput = z.infer<typeof transactionQuerySchema>;
 
 /**
  * Helper function to parse transaction filters from URL search params
@@ -178,29 +136,4 @@ export function parseTransactionFilters(
     page: page ? parseInt(page, 10) : 1,
     pageSize: pageSize ? parseInt(pageSize, 10) : 50,
   });
-}
-
-/**
- * Helper function to build URL search params from filters
- */
-export function buildTransactionSearchParams(
-  filters: Partial<TransactionFilterInput>
-): URLSearchParams {
-  const params = new URLSearchParams();
-
-  if (filters.page) params.set("page", filters.page.toString());
-  if (filters.pageSize) params.set("pageSize", filters.pageSize.toString());
-  if (filters.sortBy) params.set("sortBy", filters.sortBy);
-  if (filters.sortOrder) params.set("sortOrder", filters.sortOrder);
-  if (filters.startDate) params.set("startDate", filters.startDate);
-  if (filters.endDate) params.set("endDate", filters.endDate);
-  if (filters.accountIds?.length)
-    params.set("accountIds", filters.accountIds.join(","));
-  if (filters.categoryIds?.length)
-    params.set("categoryIds", filters.categoryIds.join(","));
-  if (filters.type) params.set("type", filters.type);
-  if (filters.status) params.set("status", filters.status);
-  if (filters.search) params.set("search", filters.search);
-
-  return params;
 }
