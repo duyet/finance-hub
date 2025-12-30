@@ -9,11 +9,12 @@
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
-import { getDb } from "~/lib/auth/db.server";
+import { getDb, type CloudflareRequest } from "~/lib/auth/db.server";
 import { accountDb } from "~/lib/db/accounts.server";
 import { categoriesCrud } from "~/lib/db/categories.server";
 import { transactionsCrud } from "~/lib/db/transactions.server";
 import type { CreateTransactionInput } from "~/lib/db/transactions.types";
+import { AIService } from "~/lib/services/ai.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
@@ -91,28 +92,52 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (intent === "map-columns") {
-    // AI column mapping - currently returns a basic mapping suggestion
-    // TODO: Implement actual AI-powered mapping using LLM API
     const headersJson = formData.get("headers") as string;
-    const headers = JSON.parse(headersJson);
+    const headers = JSON.parse(headersJson) as string[];
 
-    // Basic heuristic mapping for common column names
-    const mapping: Record<string, string> = {};
-    const headerLower = headers.map((h: string) => h.toLowerCase());
+    // Try AI-powered column mapping first
+    const cfRequest = request as CloudflareRequest;
+    const ai = cfRequest.context?.cloudflare?.env?.AI;
 
-    headerLower.forEach((header: string, index: number) => {
-      if (header.includes("date") || header.includes("Date")) {
-        mapping[headers[index]] = "date";
-      } else if (header.includes("amount") || header.includes("Amount") || header.includes("value") || header.includes("Value")) {
-        mapping[headers[index]] = "amount";
-      } else if (header.includes("desc") || header.includes("Desc") || header.includes("memo") || header.includes("payee")) {
-        mapping[headers[index]] = "description";
-      } else if (header.includes("merchant") || header.includes("Merchant") || header.includes("store") || header.includes("Shop")) {
-        mapping[headers[index]] = "merchantName";
+    if (ai) {
+      try {
+        const aiService = new AIService(ai);
+        const aiMapping = await aiService.mapColumns(headers);
+
+        // Convert AI mapping format to our format
+        const mapping: Record<string, string> = {};
+        if (aiMapping.date) mapping[aiMapping.date] = "date";
+        if (aiMapping.amount) mapping[aiMapping.amount] = "amount";
+        if (aiMapping.description) mapping[aiMapping.description] = "description";
+        if (aiMapping.merchant) mapping[aiMapping.merchant] = "merchantName";
+        if (aiMapping.category) mapping[aiMapping.category] = "category";
+        if (aiMapping.account) mapping[aiMapping.account] = "account";
+
+        if (Object.keys(mapping).length > 0) {
+          return Response.json({ mapping, source: "ai" });
+        }
+      } catch (error) {
+        console.warn("AI column mapping failed, falling back to heuristics:", error);
       }
-    });
+    }
 
-    return Response.json({ mapping });
+    // Fallback: Basic heuristic mapping for common column names
+    const mapping: Record<string, string> = {};
+
+    for (const header of headers) {
+      const lower = header.toLowerCase();
+      if (lower.includes("date") || lower.includes("tanggal") || lower.includes("ngày")) {
+        mapping[header] = "date";
+      } else if (lower.includes("amount") || lower.includes("value") || lower.includes("số tiền")) {
+        mapping[header] = "amount";
+      } else if (lower.includes("desc") || lower.includes("memo") || lower.includes("mô tả")) {
+        mapping[header] = "description";
+      } else if (lower.includes("merchant") || lower.includes("payee") || lower.includes("store")) {
+        mapping[header] = "merchantName";
+      }
+    }
+
+    return Response.json({ mapping, source: "heuristic" });
   }
 
   if (intent === "import") {

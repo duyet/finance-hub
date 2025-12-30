@@ -1,7 +1,7 @@
 // Import Cloudflare types with type-only imports to minimize global pollution
 import type {
   D1Database,
-  Fetcher,
+  Ai,
   R2Bucket,
   KVNamespace,
   Queue,
@@ -10,7 +10,7 @@ import type {
 export interface Env {
   DB: D1Database;
   /** Cloudflare Workers AI binding for text/image inference */
-  AI?: Fetcher;
+  AI?: Ai;
   /** KV namespace for caching */
   CACHE?: KVNamespace;
   /** Queue for async tasks (OCR processing) */
