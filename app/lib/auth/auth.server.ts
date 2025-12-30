@@ -34,18 +34,18 @@ function getRedirectUrl(): string {
 }
 
 /**
- * Initialize GitHub OAuth provider
+ * Initialize GitHub OAuth provider (internal)
  */
-export const github = new GitHub(
+const github = new GitHub(
   getEnvVar("GITHUB_CLIENT_ID"),
   getEnvVar("GITHUB_CLIENT_SECRET"),
   null
 );
 
 /**
- * Initialize Google OAuth provider
+ * Initialize Google OAuth provider (internal)
  */
-export const google = new Google(
+const google = new Google(
   getEnvVar("GOOGLE_CLIENT_ID"),
   getEnvVar("GOOGLE_CLIENT_SECRET"),
   `${getRedirectUrl()}/auth/callback/google`
@@ -87,9 +87,9 @@ export async function createGoogleAuthorizationUrl(): Promise<{
 }
 
 /**
- * Generate a unique user ID
+ * Generate a unique user ID (internal)
  */
-export async function generateUserId(): Promise<string> {
+async function generateUserId(): Promise<string> {
   // Generate 15 characters with alphanumeric alphabet for ~90 bits of entropy
   return generateRandomString(15, alphabet("a-z", "0-9"));
 }
@@ -307,15 +307,6 @@ function mapUserRowToUser(row: {
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),
   };
-}
-
-/**
- * Get user by ID
- */
-export async function getUser(request: Request, userId: string): Promise<User | null> {
-  const db = getDb(request);
-  const user = await userDb.findById(db, userId);
-  return user ? mapUserRowToUser(user) : null;
 }
 
 /**
