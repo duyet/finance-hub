@@ -69,43 +69,44 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
   const db = getDb(request);
 
-  // Get dashboard data
-  const dashboardData = await getDashboardData(request, user.id, 12);
-
-  // Calculate financial health score
-  const healthScore = await calculateFinancialHealthScore(db, user.id);
-
-  // Get over-budget categories for alerts
-  const overBudgetCategories = await categoriesCrud.getOverBudgetCategories(db, user.id);
-
-  // Get recent transactions for AI context
-  const recentTransactionsResult = await db
-    .prepare(
-      `SELECT date, amount, description, category_id
-       FROM transactions
-       WHERE user_id = ? AND status = 'POSTED'
-       ORDER BY date DESC
-       LIMIT 10`
-    )
-    .bind(user.id)
-    .all();
-
-  // Get accounts for AI context
-  const accountsResult = await db
-    .prepare(
-      `SELECT name, type, balance
-       FROM financial_accounts
-       WHERE user_id = ? AND is_archived = 0
-       ORDER BY name`
-    )
-    .bind(user.id)
-    .all();
-
-  // Get category names
-  const categoriesResult = await db
-    .prepare(`SELECT id, name FROM categories WHERE user_id = ?`)
-    .bind(user.id)
-    .all();
+  // Run all data fetching in parallel for better performance
+  const [
+    dashboardData,
+    healthScore,
+    overBudgetCategories,
+    recentTransactionsResult,
+    accountsResult,
+    categoriesResult,
+    dashboardConfig,
+  ] = await Promise.all([
+    getDashboardData(request, user.id, 12),
+    calculateFinancialHealthScore(db, user.id),
+    categoriesCrud.getOverBudgetCategories(db, user.id),
+    db
+      .prepare(
+        `SELECT date, amount, description, category_id
+         FROM transactions
+         WHERE user_id = ? AND status = 'POSTED'
+         ORDER BY date DESC
+         LIMIT 10`
+      )
+      .bind(user.id)
+      .all(),
+    db
+      .prepare(
+        `SELECT name, type, balance
+         FROM financial_accounts
+         WHERE user_id = ? AND is_archived = 0
+         ORDER BY name`
+      )
+      .bind(user.id)
+      .all(),
+    db
+      .prepare(`SELECT id, name FROM categories WHERE user_id = ?`)
+      .bind(user.id)
+      .all(),
+    getDashboardConfig(db, user.id),
+  ]);
 
   const categories = (categoriesResult.results || []) as unknown as CategoryRow[];
   const categoryMap = new Map(categories.map((c: CategoryRow) => [c.id, c.name]));
@@ -129,9 +130,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       balance: aa.balance,
     };
   });
-
-  // Get dashboard configuration
-  const dashboardConfig = await getDashboardConfig(db, user.id);
 
   return {
     user: {
