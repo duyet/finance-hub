@@ -8,15 +8,10 @@
  * - Public URL generation
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   generateThumbnail,
   generateAndStoreThumbnail,
-  uploadReceiptToR2,
-  uploadReceiptFromUrl,
-  deleteReceiptFromR2,
-  checkReceiptExists,
-  getReceiptMetadata,
 } from "~/lib/services/storage.server";
 
 describe("Storage Service", () => {
