@@ -7,8 +7,13 @@
  * The vector is compared (cosine similarity) against the user's category list to suggest a category."
  */
 
-import type { D1Database, Ai, KVNamespace } from "@cloudflare/workers-types";
+import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 import type { Env } from "../auth/db.server";
+
+// AI binding type with run method (Cloudflare Workers AI)
+interface AiBinding {
+  run(model: string, inputs: unknown, options?: Record<string, unknown>): Promise<unknown>;
+}
 
 /**
  * Categorization rule
@@ -144,9 +149,10 @@ const CATEGORY_ALIASES: Record<string, string> = {
  * Generate embedding for text using Cloudflare Workers AI
  * Model: @cf/baai/bge-base-en-v1.5
  */
-async function generateEmbedding(ai: Ai, text: string): Promise<number[]> {
+async function generateEmbedding(ai: AiBinding, text: string): Promise<number[]> {
   const response = await ai.run("@cf/baai/bge-base-en-v1.5", { text });
-  const embedding = (response as any).data?.[0] || (response as any).embedding;
+  const embedding = (response as { data?: number[]; embedding?: number[] }).data?.[0] ||
+                    (response as { data?: number[]; embedding?: number[] }).embedding;
 
   if (!Array.isArray(embedding)) {
     throw new Error("Invalid embedding response from AI model");
@@ -160,11 +166,14 @@ async function generateEmbedding(ai: Ai, text: string): Promise<number[]> {
  * Cache TTL: 24 hours
  */
 async function getCachedEmbedding(
-  cache: KVNamespace,
-  ai: Ai,
+  cache: KVNamespace | undefined,
+  ai: AiBinding | undefined,
   text: string,
   prefix: string = "emb"
 ): Promise<number[]> {
+  if (!cache || !ai) {
+    throw new Error("AI or cache binding not available");
+  }
   const cacheKey = `${prefix}:${Buffer.from(text).toString("base64").slice(0, 100)}`;
 
   try {
@@ -284,7 +293,8 @@ export async function suggestCategoriesByEmbedding(
   }
 
   try {
-    const searchEmbedding = await getCachedEmbedding(env.CACHE, env.AI, searchText, "tx");
+    const ai = env.AI as unknown as AiBinding | undefined;
+    const searchEmbedding = await getCachedEmbedding(env.CACHE, ai, searchText, "tx");
 
     const similarities: Array<{
       categoryId: string;
@@ -294,8 +304,8 @@ export async function suggestCategoriesByEmbedding(
       categories.map(async (category) => {
         try {
           const categoryEmbedding = await getCachedEmbedding(
-            env.CACHE!,
-            env.AI!,
+            env.CACHE,
+            ai,
             category.name,
             "cat"
           );

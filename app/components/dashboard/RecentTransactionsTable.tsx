@@ -15,9 +15,11 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { useI18n } from "~/lib/i18n/client";
 import type { RecentTransaction } from "~/lib/db/transactions.server";
-import { format } from "date-fns";
+import { formatDateShort } from "~/lib/utils/date";
+import { Plus } from "lucide-react";
 
 interface RecentTransactionsTableProps {
   transactions: RecentTransaction[];
@@ -32,8 +34,17 @@ export function RecentTransactionsTable({
 
   if (transactions.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
-        <p>No transactions yet</p>
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+          <Plus className="w-8 h-8 text-gray-400" />
+        </div>
+        <p className="text-lg font-medium text-gray-900 mb-2">No transactions yet</p>
+        <p className="text-sm text-gray-600 mb-4">
+          Start tracking by adding your first transaction
+        </p>
+        <Button asChild>
+          <Link to="/transactions">Add Transaction</Link>
+        </Button>
       </div>
     );
   }
@@ -42,8 +53,8 @@ export function RecentTransactionsTable({
   const formatTransactionDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return locale === "vi"
-      ? format(date, "dd/MM/yyyy")
-      : format(date, "MM/dd/yyyy");
+      ? date.toLocaleDateString("vi-VN")
+      : date.toLocaleDateString("en-US");
   };
 
   // Get status badge color
@@ -103,7 +114,7 @@ export function RecentTransactionsTable({
               <TableCell className={`text-right font-medium ${
                 transaction.amount >= 0 ? "text-green-600" : "text-red-600"
               }`}>
-                {formatCurrency(transaction.amount, currency as any)}
+                {formatCurrency(transaction.amount, currency)}
               </TableCell>
             </TableRow>
           ))}

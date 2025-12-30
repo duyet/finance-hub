@@ -7,12 +7,16 @@
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx"
   ],
+  "exclude": [
+    "app/workers-env.d.ts"
+  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["vite/client", "@cloudflare/workers-types"],
+    "types": [],
     "module": "ESNext",
     "target": "ES2022",
     "moduleResolution": "Bundler",
+    "moduleDetection": "force",
     "strict": true,
     "allowJs": true,
     "skipLibCheck": true,

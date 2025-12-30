@@ -159,11 +159,12 @@ export function BatchOperationsToolbar({
 
   const executeOperation = useCallback(
     (operation: BatchOperation, categoryId?: string) => {
-      const formData = {
-        type: operation.type,
-        transactionIds: selectedIds,
-        data: categoryId ? { categoryId } : undefined,
-      };
+      const formData = new FormData();
+      formData.append("type", operation.type);
+      selectedIds.forEach((id) => formData.append("transactionIds", id));
+      if (categoryId) {
+        formData.append("categoryId", categoryId);
+      }
 
       fetcher.submit(formData, {
         method: "POST",

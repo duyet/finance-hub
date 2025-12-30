@@ -129,7 +129,7 @@ export async function validateGitHubCallback(
     throw new Error("Failed to fetch GitHub user");
   }
 
-  const githubUser = await githubUserRequest.json<GithubUserResponse>();
+  const githubUser = await githubUserRequest.json() as GithubUserResponse;
 
   // Fetch user's primary email
   const githubEmailsRequest = await fetch("https://api.github.com/user/emails", {
@@ -142,7 +142,7 @@ export async function validateGitHubCallback(
   let emailVerified = !!githubUser.email;
 
   if (githubEmailsRequest.ok) {
-    const emails = await githubEmailsRequest.json<GithubEmailResponse[]>();
+    const emails = await githubEmailsRequest.json() as GithubEmailResponse[];
     const primary = emails.find((e) => e.primary && e.verified);
     if (primary) {
       primaryEmail = primary.email;
@@ -187,7 +187,7 @@ export async function validateGoogleCallback(
     throw new Error("Failed to fetch Google user");
   }
 
-  const googleUser = await googleUserRequest.json<GoogleUserResponse>();
+  const googleUser = await googleUserRequest.json() as GoogleUserResponse;
 
   return {
     id: googleUser.id,

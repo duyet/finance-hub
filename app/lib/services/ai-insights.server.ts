@@ -16,12 +16,13 @@ import { generateWithFreeModel, generateWithFallback } from "./openrouter.server
 // Types
 // ============================================================================
 
-interface AIGatewayOptions {
-  gateway?: {
-    id: string;
-    skipCache?: boolean;
-  };
+// AI binding type with run method (Cloudflare Workers AI)
+interface AiBinding {
+  run(model: string, inputs: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
 }
+
+type AIGatewayOptions = Record<string, unknown>;
 
 export interface TransactionAnalysis {
   summary: string;
@@ -92,16 +93,18 @@ export async function generateSpendingAnalysis(
     try {
       const gatewayId = env?.AI_GATEWAY_ID;
       const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+      const ai = workersAI as unknown as AiBinding;
 
-      const response = await workersAI.run("@cf/meta/llama-3.1-8b-instruct", {
+      const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt },
         ],
         max_tokens: 1024,
-      }, gatewayOptions as any);
+      }, gatewayOptions);
 
-      text = (response as any).response || (response as any).text || "";
+      text = (response as { response?: string; text?: string }).response ||
+             (response as { response?: string; text?: string }).text || "";
       return parseAnalysisResponse(text, transactionData);
     } catch (error) {
       console.warn("Workers AI failed, trying OpenRouter premium:", error);
@@ -164,16 +167,18 @@ export async function answerFinancialQuestion(
     try {
       const gatewayId = env?.AI_GATEWAY_ID;
       const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+      const ai = workersAI as unknown as AiBinding;
 
-      const response = await workersAI.run("@cf/meta/llama-3.1-8b-instruct", {
+      const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt },
         ],
         max_tokens: 512,
-      }, gatewayOptions as any);
+      }, gatewayOptions);
 
-      answer = (response as any).response || (response as any).text || "";
+      answer = (response as { response?: string; text?: string }).response ||
+               (response as { response?: string; text?: string }).text || "";
       return answer;
     } catch (error) {
       console.warn("Workers AI failed, trying OpenRouter premium:", error);
@@ -201,9 +206,9 @@ export async function detectAnomalies(
   request: CloudflareRequest,
   transactions: Array<{ date: string; amount: number; category: string; description: string }>
 ): Promise<Array<{ transaction: typeof transactions[0]; reason: string; severity: "low" | "medium" | "high" }>> {
-  const ai = request.context?.cloudflare?.env?.AI;
+  const aiBinding = request.context?.cloudflare?.env?.AI;
 
-  if (!ai) {
+  if (!aiBinding) {
     return [];
   }
 
@@ -214,6 +219,7 @@ export async function detectAnomalies(
   try {
     const gatewayId = request.context?.cloudflare?.env?.AI_GATEWAY_ID;
     const gatewayOptions: AIGatewayOptions = gatewayId ? { gateway: { id: gatewayId } } : {};
+    const ai = aiBinding as unknown as AiBinding;
 
     const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
       messages: [
@@ -227,9 +233,10 @@ export async function detectAnomalies(
         },
       ],
       max_tokens: 512,
-    }, gatewayOptions as any);
+    }, gatewayOptions);
 
-    const text = (response as any).response || (response as any).text || "";
+    const text = (response as { response?: string; text?: string }).response ||
+                 (response as { response?: string; text?: string }).text || "";
     return parseAnomalyResponse(text, recentTransactions);
   } catch (error) {
     console.error("AI anomaly detection failed:", error);

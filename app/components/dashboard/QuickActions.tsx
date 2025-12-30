@@ -2,22 +2,19 @@
  * QuickActions Component
  *
  * Quick action buttons for common dashboard tasks
- * Add Transaction, Import CSV, Upload Receipt
+ * Add Transaction, Import CSV
  */
 
 import { Button } from "~/components/ui/button";
-import { Plus, Upload, Receipt } from "lucide-react";
-import { useI18n } from "~/lib/i18n/client";
+import { Plus, Upload } from "lucide-react";
 import { Link } from "react-router";
 
 export function QuickActions() {
-  const { t } = useI18n();
-
   const actions = [
     {
       label: "Add Transaction",
       icon: Plus,
-      href: "/transactions/new",
+      href: "/transactions",
       bgColor: "bg-blue-100",
       iconColor: "text-blue-600",
     },
@@ -28,17 +25,10 @@ export function QuickActions() {
       bgColor: "bg-green-100",
       iconColor: "text-green-600",
     },
-    {
-      label: "Upload Receipt",
-      icon: Receipt,
-      href: "/receipts/upload",
-      bgColor: "bg-purple-100",
-      iconColor: "text-purple-600",
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {actions.map((action) => {
         const Icon = action.icon;
         return (

@@ -42,7 +42,8 @@ export function LanguageSwitcher({
         defaultValue={currentLocale}
         onChange={(e) => {
           // Submit the form when locale changes
-          (e.currentTarget.form as HTMLFormElement).requestSubmit();
+          const form = e.currentTarget.form as HTMLFormElement | null;
+          form?.requestSubmit?.();
         }}
         disabled={isSubmitting}
         className="block w-full rounded-md border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 disabled:opacity-50"
@@ -124,7 +125,8 @@ export function LanguageSwitcherDropdown({
           name="locale"
           defaultValue={currentLocale}
           onChange={(e) => {
-            (e.currentTarget.form as HTMLFormElement).requestSubmit();
+            const form = e.currentTarget.form as HTMLFormElement | null;
+            form?.requestSubmit?.();
           }}
           disabled={isSubmitting}
           className="block w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2 pr-8 text-sm text-gray-700 shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"

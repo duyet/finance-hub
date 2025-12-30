@@ -132,7 +132,10 @@ function RouteErrorFallback({
               </a>
             )}
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                const loc = globalThis.location as Location;
+                loc.reload();
+              }}
               className="inline-flex items-center justify-center rounded-md bg-white px-6 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               Reload Page

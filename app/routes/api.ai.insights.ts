@@ -82,17 +82,20 @@ export async function action({ request }: ActionFunctionArgs) {
       .bind(user.id)
       .all();
 
-    const categories = categoriesResult.results || [];
+    const categories = (categoriesResult.results || []) as unknown as CategoryRow[];
     const categoryMap = new Map(categories.map((c: CategoryRow) => [c.id, c.name]));
 
     // Enrich transaction data with category names
     const recentTransactions = recentTransactionsResult.results || [];
-    const enrichedTransactions = recentTransactions.map((t: TransactionRow) => ({
-      date: t.date,
-      amount: t.amount,
-      description: t.description,
-      category: categoryMap.get(t.category_id) || "Uncategorized",
-    }));
+    const enrichedTransactions = recentTransactions.map((t: unknown) => {
+      const tt = t as TransactionRow;
+      return {
+        date: tt.date,
+        amount: tt.amount,
+        description: tt.description,
+        category: categoryMap.get(tt.category_id ?? "") || "Uncategorized",
+      };
+    });
 
     // Get AI answer
     const answer = await answerFinancialQuestion(
@@ -100,11 +103,14 @@ export async function action({ request }: ActionFunctionArgs) {
       { question, context },
       {
         recentTransactions: enrichedTransactions,
-        accounts: (accountsResult.results || []).map((a: AccountRow) => ({
-          name: a.name,
-          type: a.type,
-          balance: a.balance,
-        })),
+        accounts: (accountsResult.results || []).map((a: unknown) => {
+          const aa = a as AccountRow;
+          return {
+            name: aa.name,
+            type: aa.type,
+            balance: aa.balance,
+          };
+        }),
       }
     );
 

@@ -18,6 +18,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { useNavigate } from "react-router";
 import { cn } from "~/lib/utils";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
+import { useState } from "react";
 
 interface CategoryCardProps {
   category: CategoryWithStats;
@@ -89,6 +91,8 @@ const defaultIcons: Record<string, string> = {
 
 export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
   const navigate = useNavigate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
   // Get color theme
   const theme = category.color_theme
@@ -199,9 +203,8 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm(`Delete category "${category.name}"?`)) {
-                        onDelete(category.id);
-                      }
+                      setCategoryToDelete(category.id);
+                      setIsDeleteDialogOpen(true);
                     }}
                     className="text-red-600"
                   >
@@ -290,6 +293,24 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
           )}
         </div>
       </CardContent>
+
+      {/* Delete Confirmation Dialog */}
+      {onDelete && (
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title={`Delete Category "${category.name}"?`}
+          description="Are you sure you want to delete this category? This action cannot be undone."
+          confirmLabel="Delete"
+          variant="danger"
+          onConfirm={() => {
+            if (categoryToDelete) {
+              onDelete(categoryToDelete);
+              setCategoryToDelete(null);
+            }
+          }}
+        />
+      )}
     </Card>
   );
 }

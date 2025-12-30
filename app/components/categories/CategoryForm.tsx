@@ -4,15 +4,23 @@
  * Form for creating or editing categories
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { useI18n } from "~/lib/i18n/client";
 import { Tag, DollarSign } from "lucide-react";
 import type { CategoryRow, CreateCategoryInput, UpdateCategoryInput } from "~/lib/db/categories.server";
+import { COLOR_THEMES, ICON_PRESETS_ARRAY } from "./category-presets";
+
+// Use array format directly
+const iconPresetsList = ICON_PRESETS_ARRAY.map((preset) => ({
+  key: preset.label.toLowerCase(),
+  icon: preset.icon,
+  label: preset.label,
+  category: preset.category,
+}));
 
 interface CategoryFormProps {
   onSubmit: (data: CreateCategoryInput | UpdateCategoryInput) => void;
@@ -23,65 +31,6 @@ interface CategoryFormProps {
   mode?: "create" | "edit";
 }
 
-/**
- * Color themes for categories
- */
-const COLOR_THEMES = [
-  { value: "red", label: "Red", class: "bg-red-500" },
-  { value: "pink", label: "Pink", class: "bg-pink-500" },
-  { value: "purple", label: "Purple", class: "bg-purple-500" },
-  { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
-  { value: "blue", label: "Blue", class: "bg-blue-500" },
-  { value: "cyan", label: "Cyan", class: "bg-cyan-500" },
-  { value: "teal", label: "Teal", class: "bg-teal-500" },
-  { value: "green", label: "Green", class: "bg-green-500" },
-  { value: "lime", label: "Lime", class: "bg-lime-500" },
-  { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
-  { value: "orange", label: "Orange", class: "bg-orange-500" },
-  { value: "brown", label: "Brown", class: "bg-amber-500" },
-  { value: "gray", label: "Gray", class: "bg-gray-500" },
-  { value: "slate", label: "Slate", class: "bg-slate-500" },
-];
-
-/**
- * Icon presets for common categories
- */
-const ICON_PRESETS: Record<string, { icon: string; label: string; category: string }> = {
-  salary: { icon: "💰", label: "Salary", category: "income" },
-  bonus: { icon: "🎁", label: "Bonus", category: "income" },
-  investment: { icon: "📈", label: "Investment", category: "income" },
-  freelance: { icon: "💼", label: "Freelance", category: "income" },
-  gift: { icon: "🎀", label: "Gift", category: "income" },
-  refund: { icon: "↩️", label: "Refund", category: "income" },
-  food: { icon: "🍔", label: "Food", category: "expense" },
-  groceries: { icon: "🛒", label: "Groceries", category: "expense" },
-  restaurant: { icon: "🍽️", label: "Restaurant", category: "expense" },
-  coffee: { icon: "☕", label: "Coffee", category: "expense" },
-  transport: { icon: "🚗", label: "Transport", category: "expense" },
-  gas: { icon: "⛽", label: "Gas", category: "expense" },
-  parking: { icon: "🅿️", label: "Parking", category: "expense" },
-  shopping: { icon: "🛍️", label: "Shopping", category: "expense" },
-  clothing: { icon: "👕", label: "Clothing", category: "expense" },
-  electronics: { icon: "📱", label: "Electronics", category: "expense" },
-  utilities: { icon: "💡", label: "Utilities", category: "expense" },
-  rent: { icon: "🏠", label: "Rent", category: "expense" },
-  insurance: { icon: "🛡️", label: "Insurance", category: "expense" },
-  entertainment: { icon: "🎬", label: "Entertainment", category: "expense" },
-  games: { icon: "🎮", label: "Games", category: "expense" },
-  music: { icon: "🎵", label: "Music", category: "expense" },
-  health: { icon: "🏥", label: "Health", category: "expense" },
-  pharmacy: { icon: "💊", label: "Pharmacy", category: "expense" },
-  education: { icon: "📚", label: "Education", category: "expense" },
-  travel: { icon: "✈️", label: "Travel", category: "expense" },
-  pets: { icon: "🐕", label: "Pets", category: "expense" },
-  fitness: { icon: "💪", label: "Fitness", category: "expense" },
-};
-
-const iconPresetsList = Object.entries(ICON_PRESETS).map(([key, value]) => ({
-  key,
-  ...value,
-}));
-
 export function CategoryForm({
   onSubmit,
   onCancel,
@@ -90,7 +39,6 @@ export function CategoryForm({
   isLoading = false,
   mode = "create",
 }: CategoryFormProps) {
-  const { t } = useI18n();
   const [formData, setFormData] = useState<CreateCategoryInput | UpdateCategoryInput>({
     name: initialData?.name || "",
     type: initialData?.type || "EXPENSE",
@@ -131,7 +79,10 @@ export function CategoryForm({
     }
   };
 
-  const handleChange = (field: keyof (CreateCategoryInput | UpdateCategoryInput), value: any) => {
+  const handleChange = (
+    field: keyof (CreateCategoryInput | UpdateCategoryInput),
+    value: CreateCategoryInput[typeof field] | UpdateCategoryInput[typeof field] | null
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error for this field
     if (errors[field]) {

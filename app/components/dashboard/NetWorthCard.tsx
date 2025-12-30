@@ -62,13 +62,13 @@ export function NetWorthCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{formatCurrency(netWorth, currency as any)}</div>
+        <div className="text-2xl font-bold">{formatCurrency(netWorth, currency)}</div>
         {trend !== undefined && (
           <div className={`flex items-center text-xs ${trendColor} mt-1`}>
             <TrendIcon className="w-3 h-3 mr-1" />
             <span>
               {trend > 0 ? "+" : ""}
-              {formatCurrency(trend, currency as any)} ({trendPercentage}%)
+              {formatCurrency(trend, currency)} ({trendPercentage}%)
             </span>
             <span className="text-gray-500 ml-1">vs last month</span>
           </div>

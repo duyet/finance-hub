@@ -1,10 +1,12 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { redirect, useLoaderData, useNavigation, Link, Form } from "react-router";
+import { useState } from "react";
 import { ArrowLeft, Edit, Trash2, FileText, ExternalLink } from "lucide-react";
-import { format } from "date-fns";
+import { formatDateLong, formatDateShort } from "~/lib/utils/date";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
-import { transactionsCrud, type TransactionWithRelations, type TransactionStatus } from "../lib/db/transactions.server";
+import { transactionsCrud } from "../lib/db/transactions.server";
+import type { TransactionWithRelations, TransactionStatus } from "../lib/db/transactions.types";
 import { transactionIdSchema } from "../lib/validations/transaction";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -13,6 +15,8 @@ import { Separator } from "~/components/ui/separator";
 import { StatusBadge } from "~/components/transactions/TransactionActions";
 import { CategoryBadge } from "~/components/transactions/CategoryBadge";
 import { formatCurrency } from "../lib/i18n/currency";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
+import { useToast } from "~/components/ui/use-toast";
 
 /**
  * Loader - fetch single transaction
@@ -131,7 +135,10 @@ export default function TransactionDetailPage() {
     transaction: null,
   };
   const navigation = useNavigation();
+  const { toast } = useToast();
   const isPending = navigation.state === "submitting";
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteFormRef, setDeleteFormRef] = useState<HTMLFormElement | null>(null);
 
   const transaction = data.transaction;
   if (!transaction) {
@@ -142,10 +149,15 @@ export default function TransactionDetailPage() {
   const amountPrefix = isIncome ? "+" : "";
 
   const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this transaction?")) {
-      const formData = new FormData();
-      formData.set("intent", "delete");
-      // Submit the form
+    // Open confirmation dialog instead of using native confirm()
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    // Submit the form directly
+    if (deleteFormRef) {
+      toast({ title: "Deleting transaction..." });
+      deleteFormRef.requestSubmit?.();
     }
   };
 
@@ -198,10 +210,14 @@ export default function TransactionDetailPage() {
                   Edit
                 </Link>
               </Button>
-              <Form method="post" onSubmit={(e) => {
-                e.preventDefault();
-                handleDelete();
-              }}>
+              <Form
+                method="post"
+                ref={setDeleteFormRef}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDelete();
+                }}
+              >
                 <input type="hidden" name="intent" value="delete" />
                 <Button type="submit" variant="destructive" disabled={isPending}>
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -229,7 +245,7 @@ export default function TransactionDetailPage() {
                   <div className="text-right">
                     <StatusBadge status={transaction.status} />
                     <p className="text-sm text-muted-foreground mt-2">
-                      {format(new Date(transaction.date), "MMMM d, yyyy")}
+                      {formatDateLong(transaction.date)}
                     </p>
                   </div>
                 </div>
@@ -255,7 +271,7 @@ export default function TransactionDetailPage() {
                   )}
                   <DetailRow
                     label="Date"
-                    value={format(new Date(transaction.date), "MMMM d, yyyy")}
+                    value={formatDateLong(transaction.date)}
                   />
                   <DetailRow
                     label="Status"
@@ -365,11 +381,11 @@ export default function TransactionDetailPage() {
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Created</span>
-                  <span>{format(new Date(transaction.created_at), "MMM d, yyyy")}</span>
+                  <span>{formatDateShort(transaction.created_at)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Last Updated</span>
-                  <span>{format(new Date(transaction.updated_at), "MMM d, yyyy")}</span>
+                  <span>{formatDateShort(transaction.updated_at)}</span>
                 </div>
                 {transaction.reference_number && (
                   <div className="flex justify-between">
@@ -386,6 +402,17 @@ export default function TransactionDetailPage() {
             </Card>
           </div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title="Delete Transaction?"
+          description="Are you sure you want to delete this transaction? This action cannot be undone."
+          confirmLabel="Delete"
+          variant="danger"
+          onConfirm={confirmDelete}
+        />
       </main>
     </div>
   );

@@ -1,3 +1,4 @@
+// Import Cloudflare types with type-only imports to minimize global pollution
 import type {
   D1Database,
   Fetcher,
@@ -30,7 +31,8 @@ export interface Env {
   AI_GATEWAY_NAME?: string;
   /** OpenRouter API token for model provider diversity */
   OPENROUTER_API_TOKEN?: string;
-  // Other bindings...
+  /** Cloudflare Image Resizing binding (optional) */
+  IMAGES?: unknown;
 }
 
 export interface CloudflareRequest extends Request {

@@ -12,8 +12,6 @@
  * 4. Update with server data on success
  */
 
-import type { FetcherWithComponents } from "react-router/dom";
-
 /**
  * Optimistic update state
  */

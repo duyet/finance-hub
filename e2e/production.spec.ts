@@ -473,8 +473,8 @@ test.describe('Resource Loading', () => {
 });
 
 test.describe('Mobile Responsiveness', () => {
-  test('responsive on small mobile', async ({ page, viewport }) => {
-    await viewport.setSize({ width: 320, height: 568 });
+  test('responsive on small mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -483,8 +483,8 @@ test.describe('Mobile Responsiveness', () => {
     expect(bodyText?.length).toBeGreaterThan(100);
   });
 
-  test('responsive on tablet', async ({ page, viewport }) => {
-    await viewport.setSize({ width: 768, height: 1024 });
+  test('responsive on tablet', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -492,8 +492,8 @@ test.describe('Mobile Responsiveness', () => {
     expect(bodyText?.length).toBeGreaterThan(100);
   });
 
-  test('responsive on desktop', async ({ page, viewport }) => {
-    await viewport.setSize({ width: 1920, height: 1080 });
+  test('responsive on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -501,8 +501,8 @@ test.describe('Mobile Responsiveness', () => {
     expect(bodyText?.length).toBeGreaterThan(100);
   });
 
-  test('touch targets are large enough on mobile', async ({ page, viewport }) => {
-    await viewport.setSize({ width: 375, height: 667 });
+  test('touch targets are large enough on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

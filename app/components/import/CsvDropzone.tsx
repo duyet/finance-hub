@@ -5,7 +5,7 @@
 
 import { useCallback } from "react";
 import { Upload, FileText, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useI18n } from "~/lib/i18n/client";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 
@@ -24,7 +24,7 @@ export function CsvDropzone({
   error,
   isLoading = false,
 }: CsvDropzoneProps) {
-  const { t } = useTranslation();
+  const { t } = useI18n();
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

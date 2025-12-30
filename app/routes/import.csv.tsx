@@ -3,8 +3,8 @@
  * Main page for CSV file import with AI-powered column mapping
  */
 
-import { useState, useCallback } from "react";
-import { useTranslation } from "react-i18next";
+import { useState, useCallback, lazy, Suspense } from "react";
+import { useI18n } from "~/lib/i18n/client";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useActionData, useNavigation } from "react-router";
 import { FileSpreadsheet, ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -13,16 +13,28 @@ import { Card } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Separator } from "~/components/ui/separator";
 import { toast } from "~/components/ui/use-toast";
-import {
-  CsvDropzone,
-  ColumnMappingTable,
-  CsvPreview,
-  ImportOptions,
-  ImportSummary,
-  AiMappingButton,
-} from "~/components/import";
 import type { ColumnMapping, ImportOptions as ImportOptionsType } from "../lib/types/csv-import";
 import { action as importAction, loader as importLoader } from "./action.import-csv";
+
+// Lazy load CSV import components for code splitting
+const CsvDropzone = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.CsvDropzone }))
+);
+const ColumnMappingTable = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.ColumnMappingTable }))
+);
+const CsvPreview = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.CsvPreview }))
+);
+const ImportOptions = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.ImportOptions }))
+);
+const ImportSummary = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.ImportSummary }))
+);
+const AiMappingButton = lazy(() =>
+  import("~/components/import").then(m => ({ default: m.AiMappingButton }))
+);
 
 export { importAction as action };
 
@@ -31,7 +43,7 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function CsvImportRoute() {
-  const { t } = useTranslation();
+  const { t } = useI18n();
   const navigation = useNavigation();
   const loaderData = useLoaderData<typeof importLoader>();
   const actionData = useActionData<typeof importAction>();
@@ -341,15 +353,17 @@ export default function CsvImportRoute() {
       <Tabs value={step} onValueChange={(v) => setStep(v as "upload" | "mapping" | "options" | "review")}>
         <TabsContent value="upload">
           <div className="space-y-6">
-            <CsvDropzone
-              file={file}
-              onFileSelect={handleFileSelect}
-              onFileRemove={() => {
-                setFile(null);
-                setParsedData(null);
-                setMapping({});
-              }}
-            />
+            <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+              <CsvDropzone
+                file={file}
+                onFileSelect={handleFileSelect}
+                onFileRemove={() => {
+                  setFile(null);
+                  setParsedData(null);
+                  setMapping({});
+                }}
+              />
+            </Suspense>
 
             {/* Instructions */}
             <Card className="p-6">
@@ -393,17 +407,21 @@ export default function CsvImportRoute() {
         <TabsContent value="mapping">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-6">
-              <AiMappingButton
-                onMapColumns={handleAiMapping}
-                disabled={isLoading}
-              />
+              <Suspense fallback={<div className="h-16 animate-pulse bg-muted rounded" />}>
+                <AiMappingButton
+                  onMapColumns={handleAiMapping}
+                  disabled={isLoading}
+                />
+              </Suspense>
 
-              <ColumnMappingTable
-                headers={parsedData?.headers || []}
-                mapping={mapping as Record<string, string>}
-                onMappingChange={handleMappingChange}
-                disabled={isLoading}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <ColumnMappingTable
+                  headers={parsedData?.headers || []}
+                  mapping={mapping as Record<string, string>}
+                  onMappingChange={handleMappingChange}
+                  disabled={isLoading}
+                />
+              </Suspense>
 
               <div className="flex gap-3">
                 <Button
@@ -424,11 +442,13 @@ export default function CsvImportRoute() {
             </div>
 
             <div>
-              <CsvPreview
-                headers={parsedData?.headers || []}
-                rows={parsedData?.rows || []}
-                mappedColumns={mappedColumns}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <CsvPreview
+                  headers={parsedData?.headers || []}
+                  rows={parsedData?.rows || []}
+                  mappedColumns={mappedColumns}
+                />
+              </Suspense>
             </div>
           </div>
         </TabsContent>
@@ -436,39 +456,43 @@ export default function CsvImportRoute() {
         <TabsContent value="options">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <ImportOptions
-                accounts={loaderData.accounts}
-                categories={loaderData.categories}
-                targetAccountId={options.targetAccountId}
-                defaultCategoryId={options.defaultCategoryId}
-                dateFormat={options.dateFormat}
-                skipHeaderRow={options.skipHeaderRow}
-                dryRun={options.dryRun}
-                onTargetAccountChange={(value) =>
-                  setOptions((prev) => ({ ...prev, targetAccountId: value }))
-                }
-                onDefaultCategoryChange={(value) =>
-                  setOptions((prev) => ({ ...prev, defaultCategoryId: value }))
-                }
-                onDateFormatChange={(value) =>
-                  setOptions((prev) => ({ ...prev, dateFormat: value }))
-                }
-                onSkipHeaderRowChange={(checked) =>
-                  setOptions((prev) => ({ ...prev, skipHeaderRow: checked }))
-                }
-                onDryRunChange={(checked) =>
-                  setOptions((prev) => ({ ...prev, dryRun: checked }))
-                }
-                disabled={isLoading}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <ImportOptions
+                  accounts={loaderData.accounts}
+                  categories={loaderData.categories}
+                  targetAccountId={options.targetAccountId}
+                  defaultCategoryId={options.defaultCategoryId}
+                  dateFormat={options.dateFormat}
+                  skipHeaderRow={options.skipHeaderRow}
+                  dryRun={options.dryRun}
+                  onTargetAccountChange={(value) =>
+                    setOptions((prev) => ({ ...prev, targetAccountId: value }))
+                  }
+                  onDefaultCategoryChange={(value) =>
+                    setOptions((prev) => ({ ...prev, defaultCategoryId: value }))
+                  }
+                  onDateFormatChange={(value) =>
+                    setOptions((prev) => ({ ...prev, dateFormat: value }))
+                  }
+                  onSkipHeaderRowChange={(checked) =>
+                    setOptions((prev) => ({ ...prev, skipHeaderRow: checked }))
+                  }
+                  onDryRunChange={(checked) =>
+                    setOptions((prev) => ({ ...prev, dryRun: checked }))
+                  }
+                  disabled={isLoading}
+                />
+              </Suspense>
             </div>
 
             <div className="space-y-6">
-              <CsvPreview
-                headers={parsedData?.headers || []}
-                rows={parsedData?.rows || []}
-                mappedColumns={mappedColumns}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <CsvPreview
+                  headers={parsedData?.headers || []}
+                  rows={parsedData?.rows || []}
+                  mappedColumns={mappedColumns}
+                />
+              </Suspense>
 
               <div className="flex gap-3">
                 <Button
@@ -493,21 +517,25 @@ export default function CsvImportRoute() {
         <TabsContent value="review">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <ImportSummary
-                result={importResult}
-                rowCount={parsedData?.rows.length || 0}
-                isImporting={isLoading}
-                onConfirm={handleImport}
-                onBack={() => setStep("options")}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <ImportSummary
+                  result={importResult}
+                  rowCount={parsedData?.rows.length || 0}
+                  isImporting={isLoading}
+                  onConfirm={handleImport}
+                  onBack={() => setStep("options")}
+                />
+              </Suspense>
             </div>
 
             <div>
-              <CsvPreview
-                headers={parsedData?.headers || []}
-                rows={parsedData?.rows || []}
-                mappedColumns={mappedColumns}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <CsvPreview
+                  headers={parsedData?.headers || []}
+                  rows={parsedData?.rows || []}
+                  mappedColumns={mappedColumns}
+                />
+              </Suspense>
             </div>
           </div>
         </TabsContent>

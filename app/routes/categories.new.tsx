@@ -5,12 +5,13 @@
  */
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { redirect, useLoaderData, useNavigate, Form } from "react-router";
+import { redirect, useLoaderData, useNavigate, useNavigation, Form, useFetcher } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
+import { useToast } from "~/components/ui/use-toast";
 import { getDb } from "~/lib/auth/db.server";
 import { categoriesCrud } from "~/lib/db/categories.server";
+import type { CreateCategoryInput } from "~/lib/db/categories.types";
 import { CategoryForm } from "~/components/categories/CategoryForm";
-import type { CreateCategoryInput } from "~/lib/db/categories.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
@@ -70,6 +71,14 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function NewCategoryPage() {
   const { parentOptions } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const fetcher = useFetcher();
+  const { toast } = useToast();
+  const isSubmitting = navigation.state === "submitting" || fetcher.state === "submitting";
+
+  const handleSubmit = () => {
+    toast({ title: "Creating category..." });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -81,6 +90,7 @@ export default function NewCategoryPage() {
               <button
                 onClick={() => navigate("/categories")}
                 className="text-gray-600 hover:text-indigo-600"
+                aria-label="Back to categories"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -103,12 +113,12 @@ export default function NewCategoryPage() {
           </p>
         </div>
 
-        <Form method="post">
+        <Form method="post" onSubmit={handleSubmit}>
           <CategoryForm
             onSubmit={(data) => {
               // Form submission will be handled by the Form component
               const form = document.querySelector("form") as HTMLFormElement;
-              const formData = new FormData(form);
+              const formData = new FormData();
 
               Object.entries(data).forEach(([key, value]) => {
                 if (value !== undefined && value !== null) {
@@ -116,10 +126,12 @@ export default function NewCategoryPage() {
                 }
               });
 
-              form.submit();
+              // Submit using fetcher
+              fetcher.submit(formData, { method: "post" });
             }}
             onCancel={() => navigate("/categories")}
             parentOptions={[...parentOptions.INCOME, ...parentOptions.EXPENSE]}
+            isLoading={isSubmitting}
             mode="create"
           />
         </Form>

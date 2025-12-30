@@ -2,7 +2,7 @@
  * Sidebar Navigation Component
  *
  * Main navigation sidebar with mobile responsiveness
- * Supports collapsible menu on mobile devices
+ * Simplified to MVP features only
  */
 
 import { useState } from "react";
@@ -18,30 +18,15 @@ import {
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  CreditCard,
   Landmark,
-  Settings,
   Menu,
   User,
   LogOut,
-  Link2,
-  Receipt,
-  Target,
-  Bell,
-  TrendingUp,
-  FileText,
-  Calendar,
-  Trophy,
-  DollarSign,
-  AlertTriangle,
-  Sparkles,
-  Network,
-  Shield,
+  Tags,
+  Upload,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { ThemeToggle } from "~/components/theme/theme-toggle";
-import { NotificationBell } from "~/components/notifications";
-import type { NotificationStats } from "~/lib/services/notifications.server";
 
 interface NavItem {
   label: string;
@@ -61,94 +46,19 @@ const navItems: NavItem[] = [
     icon: ArrowLeftRight,
   },
   {
-    label: "Goals",
-    href: "/goals",
-    icon: Target,
-  },
-  {
-    label: "Investments",
-    href: "/investments",
-    icon: TrendingUp,
-  },
-  {
-    label: "Taxes",
-    href: "/taxes",
-    icon: FileText,
-  },
-  {
-    label: "Notifications",
-    href: "/notifications",
-    icon: Bell,
-  },
-  {
-    label: "Receipts",
-    href: "/receipts",
-    icon: Receipt,
-  },
-  {
     label: "Accounts",
     href: "/accounts",
     icon: Landmark,
   },
   {
-    label: "Credit Cards",
-    href: "/credit-cards",
-    icon: CreditCard,
+    label: "Categories",
+    href: "/categories",
+    icon: Tags,
   },
   {
-    label: "Loans",
-    href: "/loans",
-    icon: Landmark,
-  },
-  {
-    label: "Bank Sync",
-    href: "/settings/bank-sync",
-    icon: Link2,
-  },
-  {
-    label: "Calendar Sync",
-    href: "/settings/calendar",
-    icon: Calendar,
-  },
-  {
-    label: "Net Worth",
-    href: "/settings/net-worth",
-    icon: Trophy,
-  },
-  {
-    label: "Cash Flow",
-    href: "/settings/cash-flow",
-    icon: DollarSign,
-  },
-  {
-    label: "Spending Insights",
-    href: "/settings/spending-insights",
-    icon: Target,
-  },
-  {
-    label: "Anomaly Detection",
-    href: "/settings/anomaly-detection",
-    icon: AlertTriangle,
-  },
-  {
-    label: "Smart Categorization",
-    href: "/settings/smart-categorization",
-    icon: Sparkles,
-  },
-  {
-    label: "Correlations",
-    href: "/settings/correlations",
-    icon: Network,
-  },
-  {
-    label: "Security",
-    href: "/settings/security",
-    icon: Shield,
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
+    label: "Import",
+    href: "/import/csv",
+    icon: Upload,
   },
 ];
 
@@ -158,16 +68,9 @@ interface SidebarProps {
     email?: string;
     avatarUrl?: string;
   };
-  notificationStats?: NotificationStats;
 }
 
-export function Sidebar({ user, notificationStats }: SidebarProps) {
-  // Default stats if not provided
-  const stats: NotificationStats = notificationStats || {
-    total: 0,
-    unread: 0,
-    unreadActionRequired: 0,
-  };
+export function Sidebar({ user }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -271,7 +174,6 @@ export function Sidebar({ user, notificationStats }: SidebarProps) {
                     {user?.email}
                   </p>
                 </div>
-                <NotificationBell stats={stats} />
                 <ThemeToggle />
               </div>
               <SheetClose asChild>
@@ -338,7 +240,6 @@ export function Sidebar({ user, notificationStats }: SidebarProps) {
                 {user?.email}
               </p>
             </div>
-            <NotificationBell stats={stats} />
             <ThemeToggle />
           </div>
           <Link

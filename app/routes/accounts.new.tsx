@@ -9,13 +9,16 @@ import { redirect } from "react-router";
 import { useLoaderData, useActionData, useNavigate, Form, Link } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
-import { accountDb, ACCOUNT_TYPES, type CreateAccountData } from "~/lib/db/accounts.server";
+import { accountDb } from "~/lib/db/accounts.server";
+import { ACCOUNT_TYPES, type CreateAccountData } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ArrowLeft, Landmark, PiggyBank, Wallet, TrendingUp } from "lucide-react";
 import { useI18n } from "~/lib/i18n/client";
+import { useToast } from "~/components/ui/use-toast";
+import { useNavigation } from "react-router";
 
 type ActionData = {
   errors?: {
@@ -115,6 +118,8 @@ export default function NewAccountPage() {
   const { accountTypes } = useLoaderData<typeof loader>();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const { toast } = useToast();
   const actionData = useActionData<ActionData>();
 
   const errors = actionData?.errors || {};
@@ -150,6 +155,12 @@ export default function NewAccountPage() {
     { value: "indigo", label: "Indigo", bg: "bg-indigo-500" },
   ];
 
+  const isSubmitting = navigation.state === "submitting";
+
+  const handleSubmit = () => {
+    toast({ title: "Creating account..." });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Navigation */}
@@ -160,6 +171,7 @@ export default function NewAccountPage() {
               <button
                 onClick={() => navigate("/accounts")}
                 className="text-gray-600 hover:text-indigo-600"
+                aria-label="Back to accounts"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -193,11 +205,11 @@ export default function NewAccountPage() {
               </div>
             )}
 
-            <Form method="post" className="space-y-6">
+            <Form method="post" className="space-y-6" onSubmit={handleSubmit}>
               {/* Account Name */}
               <div>
                 <Label htmlFor="name">
-                  {t("accounts.accountName") || "Account Name"} <span className="text-red-500">*</span>
+                  {t("accounts.accountName") || "Account Name"} <span className="text-red-600">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -208,13 +220,13 @@ export default function NewAccountPage() {
                   className={errors.name ? "border-red-500" : ""}
                   required
                 />
-                {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
               </div>
 
               {/* Account Type */}
               <div>
                 <Label htmlFor="type">
-                  {t("accounts.accountType") || "Account Type"} <span className="text-red-500">*</span>
+                  {t("accounts.accountType") || "Account Type"} <span className="text-red-600">*</span>
                 </Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {availableTypes.map((type) => (
@@ -242,7 +254,7 @@ export default function NewAccountPage() {
                     </label>
                   ))}
                 </div>
-                {errors.type && <p className="text-sm text-red-500 mt-1">{errors.type}</p>}
+                {errors.type && <p className="text-sm text-red-600 mt-1">{errors.type}</p>}
               </div>
 
               {/* Currency */}
@@ -276,7 +288,7 @@ export default function NewAccountPage() {
                   placeholder={t("accounts.institutionPlaceholder") || "e.g., Vietcombank, TPBank"}
                   className={errors.institution_name ? "border-red-500" : ""}
                 />
-                {errors.institution_name && <p className="text-sm text-red-500 mt-1">{errors.institution_name}</p>}
+                {errors.institution_name && <p className="text-sm text-red-600 mt-1">{errors.institution_name}</p>}
               </div>
 
               {/* Account Number (Last 4 digits) */}
@@ -294,7 +306,7 @@ export default function NewAccountPage() {
                   pattern="\d{4}"
                   className={errors.account_number_last4 ? "border-red-500" : ""}
                 />
-                {errors.account_number_last4 && <p className="text-sm text-red-500 mt-1">{errors.account_number_last4}</p>}
+                {errors.account_number_last4 && <p className="text-sm text-red-600 mt-1">{errors.account_number_last4}</p>}
                 <p className="text-sm text-gray-500 mt-1">
                   {t("accounts.accountNumberHint") || "Only the last 4 digits for identification"}
                 </p>
@@ -329,32 +341,20 @@ export default function NewAccountPage() {
               {/* Form Actions */}
               <div className="flex justify-end gap-3 pt-6 border-t">
                 <Link to="/accounts">
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="outline" disabled={isSubmitting}>
                     {t("common.cancel") || "Cancel"}
                   </Button>
                 </Link>
-                <Button type="submit">
-                  {t("accounts.createAccount") || "Create Account"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? (t("common.creating") || "Creating...")
+                    : (t("accounts.createAccount") || "Create Account")
+                  }
                 </Button>
               </div>
             </Form>
           </CardContent>
         </Card>
-
-        {/* Note about Credit Cards and Loans */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>Note:</strong> For credit cards or loans, please use the dedicated{" "}
-            <Link to="/credit-cards" className="underline hover:text-blue-900">
-              Credit Cards
-            </Link>{" "}
-            or{" "}
-            <Link to="/loans" className="underline hover:text-blue-900">
-              Loans
-            </Link>{" "}
-            pages to create those specialized accounts.
-          </p>
-        </div>
       </main>
     </div>
   );

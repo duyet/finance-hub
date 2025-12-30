@@ -7,11 +7,18 @@ import type { CloudflareRequest } from "../auth/db.server";
 import { getDb } from "../auth/db.server";
 import type { CategorySuggestion } from "../types/receipt";
 
+// AI binding type with run method (Cloudflare Workers AI)
+interface AiBinding {
+  run(model: string, inputs: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
+
 /**
  * Get AI binding from request context
  */
-function getAI(request: CloudflareRequest) {
-  return request.context?.cloudflare?.env?.AI;
+function getAI(request: CloudflareRequest): AiBinding | undefined {
+  const ai = request.context?.cloudflare?.env?.AI;
+  return ai as unknown as AiBinding | undefined;
 }
 
 /**
@@ -35,9 +42,9 @@ export async function generateEmbedding(
 
     // Response shape varies, try common formats
     const embedding =
-      (response as any).embedding ||
-      (response as any).data?.[0]?.embedding ||
-      (response as any).vector ||
+      (response as { embedding?: number[] }).embedding ||
+      (response as { data?: Array<{ embedding?: number[] }> }).data?.[0]?.embedding ||
+      (response as { vector?: number[] }).vector ||
       [];
 
     if (!Array.isArray(embedding) || embedding.length === 0) {

@@ -36,38 +36,24 @@ type Pages = {
       "id": string;
     };
   };
-  "/credit-cards": {
+  "/accounts": {
     params: {};
   };
-  "/credit-cards/:id": {
+  "/accounts/:id": {
     params: {
       "id": string;
     };
   };
-  "/loans": {
+  "/accounts/new": {
     params: {};
   };
-  "/loans/:id": {
-    params: {
-      "id": string;
-    };
+  "/categories": {
+    params: {};
+  };
+  "/categories/new": {
+    params: {};
   };
   "/import/csv": {
-    params: {};
-  };
-  "/import/receipt": {
-    params: {};
-  };
-  "/receipts": {
-    params: {};
-  };
-  "/settings/bank-sync": {
-    params: {};
-  };
-  "/reports/generate": {
-    params: {};
-  };
-  "/reports/history": {
     params: {};
   };
 };
@@ -75,10 +61,10 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/credit-cards" | "/credit-cards/:id" | "/loans" | "/loans/:id" | "/import/csv" | "/import/receipt" | "/receipts" | "/settings/bank-sync" | "/reports/generate" | "/reports/history";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv";
   } | {
     id: "app-root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/credit-cards" | "/credit-cards/:id" | "/loans" | "/loans/:id" | "/import/csv" | "/import/receipt" | "/receipts" | "/settings/bank-sync" | "/reports/generate" | "/reports/history";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv";
   };
   "routes/_index.tsx": {
     id: "routes/_index";
@@ -108,45 +94,29 @@ type RouteFiles = {
     id: "routes/transactions.$id";
     page: "/transactions/:id";
   };
-  "routes/credit-cards._index.tsx": {
-    id: "routes/credit-cards._index";
-    page: "/credit-cards";
+  "routes/accounts._index.tsx": {
+    id: "routes/accounts._index";
+    page: "/accounts";
   };
-  "routes/credit-cards.$id.tsx": {
-    id: "routes/credit-cards.$id";
-    page: "/credit-cards/:id";
+  "routes/accounts.$id.tsx": {
+    id: "routes/accounts.$id";
+    page: "/accounts/:id";
   };
-  "routes/loans._index.tsx": {
-    id: "routes/loans._index";
-    page: "/loans";
+  "routes/accounts.new.tsx": {
+    id: "routes/accounts.new";
+    page: "/accounts/new";
   };
-  "routes/loans.$id.tsx": {
-    id: "routes/loans.$id";
-    page: "/loans/:id";
+  "routes/categories._index.tsx": {
+    id: "routes/categories._index";
+    page: "/categories";
+  };
+  "routes/categories.new.tsx": {
+    id: "routes/categories.new";
+    page: "/categories/new";
   };
   "routes/import.csv.tsx": {
     id: "routes/import.csv";
     page: "/import/csv";
-  };
-  "routes/import.receipt.tsx": {
-    id: "routes/import.receipt";
-    page: "/import/receipt";
-  };
-  "routes/receipts._index.tsx": {
-    id: "routes/receipts._index";
-    page: "/receipts";
-  };
-  "routes/settings.bank-sync.tsx": {
-    id: "routes/settings.bank-sync";
-    page: "/settings/bank-sync";
-  };
-  "routes/reports.generate.tsx": {
-    id: "routes/reports.generate";
-    page: "/reports/generate";
-  };
-  "routes/reports.history.tsx": {
-    id: "routes/reports.history";
-    page: "/reports/history";
   };
 };
 
@@ -160,14 +130,10 @@ type RouteModules = {
   "routes/dashboard._index": typeof import("./app/routes/dashboard._index.tsx");
   "routes/transactions._index": typeof import("./app/routes/transactions._index.tsx");
   "routes/transactions.$id": typeof import("./app/routes/transactions.$id.tsx");
-  "routes/credit-cards._index": typeof import("./app/routes/credit-cards._index.tsx");
-  "routes/credit-cards.$id": typeof import("./app/routes/credit-cards.$id.tsx");
-  "routes/loans._index": typeof import("./app/routes/loans._index.tsx");
-  "routes/loans.$id": typeof import("./app/routes/loans.$id.tsx");
+  "routes/accounts._index": typeof import("./app/routes/accounts._index.tsx");
+  "routes/accounts.$id": typeof import("./app/routes/accounts.$id.tsx");
+  "routes/accounts.new": typeof import("./app/routes/accounts.new.tsx");
+  "routes/categories._index": typeof import("./app/routes/categories._index.tsx");
+  "routes/categories.new": typeof import("./app/routes/categories.new.tsx");
   "routes/import.csv": typeof import("./app/routes/import.csv.tsx");
-  "routes/import.receipt": typeof import("./app/routes/import.receipt.tsx");
-  "routes/receipts._index": typeof import("./app/routes/receipts._index.tsx");
-  "routes/settings.bank-sync": typeof import("./app/routes/settings.bank-sync.tsx");
-  "routes/reports.generate": typeof import("./app/routes/reports.generate.tsx");
-  "routes/reports.history": typeof import("./app/routes/reports.history.tsx");
 };

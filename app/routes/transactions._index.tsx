@@ -1,10 +1,11 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { redirect, useLoaderData, useNavigation, useSearchParams } from "react-router";
-import { useState } from "react";
+import { redirect, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
+import { useState, lazy, Suspense } from "react";
 import { Plus } from "lucide-react";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
-import { transactionsCrud, type TransactionFilters, type PaginationOptions, type TransactionStatus } from "../lib/db/transactions.server";
+import { transactionsCrud } from "../lib/db/transactions.server";
+import type { TransactionFilters, PaginationOptions, TransactionStatus } from "../lib/db/transactions.types";
 import { parseTransactionFilters, type CreateTransactionInput } from "../lib/validations/transaction";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -15,11 +16,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { TransactionFilters as TransactionFiltersComponent } from "~/components/transactions/TransactionFilters";
-import { TransactionsTable } from "~/components/transactions/TransactionsTable";
-import { TransactionDialog } from "~/components/transactions/TransactionDialog";
-import { BatchOperationsToolbar } from "~/components/transactions/batch-operations-toolbar";
 import { useToast } from "~/components/ui/use-toast";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
+
+// Lazy load transaction components for code splitting
+const TransactionFiltersComponent = lazy(() =>
+  import("~/components/transactions/TransactionFilters").then(m => ({ default: m.TransactionFilters }))
+);
+const TransactionsTable = lazy(() =>
+  import("~/components/transactions/TransactionsTable").then(m => ({ default: m.TransactionsTable }))
+);
+const TransactionDialog = lazy(() =>
+  import("~/components/transactions/TransactionDialog").then(m => ({ default: m.TransactionDialog }))
+);
+const BatchOperationsToolbar = lazy(() =>
+  import("~/components/transactions/batch-operations-toolbar").then(m => ({ default: m.BatchOperationsToolbar }))
+);
 
 /**
  * Loader - fetch transactions and filter options
@@ -149,6 +161,7 @@ export default function TransactionsListPage() {
     filterOptions: { accounts: [], categories: [] },
     currentFilters: {},
   };
+  const navigate = useNavigate();
   const navigation = useNavigation();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
@@ -157,6 +170,8 @@ export default function TransactionsListPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
   const isPending = navigation.state === "submitting";
 
@@ -184,7 +199,7 @@ export default function TransactionsListPage() {
     params.set("sortBy", sortBy);
     params.set("sortOrder", sortOrder);
     params.set("page", "1");
-    window.location.search = params.toString();
+    navigate(`?${params.toString()}`);
   };
 
   // Handle edit
@@ -197,18 +212,30 @@ export default function TransactionsListPage() {
     }
   };
 
-  // Handle delete
+  // Handle delete - use navigate to refresh instead of hard reload
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this transaction?")) {
-      const formData = new FormData();
-      formData.set("intent", "delete");
-      formData.set("id", id);
-      // Submit using navigate/form
-      toast({ title: "Deleting transaction..." });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    }
+    // Open confirmation dialog instead of using native confirm()
+    setTransactionToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirm delete action
+  const confirmDelete = () => {
+    if (!transactionToDelete) return;
+
+    const formData = new FormData();
+    formData.set("intent", "delete");
+    formData.set("id", transactionToDelete);
+    // Submit using navigate/form
+    toast({ title: "Deleting transaction..." });
+    fetch("/transactions", {
+      method: "POST",
+      body: formData,
+    }).then(() => {
+      // Use React Router's navigation to refresh instead of hard reload
+      navigate(0);
+    });
+    setTransactionToDelete(null);
   };
 
   return (
@@ -256,49 +283,55 @@ export default function TransactionsListPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <TransactionFiltersComponent
-              filterOptions={data.filterOptions}
-              currentFilters={{
-                ...data.currentFilters,
-                page: data.page,
-                pageSize: data.pageSize,
-                sortBy: data.pagination.sortBy,
-                sortOrder: data.pagination.sortOrder,
-              }}
-            />
+            <Suspense fallback={<div className="h-32 animate-pulse bg-muted rounded" />}>
+              <TransactionFiltersComponent
+                filterOptions={data.filterOptions}
+                currentFilters={{
+                  ...data.currentFilters,
+                  page: data.page,
+                  pageSize: data.pageSize,
+                  sortBy: data.pagination.sortBy,
+                  sortOrder: data.pagination.sortOrder,
+                }}
+              />
+            </Suspense>
           </CardContent>
         </Card>
 
         {/* Batch Operations Toolbar */}
         <div className="mb-6">
-          <BatchOperationsToolbar
-            selectedIds={selectedIds}
-            totalCount={data.total}
-            onClear={() => setSelectedIds([])}
-            disabled={isPending}
-            availableCategories={data.filterOptions.categories.map((c) => ({
-              id: c.id,
-              name: c.name,
-            }))}
-          />
+          <Suspense fallback={<div className="h-14 animate-pulse bg-muted rounded" />}>
+            <BatchOperationsToolbar
+              selectedIds={selectedIds}
+              totalCount={data.total}
+              onClear={() => setSelectedIds([])}
+              disabled={isPending}
+              availableCategories={data.filterOptions.categories.map((c) => ({
+                id: c.id,
+                name: c.name,
+              }))}
+            />
+          </Suspense>
         </div>
 
         {/* Transactions Table */}
         <Card>
           <CardContent className="pt-6">
-            <TransactionsTable
-              transactions={data.transactions}
-              total={data.total}
-              page={data.page}
-              pageSize={data.pageSize}
-              pagination={data.pagination}
-              selectedIds={selectedIds}
-              onSelectAll={handleSelectAll}
-              onSelectOne={handleSelectOne}
-              onSort={handleSort}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded" />}>
+              <TransactionsTable
+                transactions={data.transactions}
+                total={data.total}
+                page={data.page}
+                pageSize={data.pageSize}
+                pagination={data.pagination}
+                selectedIds={selectedIds}
+                onSelectAll={handleSelectAll}
+                onSelectOne={handleSelectOne}
+                onSort={handleSort}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -327,18 +360,35 @@ export default function TransactionsListPage() {
       </main>
 
       {/* Transaction Dialog */}
-      <TransactionDialog
-        isOpen={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setEditingTransaction(null);
-        }}
-        transaction={editingTransaction}
-        filterOptions={data.filterOptions}
-        isSubmitting={isPending}
-        onSubmit={(data) => {
-          setIsDialogOpen(false);
-        }}
+      <Suspense fallback={null}>
+        <TransactionDialog
+          isOpen={isDialogOpen}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setEditingTransaction(null);
+          }}
+          transaction={editingTransaction}
+          filterOptions={data.filterOptions}
+          isSubmitting={isPending}
+          onSubmit={(data) => {
+            const isEditing = !!editingTransaction;
+            toast({
+              title: isEditing ? "Updating transaction..." : "Creating transaction..."
+            });
+            setIsDialogOpen(false);
+          }}
+        />
+      </Suspense>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Transaction?"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={confirmDelete}
       />
     </div>
   );

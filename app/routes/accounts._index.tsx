@@ -2,7 +2,6 @@
  * Accounts List Page
  *
  * Displays all financial accounts including checking, savings, wallets, and investments.
- * Credit cards and loans have their own dedicated pages.
  */
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
@@ -10,7 +9,9 @@ import { redirect } from "react-router";
 import { useLoaderData, useNavigate, Form, Link } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
-import { accountDb, type FinancialAccount, type AccountType, getAccountTypeConfig } from "~/lib/db/accounts.server";
+import { accountDb } from "~/lib/db/accounts.server";
+import type { FinancialAccount, AccountType } from "~/lib/db/accounts.types";
+import { getAccountTypeConfig } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -18,6 +19,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~
 import { ArrowLeft, Plus, Wallet, Landmark, PiggyBank, TrendingUp, CreditCard, Home } from "lucide-react";
 import { useI18n } from "~/lib/i18n/client";
 import { useState } from "react";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
+import { useToast } from "~/components/ui/use-toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
@@ -59,7 +62,11 @@ export default function AccountsIndexPage() {
   const { accounts, balanceSummary, netWorth } = useLoaderData<typeof loader>();
   const { t, formatCurrency } = useI18n();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [filterType, setFilterType] = useState<string>("ALL");
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
+  const [accountIdToArchive, setAccountIdToArchive] = useState<string | null>(null);
+  const [archiveFormRef, setArchiveFormRef] = useState<HTMLFormElement | null>(null);
 
   // Account type icon mapping
   const getAccountIcon = (type: string) => {
@@ -101,6 +108,7 @@ export default function AccountsIndexPage() {
               <button
                 onClick={() => navigate("/dashboard")}
                 className="text-gray-600 hover:text-indigo-600"
+                aria-label="Back to dashboard"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -262,22 +270,17 @@ export default function AccountsIndexPage() {
                                 {t("common.view") || "View"}
                               </Button>
                             </Link>
-                            <Form method="post">
-                              <input type="hidden" name="intent" value="archive" />
-                              <input type="hidden" name="accountId" value={account.id} />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={(e) => {
-                                  if (!confirm(t("accounts.confirmArchive") || "Are you sure?")) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              >
-                                {t("common.archive") || "Archive"}
-                              </Button>
-                            </Form>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => {
+                                setAccountIdToArchive(account.id);
+                                setIsArchiveDialogOpen(true);
+                              }}
+                            >
+                              {t("common.archive") || "Archive"}
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -290,49 +293,9 @@ export default function AccountsIndexPage() {
         </Card>
 
         {/* Quick Links */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link to="/credit-cards" className="block">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <CreditCard className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {t("nav.creditCards") || "Credit Cards"}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {t("accounts.manageCreditCards") || "Manage credit card accounts"}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/loans" className="block">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
-                    <Home className="w-6 h-6 text-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {t("nav.loans") || "Loans"}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {t("accounts.manageLoans") || "Track loans and mortgages"}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
+        <div className="mt-8">
           <Link to="/transactions" className="block">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -351,6 +314,35 @@ export default function AccountsIndexPage() {
             </Card>
           </Link>
         </div>
+
+        {/* Hidden form for archive submission */}
+        {accountIdToArchive && (
+          <Form
+            ref={setArchiveFormRef}
+            method="post"
+            action="/accounts"
+            style={{ display: "none" }}
+          >
+            <input type="hidden" name="intent" value="archive" />
+            <input type="hidden" name="accountId" value={accountIdToArchive} />
+          </Form>
+        )}
+
+        {/* Archive Confirmation Dialog */}
+        <ConfirmDialog
+          open={isArchiveDialogOpen}
+          onOpenChange={setIsArchiveDialogOpen}
+          title={t("accounts.confirmArchive") || "Archive Account?"}
+          description="Are you sure you want to archive this account? This action cannot be undone."
+          confirmLabel="Archive"
+          variant="warning"
+          onConfirm={() => {
+            if (archiveFormRef) {
+              toast({ title: "Archiving account..." });
+              archiveFormRef.requestSubmit?.();
+            }
+          }}
+        />
       </main>
     </div>
   );

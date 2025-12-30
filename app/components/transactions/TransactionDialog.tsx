@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { lazy, Suspense } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,8 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { TransactionForm } from "./TransactionForm";
 import type { TransactionFilterOptions, TransactionWithRelations } from "~/lib/db/transactions.server";
+import { createTransactionSchema } from "~/lib/validations/transaction";
+import type { z } from "zod";
+
+// Lazy load TransactionForm to reduce initial dialog bundle size
+const TransactionForm = lazy(() =>
+  import("./TransactionForm").then(m => ({ default: m.TransactionForm }))
+);
 
 /**
  * Transaction dialog props
@@ -18,7 +24,7 @@ interface TransactionDialogProps {
   transaction?: TransactionWithRelations;
   filterOptions: TransactionFilterOptions;
   isSubmitting?: boolean;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: z.infer<typeof createTransactionSchema>) => void;
 }
 
 /**
@@ -49,13 +55,15 @@ export function TransactionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <TransactionForm
-          transaction={transaction}
-          filterOptions={filterOptions}
-          isSubmitting={isSubmitting}
-          onSubmit={onSubmit}
-          onCancel={onClose}
-        />
+        <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+          <TransactionForm
+            transaction={transaction}
+            filterOptions={filterOptions}
+            isSubmitting={isSubmitting}
+            onSubmit={onSubmit}
+            onCancel={onClose}
+          />
+        </Suspense>
       </DialogContent>
     </Dialog>
   );

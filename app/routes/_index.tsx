@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import type { ClientLoaderFunctionArgs, MetaFunction } from "react-router";
 import { Link } from "react-router";
 
 export const meta: MetaFunction = () => [
@@ -6,7 +6,7 @@ export const meta: MetaFunction = () => [
   { name: "description", content: "Personal Finance Management Platform" },
 ];
 
-export function loader({ request }: LoaderFunctionArgs) {
+export function clientLoader({ request }: ClientLoaderFunctionArgs) {
   return { message: "Welcome to Finance Hub" };
 }
 

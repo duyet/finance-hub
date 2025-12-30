@@ -44,18 +44,31 @@ export function useI18n() {
     /**
      * Translate a key using dot notation
      *
-     * @param key - Translation key in dot notation (e.g., "nav.dashboard")
-     * @param params - Optional parameters for interpolation
-     * @returns Translated string or key if not found
+     * Supports multiple calling patterns:
+     * - t('key') - just key
+     * - t('key', { param: value }) - with params
+     * - t('key', 'fallback') - with fallback string
+     * - t('key', 'fallback', { param: value }) - with both fallback and params
      *
-     * @example
-     * ```tsx
-     * t('nav.dashboard') // "Tổng quan" (in Vietnamese)
-     * t('validation.minLength', { min: 5 }) // "Phải có ít nhất 5 ký tự"
-     * ```
+     * @param key - Translation key in dot notation (e.g., "nav.dashboard")
+     * @param arg2 - Optional fallback string OR params object
+     * @param arg3 - Optional params object (if arg2 is fallback)
+     * @returns Translated string or key/fallback if not found
      */
-    t: (key: string, params?: Record<string, string | number>): string => {
-      return translate(translations, key, params, locale);
+    t: (key: string, arg2?: Record<string, string | number> | string, arg3?: Record<string, string | number>): string => {
+      let params: Record<string, string | number> | undefined;
+      let fallback: string | undefined;
+
+      if (typeof arg2 === "string") {
+        // t('key', 'fallback', { params })
+        fallback = arg2;
+        params = arg3;
+      } else if (arg2) {
+        // t('key', { params })
+        params = arg2;
+      }
+
+      return translate(translations, key, params, locale, fallback);
     },
 
     /**
@@ -141,7 +154,8 @@ function translate(
   translations: Record<string, unknown>,
   key: string,
   params?: Record<string, string | number>,
-  locale?: Locale
+  locale?: Locale,
+  fallback?: string
 ): string {
   const keys = key.split(".");
   let value: unknown = translations;
@@ -150,13 +164,19 @@ function translate(
     if (value && typeof value === "object" && k in value) {
       value = (value as Record<string, unknown>)[k];
     } else {
-      // Key not found, return the key itself
+      // Key not found, return fallback or key
+      if (fallback) {
+        return fallback;
+      }
       console.warn(`Translation key not found: ${key}`);
       return key;
     }
   }
 
   if (typeof value !== "string") {
+    if (fallback) {
+      return fallback;
+    }
     console.warn(`Translation value is not a string: ${key}`);
     return key;
   }
@@ -274,7 +294,21 @@ function createFallbackI18n() {
   return {
     locale: "en" as Locale,
     translations: {},
-    t: (key: string): string => key,
+    t: (key: string, arg2?: Record<string, string | number> | string, arg3?: Record<string, string | number>): string => {
+      if (typeof arg2 === "string") {
+        // Return fallback string, ignore params
+        return arg2;
+      }
+      if (arg2) {
+        // Has params - do simple interpolation
+        let result = key;
+        for (const [k, v] of Object.entries(arg2)) {
+          result = result.replace(`{{${k}}}`, String(v));
+        }
+        return result;
+      }
+      return key;
+    },
     has: (): boolean => false,
     formatCurrency: (amount: number): string => amount.toString(),
     formatDate: (date: Date | string | number): string =>

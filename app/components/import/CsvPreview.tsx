@@ -3,7 +3,7 @@
  * Preview first N rows of CSV data with mapped columns
  */
 
-import { useTranslation } from "react-i18next";
+import { useI18n } from "~/lib/i18n/client";
 import { Card } from "~/components/ui/card";
 import {
   Table,
@@ -29,7 +29,7 @@ export function CsvPreview({
   mappedColumns,
   maxRows = 10,
 }: CsvPreviewProps) {
-  const { t } = useTranslation();
+  const { t } = useI18n();
 
   const displayRows = rows.slice(0, maxRows);
 

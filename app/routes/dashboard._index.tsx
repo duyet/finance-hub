@@ -15,25 +15,34 @@ import { useLoaderData } from "react-router";
 import { useState, lazy, Suspense } from "react";
 import { requireAuth } from "../lib/auth/session.server";
 import { getDashboardData } from "../lib/db/transactions.server";
-import { getUnpaidStatements } from "~/lib/db/credit-cards.server";
 import { getDb } from "~/lib/auth/db.server";
 import { Sidebar } from "~/components/layout/Sidebar";
-import {
-  NetWorthCard,
-  RunwayCard,
-  RecentTransactionsTable,
-  QuickActions,
-} from "~/components/dashboard";
-import { PaymentDueAlert } from "~/components/dashboard/PaymentDueAlert";
-import { BudgetAlert } from "~/components/dashboard/BudgetAlert";
-import { FinancialInsightsChat, QuickInsightQuestions } from "~/components/ai/FinancialInsightsChat";
-import { FinancialHealthCard } from "~/components/dashboard/FinancialHealthCard";
-import { ChartSkeleton } from "~/components/ui/skeleton";
 import { calculateFinancialHealthScore } from "~/lib/services/financial-health.server";
 import { getDashboardConfig } from "~/lib/services/settings.server";
-import { getGoalsForDashboard } from "~/lib/db/financial-goals.server";
-import { GoalCardCompact } from "~/components/goals";
 import { categoriesCrud } from "~/lib/db/categories.server";
+
+// Lazy load dashboard components for code splitting
+const NetWorthCard = lazy(() =>
+  import("~/components/dashboard").then(m => ({ default: m.NetWorthCard }))
+);
+const RunwayCard = lazy(() =>
+  import("~/components/dashboard").then(m => ({ default: m.RunwayCard }))
+);
+const RecentTransactionsTable = lazy(() =>
+  import("~/components/dashboard").then(m => ({ default: m.RecentTransactionsTable }))
+);
+const QuickActions = lazy(() =>
+  import("~/components/dashboard").then(m => ({ default: m.QuickActions }))
+);
+const BudgetAlert = lazy(() =>
+  import("~/components/dashboard/BudgetAlert").then(m => ({ default: m.BudgetAlert }))
+);
+const FinancialHealthCard = lazy(() =>
+  import("~/components/dashboard/FinancialHealthCard").then(m => ({ default: m.FinancialHealthCard }))
+);
+const FinancialInsightsChat = lazy(() =>
+  import("~/components/ai/FinancialInsightsChat").then(m => ({ default: m.FinancialInsightsChat }))
+);
 
 /**
  * Database row types for AI context queries
@@ -56,14 +65,6 @@ interface AccountRow {
   balance: number;
 }
 
-// Lazy load chart components to defer recharts loading (425KB)
-const IncomeExpenseChart = lazy(() =>
-  import("~/components/dashboard/IncomeExpenseChart").then(m => ({ default: m.IncomeExpenseChart }))
-);
-const ExpenseBreakdownChart = lazy(() =>
-  import("~/components/dashboard/ExpenseBreakdownChart").then(m => ({ default: m.ExpenseBreakdownChart }))
-);
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
   const db = getDb(request);
@@ -71,14 +72,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Get dashboard data
   const dashboardData = await getDashboardData(request, user.id, 12);
 
-  // Get unpaid credit card statements for alerts
-  const unpaidStatements = await getUnpaidStatements(request, user.id);
-
   // Calculate financial health score
   const healthScore = await calculateFinancialHealthScore(db, user.id);
-
-  // Get goals for dashboard
-  const goalsData = await getGoalsForDashboard(db, user.id);
 
   // Get over-budget categories for alerts
   const overBudgetCategories = await categoriesCrud.getOverBudgetCategories(db, user.id);
@@ -112,22 +107,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
     .bind(user.id)
     .all();
 
-  const categories = categoriesResult.results || [];
+  const categories = (categoriesResult.results || []) as unknown as CategoryRow[];
   const categoryMap = new Map(categories.map((c: CategoryRow) => [c.id, c.name]));
 
   // Enrich transactions with category names
-  const aiContextTransactions = (recentTransactionsResult.results || []).map((t: TransactionRow) => ({
-    date: t.date,
-    amount: t.amount,
-    description: t.description,
-    category: categoryMap.get(t.category_id) || "Uncategorized",
-  }));
+  const aiContextTransactions = (recentTransactionsResult.results || []).map((t: unknown) => {
+    const tt = t as TransactionRow;
+    return {
+      date: tt.date,
+      amount: tt.amount,
+      description: tt.description,
+      category: categoryMap.get(tt.category_id ?? "") || "Uncategorized",
+    };
+  });
 
-  const aiContextAccounts = (accountsResult.results || []).map((a: AccountRow) => ({
-    name: a.name,
-    type: a.type,
-    balance: a.balance,
-  }));
+  const aiContextAccounts = (accountsResult.results || []).map((a: unknown) => {
+    const aa = a as AccountRow;
+    return {
+      name: aa.name,
+      type: aa.type,
+      balance: aa.balance,
+    };
+  });
 
   // Get dashboard configuration
   const dashboardConfig = await getDashboardConfig(db, user.id);
@@ -140,9 +141,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       avatarUrl: user.avatarUrl,
     },
     dashboard: dashboardData,
-    unpaidStatements,
     healthScore,
-    goals: goalsData,
     overBudgetCategories,
     dashboardConfig,
     aiContext: {
@@ -153,7 +152,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function DashboardPage() {
-  const { user, dashboard, unpaidStatements, healthScore, goals, overBudgetCategories, dashboardConfig, aiContext } = useLoaderData<typeof loader>();
+  const { user, dashboard, healthScore, overBudgetCategories, dashboardConfig, aiContext } = useLoaderData<typeof loader>();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState<string | null>(null);
 
@@ -168,11 +167,6 @@ export default function DashboardPage() {
         );
       })
     : dashboard.recentTransactions;
-
-  // Handle bar click from chart
-  const handleBarClick = (month: string) => {
-    setSelectedMonth(month);
-  };
 
   // Clear month filter
   const clearFilter = () => {
@@ -203,36 +197,37 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Payment Due Alert */}
-          {unpaidStatements && unpaidStatements.length > 0 && (
-            <div className="mb-8">
-              <PaymentDueAlert unpaidStatements={unpaidStatements} />
-            </div>
-          )}
-
           {/* Budget Alert */}
           {overBudgetCategories && overBudgetCategories.length > 0 && (
             <div className="mb-8">
-              <BudgetAlert overBudgetCategories={overBudgetCategories} />
+              <Suspense fallback={<div className="h-24 animate-pulse bg-muted rounded-lg" />}>
+                <BudgetAlert overBudgetCategories={overBudgetCategories} />
+              </Suspense>
             </div>
           )}
 
           {/* Net Worth and Runway Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <NetWorthCard
-              netWorth={dashboard.netWorth}
-              currency="VND"
-            />
-            <RunwayCard
-              months={dashboard.runway.months}
-              health={dashboard.runway.health}
-            />
+            <Suspense fallback={<div className="h-40 animate-pulse bg-muted rounded-lg" />}>
+              <NetWorthCard
+                netWorth={dashboard.netWorth}
+                currency="VND"
+              />
+            </Suspense>
+            <Suspense fallback={<div className="h-40 animate-pulse bg-muted rounded-lg" />}>
+              <RunwayCard
+                months={dashboard.runway.months}
+                health={dashboard.runway.health}
+              />
+            </Suspense>
           </div>
 
           {/* Financial Health Score Card */}
           {dashboardConfig.showFinancialHealth && (
             <div className="mb-8">
-              <FinancialHealthCard health={healthScore} />
+              <Suspense fallback={<div className="h-32 animate-pulse bg-muted rounded-lg" />}>
+                <FinancialHealthCard health={healthScore} />
+              </Suspense>
             </div>
           )}
 
@@ -336,66 +331,18 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Financial Goals Section */}
-          {dashboardConfig.showFinancialGoals && goals.topGoals.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Financial Goals</h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Track progress toward your savings and debt payoff goals
-                  </p>
-                </div>
-                <a
-                  href="/goals"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  View all →
-                </a>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {goals.topGoals.map((goal) => (
-                  <GoalCardCompact
-                    key={goal.id}
-                    goal={goal}
-                    onClick={() => (window.location.href = `/goals/${goal.id}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {dashboardConfig.showIncomeExpenseChart && (
-              <Suspense fallback={<ChartSkeleton />}>
-                <IncomeExpenseChart
-                  data={dashboard.incomeVsExpense}
-                  currency="VND"
-                  onBarClick={handleBarClick}
-                />
-              </Suspense>
-            )}
-            {dashboardConfig.showExpenseBreakdownChart && (
-              <Suspense fallback={<ChartSkeleton />}>
-                <ExpenseBreakdownChart
-                  data={dashboard.expenseByCategory}
-                  currency="VND"
-                />
-              </Suspense>
-            )}
-          </div>
-
           {/* AI Financial Insights */}
           {dashboardConfig.showAIInsights && (
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 AI Financial Insights
               </h2>
-              <FinancialInsightsChat
-                userId={user.id}
-                initialContext={aiContext}
-              />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+                <FinancialInsightsChat
+                  userId={user.id}
+                  initialContext={aiContext}
+                />
+              </Suspense>
             </div>
           )}
 
@@ -423,10 +370,12 @@ export default function DashboardPage() {
                 </button>
               )}
             </div>
-            <RecentTransactionsTable
-              transactions={filteredTransactions}
-              currency="VND"
-            />
+            <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
+              <RecentTransactionsTable
+                transactions={filteredTransactions}
+                currency="VND"
+              />
+            </Suspense>
           </div>
 
           {/* Quick Actions */}
@@ -435,7 +384,9 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Quick Actions
               </h2>
-              <QuickActions />
+              <Suspense fallback={<div className="h-32 animate-pulse bg-muted rounded" />}>
+                <QuickActions />
+              </Suspense>
             </div>
           )}
         </div>

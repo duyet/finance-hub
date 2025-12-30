@@ -3,7 +3,7 @@
  * Form for import options (account, category, date format, etc.)
  */
 
-import { useTranslation } from "react-i18next";
+import { useI18n } from "~/lib/i18n/client";
 import { Label } from "~/components/ui/label";
 import {
   Select,
@@ -55,7 +55,7 @@ export function ImportOptions({
   onDryRunChange,
   disabled = false,
 }: ImportOptionsProps) {
-  const { t } = useTranslation();
+  const { t } = useI18n();
 
   return (
     <Card className="p-4 space-y-4">

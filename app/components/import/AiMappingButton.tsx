@@ -4,7 +4,7 @@
  */
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useI18n } from "~/lib/i18n/client";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { toast } from "~/components/ui/use-toast";
@@ -18,7 +18,7 @@ export function AiMappingButton({
   onMapColumns,
   disabled = false,
 }: AiMappingButtonProps) {
-  const { t } = useTranslation();
+  const { t } = useI18n();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {

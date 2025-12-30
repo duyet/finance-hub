@@ -10,15 +10,12 @@
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { useLoaderData, useActionData, useNavigate, Link, Form } from "react-router";
+import { useLoaderData, useActionData, useNavigate, useNavigation, Link, Form } from "react-router";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
-import {
-  accountDb,
-  type AccountWithTransactions,
-  type UpdateAccountData,
-  getAccountTypeConfig,
-} from "~/lib/db/accounts.server";
+import { accountDb, type AccountWithTransactions } from "~/lib/db/accounts.server";
+import type { UpdateAccountData } from "~/lib/db/accounts.types";
+import { getAccountTypeConfig } from "~/lib/db/accounts.types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -27,7 +24,9 @@ import { Label } from "~/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { ArrowLeft, Edit3, Landmark, PiggyBank, Wallet, TrendingUp, CreditCard, Home } from "lucide-react";
 import { useI18n } from "~/lib/i18n/client";
+import { useToast } from "~/components/ui/use-toast";
 import { useState } from "react";
+import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 
 type ActionData = {
   errors?: {
@@ -136,14 +135,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function AccountDetailPage() {
   const { account } = useLoaderData<typeof loader>();
   const { t, formatCurrency, formatDate } = useI18n();
+  const { toast } = useToast();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
   const [isEditing, setIsEditing] = useState(false);
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
+  const [archiveFormRef, setArchiveFormRef] = useState<HTMLFormElement | null>(null);
   const actionData = useActionData<ActionData>();
 
   const errors = actionData?.errors || {};
   const values = actionData?.values || {};
 
   const config = getAccountTypeConfig(account.type);
+
+  const handleSave = () => {
+    toast({ title: "Saving account..." });
+  };
 
   // Account type icon mapping
   const getAccountIcon = (type: string) => {
@@ -175,6 +183,7 @@ export default function AccountDetailPage() {
               <button
                 onClick={() => navigate("/accounts")}
                 className="text-gray-600 hover:text-indigo-600"
+                aria-label="Back to accounts"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -220,7 +229,7 @@ export default function AccountDetailPage() {
               <CardContent>
                 {/* Edit Form */}
                 {isEditing ? (
-                  <Form method="post" className="space-y-4">
+                  <Form method="post" className="space-y-4" onSubmit={handleSave}>
                     <input type="hidden" name="intent" value="update" />
 
                     {errors._form && (
@@ -240,7 +249,7 @@ export default function AccountDetailPage() {
                           className={errors.name ? "border-red-500" : ""}
                           required
                         />
-                        {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+                        {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
                       </div>
 
                       <div>
@@ -285,15 +294,20 @@ export default function AccountDetailPage() {
                           pattern="\d{4}"
                           className={errors.account_number_last4 ? "border-red-500" : ""}
                         />
-                        {errors.account_number_last4 && <p className="text-sm text-red-500 mt-1">{errors.account_number_last4}</p>}
+                        {errors.account_number_last4 && <p className="text-sm text-red-600 mt-1">{errors.account_number_last4}</p>}
                       </div>
                     </div>
 
                     <div className="flex justify-end gap-3">
-                      <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
+                      <Button type="button" variant="outline" onClick={() => setIsEditing(false)} disabled={isSubmitting}>
                         {t("common.cancel") || "Cancel"}
                       </Button>
-                      <Button type="submit">{t("common.save") || "Save Changes"}</Button>
+                      <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting
+                          ? (t("common.saving") || "Saving...")
+                          : (t("common.save") || "Save Changes")
+                        }
+                      </Button>
                     </div>
                   </Form>
                 ) : (
@@ -398,16 +412,6 @@ export default function AccountDetailPage() {
                     {t("accounts.viewTransactionsHint") || "See all transactions for this account"}
                   </div>
                 </Link>
-
-                <Link
-                  to={`/reports/generate?accountId=${account.id}`}
-                  className="block w-full px-4 py-3 text-left hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  <div className="font-medium">{t("accounts.generateReport") || "Generate Report"}</div>
-                  <div className="text-sm text-gray-600">
-                    {t("accounts.generateReportHint") || "Create a financial report for this account"}
-                  </div>
-                </Link>
               </CardContent>
             </Card>
 
@@ -426,17 +430,19 @@ export default function AccountDetailPage() {
                   {t("accounts.editDetails") || "Edit Account Details"}
                 </Button>
 
-                <Form method="post">
+                <Form
+                  method="post"
+                  ref={setArchiveFormRef}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setIsArchiveDialogOpen(true);
+                  }}
+                >
                   <input type="hidden" name="intent" value="archive" />
                   <Button
                     type="submit"
                     variant="outline"
                     className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={(e) => {
-                      if (!confirm(t("accounts.confirmArchive") || "Are you sure you want to archive this account?")) {
-                        e.preventDefault();
-                      }
-                    }}
                   >
                     {t("accounts.archiveAccount") || "Archive Account"}
                   </Button>
@@ -467,6 +473,22 @@ export default function AccountDetailPage() {
             </Card>
           </div>
         </div>
+
+        {/* Archive Confirmation Dialog */}
+        <ConfirmDialog
+          open={isArchiveDialogOpen}
+          onOpenChange={setIsArchiveDialogOpen}
+          title={t("accounts.confirmArchive") || "Archive Account?"}
+          description="Are you sure you want to archive this account? This action cannot be undone."
+          confirmLabel="Archive"
+          variant="warning"
+          onConfirm={() => {
+            if (archiveFormRef) {
+              toast({ title: "Archiving account..." });
+              archiveFormRef.requestSubmit?.();
+            }
+          }}
+        />
       </main>
     </div>
   );

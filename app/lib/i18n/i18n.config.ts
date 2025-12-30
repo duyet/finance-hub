@@ -1,7 +1,3 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-
 // Supported locales
 export const SUPPORTED_LOCALES = ["en", "vi"] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
@@ -9,70 +5,25 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 // Default locale
 export const DEFAULT_LOCALE: Locale = "en";
 
-// Namespace structure
+// Namespace structure (for reference, no longer used)
 export const NAMESPACES = {
   COMMON: "common",
   DASHBOARD: "dashboard",
   TRANSACTIONS: "transactions",
-  CREDIT_CARDS: "credit_cards",
-  LOANS: "loans",
-  SETTINGS: "settings",
-  RECEIPTS: "receipts",
 } as const;
 
-// Translation resources interface
+// Translation resources interface (for type reference)
 interface TranslationResources {
   [locale: string]: {
     [namespace: string]: Record<string, string | object>;
   };
 }
 
-// Initialize i18next
+// No-op function for compatibility - i18n is now fully custom
 export async function initI18n(locale: Locale = DEFAULT_LOCALE) {
-  await i18n
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-      resources: {} as Record<string, Record<string, string | object>>,
-      lng: locale,
-      fallbackLng: DEFAULT_LOCALE,
-      defaultNS: NAMESPACES.COMMON,
-      ns: Object.values(NAMESPACES),
-      fallbackNS: NAMESPACES.COMMON,
-
-      detection: {
-        order: ["cookie", "header", "navigator"],
-        caches: ["cookie"],
-        lookupCookie: "locale",
-        // lookupHeader: "accept-language", // Not supported by i18next types
-        lookupFromPathIndex: 0,
-        // checkWhitelist: true, // Not supported by i18next types
-      } as any,
-
-      interpolation: {
-        escapeValue: false, // React already escapes values
-        formatSeparator: ",",
-        format: function (value, format, lng) {
-          if (format === "uppercase") return value.toUpperCase();
-          if (format === "lowercase") return value.toLowerCase();
-          if (format === "capitalize") return value.charAt(0).toUpperCase() + value.slice(1);
-          return value;
-        },
-      },
-
-      react: {
-        useSuspense: false,
-        bindI18n: "languageChanged",
-        bindI18nStore: "added removed",
-        transEmptyNodeValue: "",
-        transSupportBasicHtmlNodes: true,
-        transKeepBasicHtmlNodesFor: ["br", "strong", "i", "p", "b", "span"],
-      },
-
-      debug: process.env.NODE_ENV === "development",
-    });
-
-  return i18n;
+  // i18n is now handled by the custom useI18n hook
+  // This function exists for backward compatibility
+  return Promise.resolve();
 }
 
 // Helper to check if locale is supported
@@ -137,5 +88,3 @@ export function getLocale(
   // Fallback to default
   return DEFAULT_LOCALE;
 }
-
-export default i18n;

@@ -3,7 +3,7 @@
  * Summary of what will be imported with validation results
  */
 
-import { useTranslation } from "react-i18next";
+import { useI18n } from "~/lib/i18n/client";
 import { Card } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -25,7 +25,7 @@ export function ImportSummary({
   onConfirm,
   onBack,
 }: ImportSummaryProps) {
-  const { t } = useTranslation();
+  const { t } = useI18n();
 
   if (!result) {
     return null;
@@ -100,9 +100,9 @@ export function ImportSummary({
             </h4>
           </div>
           <div className="max-h-40 overflow-y-auto space-y-1">
-            {result.errors.slice(0, 10).map((error, index) => (
+            {result.errors.slice(0, 10).map((error) => (
               <div
-                key={index}
+                key={`${error.row}-${error.field}`}
                 className="text-sm bg-destructive/10 rounded px-3 py-2"
               >
                 <span className="font-medium">
@@ -134,9 +134,9 @@ export function ImportSummary({
             </h4>
           </div>
           <div className="max-h-40 overflow-y-auto space-y-1">
-            {result.warnings.slice(0, 5).map((warning, index) => (
+            {result.warnings.slice(0, 5).map((warning) => (
               <div
-                key={index}
+                key={`${warning.row}-${warning.field}`}
                 className="text-sm bg-yellow-500/10 rounded px-3 py-2"
               >
                 <span className="font-medium">

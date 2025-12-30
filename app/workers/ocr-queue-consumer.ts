@@ -10,6 +10,12 @@
 import type { Env } from "../lib/auth/db.server";
 import type { ReceiptData } from "../lib/types/receipt";
 
+// AI binding type with run method (Cloudflare Workers AI)
+interface AiBinding {
+  run(model: string, inputs: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
+
 type OcrModel = "gemma-3" | "llama-3.2";
 
 const DEFAULT_MODEL: OcrModel = "gemma-3";
@@ -146,6 +152,9 @@ async function processReceiptWithAI(
   const { detectCurrency, defaultCurrency, extractLineItems, locale } = options;
   const model = getOcrModel(env);
 
+  // Type assertion for AI binding
+  const ai = env.AI as unknown as AiBinding;
+
   // Build prompt
   const prompt = buildExtractionPrompt(
     detectCurrency,
@@ -169,7 +178,7 @@ async function processReceiptWithAI(
 
   if (model === "gemma-3") {
     // Use Gemma 3 with messages API for multimodal input
-    const modelResponse = await env.AI.run("@cf/google/gemma-3-12b-it", {
+    const modelResponse = await ai.run("@cf/google/gemma-3-12b-it", {
       messages: [
         {
           role: "user",
@@ -185,15 +194,17 @@ async function processReceiptWithAI(
       max_tokens: 2048,
       temperature: 0.2, // Lower temperature for more consistent extraction
     }, gatewayOptions);
-    extractedText = modelResponse.response || modelResponse.text || "";
+    const response = modelResponse as { response?: string; text?: string };
+    extractedText = response.response || response.text || "";
   } else {
     // Use Llama 3.2 Vision as fallback
-    const modelResponse = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
+    const modelResponse = await ai.run("@cf/meta/llama-3.2-11b-vision-instruct", {
       image: [imageDataUrl],
       prompt: prompt,
       max_tokens: 2048,
     }, gatewayOptions);
-    extractedText = modelResponse.response || modelResponse.text || "";
+    const response = modelResponse as { response?: string; text?: string };
+    extractedText = response.response || response.text || "";
   }
 
   const parsed = parseReceiptResponse(extractedText, defaultCurrency);
@@ -275,6 +286,9 @@ async function suggestCategories(
   merchantName: string,
   userId: string
 ): Promise<Array<{ categoryId: string; categoryName: string; confidence: number }>> {
+  // Type assertion for AI binding
+  const ai = env.AI as unknown as AiBinding;
+
   // Get user's categories
   const categories = await env.DB.prepare(
     `SELECT id, name FROM categories WHERE user_id = ? ORDER BY name`
@@ -287,9 +301,9 @@ async function suggestCategories(
   }
 
   // Generate merchant embedding
-  const merchantResponse = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
+  const merchantResponse = await ai.run("@cf/baai/bge-base-en-v1.5", {
     text: merchantName,
-  });
+  }) as { embedding?: number[]; data?: Array<{ embedding?: number[] }> };
 
   const merchantEmbedding = merchantResponse.embedding || merchantResponse.data?.[0]?.embedding || [];
 
@@ -299,23 +313,24 @@ async function suggestCategories(
 
   // Calculate similarities
   const suggestions = await Promise.all(
-    categories.results.map(async (category: { id: string; name: string }) => {
-      const categoryResponse = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
-        text: category.name,
-      });
+    categories.results.map(async (category: unknown) => {
+      const cat = category as { id: string; name: string };
+      const categoryResponse = await ai.run("@cf/baai/bge-base-en-v1.5", {
+        text: cat.name,
+      }) as { embedding?: number[]; data?: Array<{ embedding?: number[] }> };
 
       const categoryEmbedding =
         categoryResponse.embedding || categoryResponse.data?.[0]?.embedding || [];
 
       if (!Array.isArray(categoryEmbedding) || categoryEmbedding.length === 0) {
-        return { categoryId: category.id, categoryName: category.name, confidence: 0 };
+        return { categoryId: cat.id, categoryName: cat.name, confidence: 0 };
       }
 
       const similarity = cosineSimilarity(merchantEmbedding, categoryEmbedding);
 
       return {
-        categoryId: category.id,
-        categoryName: category.name,
+        categoryId: cat.id,
+        categoryName: cat.name,
         confidence: similarity,
       };
     })

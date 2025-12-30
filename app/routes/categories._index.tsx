@@ -6,15 +6,21 @@
 
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { useLoaderData, useNavigate, Form } from "react-router";
+import { useLoaderData, useNavigate, useNavigation, Form } from "react-router";
+import { lazy, Suspense, useState } from "react";
 import { requireAuth } from "~/lib/auth/session.server";
 import { getDb } from "~/lib/auth/db.server";
-import { categoriesCrud, type CategoryWithStats } from "~/lib/db/categories.server";
-import { CategoryGrid } from "~/components/categories/CategoryGrid";
+import { categoriesCrud } from "~/lib/db/categories.server";
+import type { CategoryWithStats, CreateCategoryInput, UpdateCategoryInput } from "~/lib/db/categories.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { useState } from "react";
 import { useI18n } from "~/lib/i18n/client";
-import type { CreateCategoryInput, UpdateCategoryInput } from "~/lib/db/categories.server";
+import { useToast } from "~/components/ui/use-toast";
+import { COLOR_THEMES, ICON_PRESETS_ARRAY } from "~/components/categories/category-presets";
+
+// Lazy load CategoryGrid for code splitting
+const CategoryGrid = lazy(() =>
+  import("~/components/categories/CategoryGrid").then(m => ({ default: m.CategoryGrid }))
+);
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
@@ -64,6 +70,21 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect("/categories");
   }
 
+  if (intent === "update") {
+    const categoryId = formData.get("categoryId") as string;
+    const data: UpdateCategoryInput = {
+      name: formData.get("name") as string,
+      budgetLimit: formData.get("budgetLimit")
+        ? parseFloat(formData.get("budgetLimit") as string)
+        : null,
+      colorTheme: (formData.get("colorTheme") as string) || null,
+      icon: (formData.get("icon") as string) || null,
+    };
+
+    await categoriesCrud.updateCategory(db, categoryId, user.id, data);
+    return redirect("/categories");
+  }
+
   if (intent === "delete") {
     const categoryId = formData.get("categoryId") as string;
     await categoriesCrud.deleteCategory(db, categoryId, user.id);
@@ -77,10 +98,25 @@ export default function CategoriesIndexPage() {
   const { categories, parentOptions } = useLoaderData<typeof loader>();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const { toast } = useToast();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<CategoryWithStats | null>(null);
+  const isSubmitting = navigation.state === "submitting";
+
+  // Handle edit category - open edit dialog with category data
+  const handleEdit = (id: string) => {
+    const category = categories.find((c) => c.id === id);
+    if (category) {
+      setEditingCategory(category);
+      setIsEditDialogOpen(true);
+    }
+  };
 
   // Handle delete category
   const handleDelete = async (id: string) => {
+    toast({ title: "Deleting category..." });
     const formData = new FormData();
     formData.set("intent", "delete");
     formData.set("categoryId", id);
@@ -90,12 +126,17 @@ export default function CategoriesIndexPage() {
       body: formData,
     });
 
-    window.location.reload();
+    navigate(0);
   };
 
-  // Handle edit category - navigate to edit page
-  const handleEdit = (id: string) => {
-    navigate(`/categories/${id}/edit`);
+  // Handle edit category submit
+  const handleEditCategorySubmit = () => {
+    toast({ title: "Updating category..." });
+  };
+
+  // Handle add category submit with toast
+  const handleAddCategorySubmit = () => {
+    toast({ title: "Creating category..." });
   };
 
   return (
@@ -108,6 +149,7 @@ export default function CategoriesIndexPage() {
               <button
                 onClick={() => navigate("/dashboard")}
                 className="text-gray-600 hover:text-indigo-600"
+                aria-label="Back to dashboard"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -131,12 +173,14 @@ export default function CategoriesIndexPage() {
         </div>
 
         {/* Categories Grid */}
-        <CategoryGrid
-          categories={categories}
-          onAddCategory={() => setIsAddDialogOpen(true)}
-          onEditCategory={handleEdit}
-          onDeleteCategory={handleDelete}
-        />
+        <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded" />}>
+          <CategoryGrid
+            categories={categories}
+            onAddCategory={() => setIsAddDialogOpen(true)}
+            onEditCategory={handleEdit}
+            onDeleteCategory={handleDelete}
+          />
+        </Suspense>
 
         {/* Add Category Dialog */}
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -144,14 +188,48 @@ export default function CategoriesIndexPage() {
             <DialogHeader>
               <DialogTitle>Create New Category</DialogTitle>
             </DialogHeader>
-            <Form method="post" onSubmit={() => setIsAddDialogOpen(false)}>
+            <Form method="post" onSubmit={() => {
+              handleAddCategorySubmit();
+              setIsAddDialogOpen(false);
+            }}>
               <input type="hidden" name="intent" value="create" />
               <CategoryFormContent
                 parentOptionsINCOME={parentOptions.INCOME}
                 parentOptionsEXPENSE={parentOptions.EXPENSE}
                 onCancel={() => setIsAddDialogOpen(false)}
+                isSubmitting={isSubmitting}
               />
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Category Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+          setIsEditDialogOpen(open);
+          if (!open) setEditingCategory(null);
+        }}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Category</DialogTitle>
+            </DialogHeader>
+            {editingCategory && (
+              <Form method="post" onSubmit={() => {
+                handleEditCategorySubmit();
+                setIsEditDialogOpen(false);
+                setEditingCategory(null);
+              }}>
+                <input type="hidden" name="intent" value="update" />
+                <input type="hidden" name="categoryId" value={editingCategory.id} />
+                <EditCategoryFormContent
+                  category={editingCategory}
+                  onCancel={() => {
+                    setIsEditDialogOpen(false);
+                    setEditingCategory(null);
+                  }}
+                  isSubmitting={isSubmitting}
+                />
+              </Form>
+            )}
           </DialogContent>
         </Dialog>
       </main>
@@ -167,10 +245,12 @@ function CategoryFormContent({
   parentOptionsINCOME,
   parentOptionsEXPENSE,
   onCancel,
+  isSubmitting = false,
 }: {
   parentOptionsINCOME: Array<{ id: string; name: string }>;
   parentOptionsEXPENSE: Array<{ id: string; name: string }>;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }) {
   const [formData, setFormData] = useState<CreateCategoryInput>({
     name: "",
@@ -183,54 +263,6 @@ function CategoryFormContent({
 
   const [errors, setErrors] = useState<Partial<Record<keyof CreateCategoryInput, string>>>({});
   const [categoryType, setCategoryType] = useState<"INCOME" | "EXPENSE">("EXPENSE");
-
-  const COLOR_THEMES = [
-    { value: "red", label: "Red", class: "bg-red-500" },
-    { value: "pink", label: "Pink", class: "bg-pink-500" },
-    { value: "purple", label: "Purple", class: "bg-purple-500" },
-    { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
-    { value: "blue", label: "Blue", class: "bg-blue-500" },
-    { value: "cyan", label: "Cyan", class: "bg-cyan-500" },
-    { value: "teal", label: "Teal", class: "bg-teal-500" },
-    { value: "green", label: "Green", class: "bg-green-500" },
-    { value: "lime", label: "Lime", class: "bg-lime-500" },
-    { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
-    { value: "orange", label: "Orange", class: "bg-orange-500" },
-    { value: "brown", label: "Brown", class: "bg-amber-500" },
-    { value: "gray", label: "Gray", class: "bg-gray-500" },
-    { value: "slate", label: "Slate", class: "bg-slate-500" },
-  ];
-
-  const ICON_PRESETS = [
-    { icon: "💰", label: "Salary", category: "income" },
-    { icon: "🎁", label: "Bonus", category: "income" },
-    { icon: "📈", label: "Investment", category: "income" },
-    { icon: "💼", label: "Freelance", category: "income" },
-    { icon: "🎀", label: "Gift", category: "income" },
-    { icon: "↩️", label: "Refund", category: "income" },
-    { icon: "🍔", label: "Food", category: "expense" },
-    { icon: "🛒", label: "Groceries", category: "expense" },
-    { icon: "🍽️", label: "Restaurant", category: "expense" },
-    { icon: "☕", label: "Coffee", category: "expense" },
-    { icon: "🚗", label: "Transport", category: "expense" },
-    { icon: "⛽", label: "Gas", category: "expense" },
-    { icon: "🅿️", label: "Parking", category: "expense" },
-    { icon: "🛍️", label: "Shopping", category: "expense" },
-    { icon: "👕", label: "Clothing", category: "expense" },
-    { icon: "📱", label: "Electronics", category: "expense" },
-    { icon: "💡", label: "Utilities", category: "expense" },
-    { icon: "🏠", label: "Rent", category: "expense" },
-    { icon: "🛡️", label: "Insurance", category: "expense" },
-    { icon: "🎬", label: "Entertainment", category: "expense" },
-    { icon: "🎮", label: "Games", category: "expense" },
-    { icon: "🎵", label: "Music", category: "expense" },
-    { icon: "🏥", label: "Health", category: "expense" },
-    { icon: "💊", label: "Pharmacy", category: "expense" },
-    { icon: "📚", label: "Education", category: "expense" },
-    { icon: "✈️", label: "Travel", category: "expense" },
-    { icon: "🐕", label: "Pets", category: "expense" },
-    { icon: "💪", label: "Fitness", category: "expense" },
-  ];
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateCategoryInput, string>> = {};
@@ -253,7 +285,7 @@ function CategoryFormContent({
     e.preventDefault();
     if (validateForm()) {
       // Form will be submitted by the Form component
-      const form = e.target as HTMLFormElement;
+      const form = e.target as unknown as HTMLFormElement;
       form.submit();
     }
   };
@@ -419,7 +451,7 @@ function CategoryFormContent({
             >
               -
             </button>
-            {ICON_PRESETS.map((preset) => (
+            {ICON_PRESETS_ARRAY.map((preset) => (
               <button
                 key={preset.icon}
                 type="button"
@@ -443,14 +475,215 @@ function CategoryFormContent({
         <button
           type="submit"
           onClick={handleSubmit}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={isSubmitting}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Category
+          {isSubmitting ? "Creating..." : "Create Category"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          disabled={isSubmitting}
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Inline edit form component for the edit dialog
+ */
+function EditCategoryFormContent({
+  category,
+  onCancel,
+  isSubmitting = false,
+}: {
+  category: CategoryWithStats;
+  onCancel: () => void;
+  isSubmitting?: boolean;
+}) {
+  const [formData, setFormData] = useState({
+    name: category.name,
+    budgetLimit: category.budget_limit,
+    colorTheme: category.color_theme || "blue",
+    icon: category.icon || "",
+  });
+
+  const [errors, setErrors] = useState<Partial<Record<"name" | "budgetLimit", string>>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<"name" | "budgetLimit", string>> = {};
+
+    if (!formData.name?.trim()) {
+      newErrors.name = "Category name is required";
+    }
+    if (formData.budgetLimit !== null && formData.budgetLimit !== undefined && formData.budgetLimit < 0) {
+      newErrors.budgetLimit = "Budget limit must be positive";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      const form = e.target as unknown as HTMLFormElement;
+      form.submit();
+    }
+  };
+
+  const handleChange = (field: keyof typeof formData, value: string | number | undefined) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  // Filter icons by category type
+  const applicableIcons = category.type === "INCOME"
+    ? ICON_PRESETS_ARRAY.filter((i) => i.category === "income")
+    : ICON_PRESETS_ARRAY.filter((i) => i.category === "expense");
+
+  return (
+    <div className="space-y-6">
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-semibold text-gray-900">Basic Information</h3>
+
+        <div className="space-y-2">
+          <label htmlFor="edit-name" className="text-sm font-medium">
+            Category Name *
+          </label>
+          <input
+            id="edit-name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+            className={`w-full px-3 py-2 border rounded-md ${
+              errors.name ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+          />
+          {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+        </div>
+
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">
+            <span className="font-medium">Type:</span> {category.type === "INCOME" ? "💵 Income" : "💸 Expense"}
+          </p>
+        </div>
+      </div>
+
+      {/* Budget Settings - only for expense categories */}
+      {category.type === "EXPENSE" && (
+        <div className="space-y-4 pt-4 border-t">
+          <h3 className="text-sm font-semibold text-gray-900">Budget Settings</h3>
+
+          <div className="space-y-2">
+            <label htmlFor="edit-budgetLimit" className="text-sm font-medium">
+              Monthly Budget Limit (Optional)
+            </label>
+            <input
+              id="edit-budgetLimit"
+              name="budgetLimit"
+              type="number"
+              min={0}
+              step={1}
+              value={formData.budgetLimit ?? ""}
+              onChange={(e) =>
+                handleChange("budgetLimit", e.target.value ? parseFloat(e.target.value) : undefined)
+              }
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors.budgetLimit ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.budgetLimit && <p className="text-sm text-red-600">{errors.budgetLimit}</p>}
+            <p className="text-xs text-gray-500">
+              Set a monthly spending limit for this category
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Appearance */}
+      <div className="space-y-4 pt-4 border-t">
+        <h3 className="text-sm font-semibold text-gray-900">Appearance</h3>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Color Theme</label>
+          <input type="hidden" name="colorTheme" value={formData.colorTheme} />
+          <div className="grid grid-cols-7 gap-2">
+            {COLOR_THEMES.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                onClick={() => handleChange("colorTheme", color.value)}
+                className={`h-10 rounded-lg ${color.class} ${
+                  formData.colorTheme === color.value
+                    ? "ring-2 ring-offset-2 ring-gray-900"
+                    : ""
+                }`}
+                title={color.label}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Icon (Optional)</label>
+          <input type="hidden" name="icon" value={formData.icon} />
+          <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg">
+            <button
+              type="button"
+              onClick={() => handleChange("icon", "")}
+              className={`h-10 rounded flex items-center justify-center text-lg ${
+                !formData.icon
+                  ? "bg-blue-100 ring-2 ring-blue-500"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
+              title="No icon"
+            >
+              -
+            </button>
+            {applicableIcons.map((preset) => (
+              <button
+                key={preset.icon}
+                type="button"
+                onClick={() => handleChange("icon", preset.icon)}
+                className={`h-10 rounded flex items-center justify-center text-lg ${
+                  formData.icon === preset.icon
+                    ? "bg-blue-100 ring-2 ring-blue-500"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+                title={preset.label}
+              >
+                {preset.icon}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-3 pt-4">
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Saving..." : "Save Changes"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

@@ -2,14 +2,8 @@ name = "finance-hub"
 compatibility_date = "2024-04-05"
 compatibility_flags = ["nodejs_compat"]
 
-# Worker entry point (Cloudflare Workers using React Router v7)
-# The entry.server.tsx exports the Cloudflare request handler
-main = "./build/server/index.js"
-
-# Static assets binding (serves ./build/client as static files)
-[assets]
-directory = "./build/client"
-binding = "ASSETS"
+# Pages configuration for React Router v7
+pages_build_output_dir = "./build/client"
 
 # Database Binding
 [[d1_databases]]
@@ -31,10 +25,10 @@ binding = "AI"
 binding = "CACHE"
 id = "9ec7b28367c14caf90bb300ae2d3216f"
 
-# Queue Producer for OCR/CSV jobs
-[[queues.producers]]
-queue = "finance-hub-jobs"
-binding = "QUEUE"
+# Queue Producer for OCR/CSV jobs (requires paid plan - disabled for now)
+# [[queues.producers]]
+# queue = "finance-hub-jobs"
+# binding = "QUEUE"
 
 # Environment variables (non-sensitive)
 [vars]

@@ -28,11 +28,18 @@ function getOcrModel(request: CloudflareRequest): OcrModel {
   return DEFAULT_MODEL;
 }
 
+// AI binding type with run method (Cloudflare Workers AI)
+interface AiBinding {
+  run(model: string, inputs: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
+
 /**
  * Get AI binding from request context
  */
-function getAI(request: CloudflareRequest) {
-  return request.context?.cloudflare?.env?.AI;
+function getAI(request: CloudflareRequest): AiBinding | undefined {
+  const ai = request.context?.cloudflare?.env?.AI;
+  return ai as unknown as AiBinding | undefined;
 }
 
 /**
@@ -117,7 +124,8 @@ export async function processReceiptWithAI(
         max_tokens: 2048,
         temperature: 0.2, // Lower temperature for more consistent extraction
       }, gatewayOptions);
-      extractedText = modelResponse.response || modelResponse.text || "";
+      extractedText = (modelResponse as { response?: string; text?: string }).response ||
+                       (modelResponse as { response?: string; text?: string }).text || "";
     } else {
       // Use Llama 3.2 Vision as fallback
       const modelResponse = await ai.run("@cf/meta/llama-3.2-11b-vision-instruct", {
@@ -125,7 +133,8 @@ export async function processReceiptWithAI(
         prompt: prompt,
         max_tokens: 2048,
       }, gatewayOptions);
-      extractedText = modelResponse.response || modelResponse.text || "";
+      extractedText = (modelResponse as { response?: string; text?: string }).response ||
+                       (modelResponse as { response?: string; text?: string }).text || "";
     }
 
     // Parse the response

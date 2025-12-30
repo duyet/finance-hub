@@ -11,7 +11,7 @@
  *   - r is annual interest rate (as percentage)
  */
 
-import { addMonths, differenceInMonths, startOfMonth, isSameMonth } from "date-fns";
+import { addMonths, differenceInMonths, startOfMonth, isSameMonth } from "~/lib/utils/date";
 
 // ============================================================================
 // Type Definitions

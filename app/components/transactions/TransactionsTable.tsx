@@ -1,5 +1,4 @@
 import { Link, useSearchParams } from "react-router";
-import { format } from "date-fns";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import {
   Table,
@@ -187,7 +186,7 @@ export function TransactionsTable({
                     />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {format(new Date(transaction.date), "MMM d, yyyy")}
+                    {new Date(transaction.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </TableCell>
                   <TableCell className="font-medium">
                     <Link
