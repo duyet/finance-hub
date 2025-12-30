@@ -8,9 +8,6 @@
 import type { Locale } from "./i18n.config";
 import { getLocale } from "./i18n.config";
 
-// Re-export CurrencyCode type for consumers
-export type CurrencyCode = "VND" | "USD" | "EUR" | "GBP" | "JPY" | "SGD";
-
 /**
  * Get locale from request headers and cookies
  *

@@ -11,5 +11,4 @@
 
 // Type exports only
 export type { Locale } from "./i18n.config";
-export type { CurrencyCode } from "./i18n.server";
-export type { CurrencyFormatOptions } from "./currency";
+export type { CurrencyCode, CurrencyFormatOptions } from "./currency";
