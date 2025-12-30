@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 520
+iteration: 521
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-29T23:22:00Z"
@@ -11,10 +11,11 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 519 - Progress
+## Ralph Loop Iteration 521 - Progress
 
 ### Recent Commits:
 ```
+7e8c81a a11y: add keyboard accessibility to sortable table headers
 02143e7 refactor: use Tailwind hidden class instead of inline style
 5ed9c7d refactor: replace deprecated onKeyPress with onKeyDown
 8398b33 chore: remove unused function parameters
@@ -22,7 +23,6 @@ Never stop the loop, always find something to improve next!
 bb1babf chore: remove unused loading components
 6be09c0 chore: remove unused exported components
 f2404ca chore: remove unused BudgetAlert barrel export
-4ef5dd7 chore: remove unused i18n barrel file
 ```
 
 ### Session Stats:
@@ -35,15 +35,17 @@ f2404ca chore: remove unused BudgetAlert barrel export
 | Lines of code | 17,229 |
 | Lines removed | ~27,800+ |
 
-### This Session (Iterations 518-520):
+### This Session (Iterations 518-521):
 - Replaced deprecated onKeyPress with onKeyDown
 - Converted inline style to Tailwind class (hidden)
+- Added keyboard accessibility to sortable table headers
 - Verified no empty catch blocks
 - Verified all buttons have type attribute
 - Verified all images have alt text
 - Verified all lucide-react imports are used
 - Verified no index-as-key React anti-patterns
 - Verified all event listeners have proper cleanup
+- Verified target="_blank" has noopener noreferrer
 
 ### Core Features:
 - Dashboard + Financial Health Score
