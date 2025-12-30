@@ -5,20 +5,6 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 // Default locale
 export const DEFAULT_LOCALE: Locale = "en";
 
-// Namespace structure (for reference, no longer used)
-export const NAMESPACES = {
-  COMMON: "common",
-  DASHBOARD: "dashboard",
-  TRANSACTIONS: "transactions",
-} as const;
-
-// No-op function for compatibility - i18n is now fully custom
-export async function initI18n(_locale: Locale = DEFAULT_LOCALE) {
-  // i18n is now handled by the custom useI18n hook
-  // This function exists for backward compatibility
-  return Promise.resolve();
-}
-
 // Helper to check if locale is supported
 export function isSupportedLocale(locale: string): locale is Locale {
   return SUPPORTED_LOCALES.includes(locale as Locale);
