@@ -7,7 +7,6 @@
   "include": [
     "app/**/*.server.ts",
     "app/**/*.server.tsx",
-    "workers/**/*.ts",
     "wrangler.toml"
   ]
 }
