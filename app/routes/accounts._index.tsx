@@ -26,9 +26,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
   const db = getDb(request);
 
-  const accounts = await accountDb.getAll(db, user.id);
-  const balanceSummary = await accountDb.getBalanceSummary(db, user.id);
-  const netWorth = await accountDb.getNetWorth(db, user.id);
+  // Fetch all data in parallel for better performance
+  const [accounts, balanceSummary, netWorth] = await Promise.all([
+    accountDb.getAll(db, user.id),
+    accountDb.getBalanceSummary(db, user.id),
+    accountDb.getNetWorth(db, user.id),
+  ]);
 
   return {
     user: {

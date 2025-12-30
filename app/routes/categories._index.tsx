@@ -25,12 +25,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user } = await requireAuth(request);
   const db = getDb(request);
 
-  // Fetch all categories with statistics
-  const categories = await categoriesCrud.getCategories(db, user.id, {});
-
-  // Get parent options for creating new categories
-  const incomeParents = await categoriesCrud.getParentOptions(db, user.id, "INCOME");
-  const expenseParents = await categoriesCrud.getParentOptions(db, user.id, "EXPENSE");
+  // Fetch all data in parallel for better performance
+  const [categories, incomeParents, expenseParents] = await Promise.all([
+    categoriesCrud.getCategories(db, user.id, {}),
+    categoriesCrud.getParentOptions(db, user.id, "INCOME"),
+    categoriesCrud.getParentOptions(db, user.id, "EXPENSE"),
+  ]);
 
   return {
     user: {
