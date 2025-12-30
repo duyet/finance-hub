@@ -11,16 +11,14 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 493 - Progress
+## Ralph Loop Iteration 494 - Progress
 
-### Commits This Session (27):
+### Commits This Session (29):
 ```
+8f6b826 chore: update CI workflow to use bun
+5af6438 docs: update ralph-loop to iteration 493
 2e9598b chore: remove npm lock file (using bun)
 15591ab chore: remove orphan config files
-784ec9a docs: update ralph-loop to iteration 492
-3057fcf docs: update INDEX.md to remove references to deleted docs
-006b974 chore: remove outdated documentation and orphan files
-4966b3f chore: remove outdated i18n TREE.txt
 a2c7439 fix: move batch-transactions route to correct location
 c1f2742 fix: add missing routes to routes.ts
 29753f9 docs: update TODO.md with accurate project state
@@ -39,29 +37,32 @@ f4e32d1 feat(import): add AI-powered column mapping for CSV imports
 | Lint warnings | 0 |
 | Tests | 206 passing |
 | Build time | 278ms |
-| Lines removed | ~17,000 |
+| Lines removed | ~17,000+ |
+
+### Latest Updates:
+- Updated CI workflow from npm to bun
+- Added test job to CI pipeline
+- Removed backup migration file
 
 ### Session Accomplishments:
-1. **Massive Code Cleanup** (~17,000 lines removed)
-   - 9 unused service files (~3,500 lines)
-   - 3 unused type/validation files (~250 lines)
-   - 3 outdated documentation files (~1,000 lines)
-   - 2 orphan config files (~40 lines)
-   - package-lock.json (~12,000 lines)
+1. **Massive Code Cleanup** (~17,000+ lines removed)
+   - 9 unused service files
+   - 3 unused type/validation files
+   - 3 outdated documentation files
+   - 3 orphan config files
+   - package-lock.json
+   - backup migration file
 
 2. **Bug Fixes**
-   - Fixed batch-transactions route (wrong directory)
+   - Fixed batch-transactions route
    - Added 3 missing routes to routes.ts
 
-3. **Features**
+3. **CI/CD**
+   - Updated CI workflow to use bun
+   - Added test job to pipeline
+
+4. **Features**
    - AI-powered column mapping for CSV imports
-
-4. **Documentation Updates**
-   - TODO.md, README.md, CLAUDE.md, INDEX.md, tsconfig.server.json
-
-5. **Dependencies**
-   - Removed 4 unused dependencies
-   - Updated typescript-eslint to v8.51.0
 
 ### Core Features:
 - Dashboard + Financial Health
