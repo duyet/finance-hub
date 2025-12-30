@@ -489,19 +489,34 @@ export async function getUserReceipts(
     .bind(...params)
     .all();
 
-  const parsedReceipts = receipts.results?.map((row: any) => ({
+  interface ReceiptDbRow {
+    id: string;
+    user_id: string;
+    image_url: string;
+    thumbnail_url: string | null;
+    status: ReceiptProcessingStatus;
+    extracted_data: string;
+    confidence: number;
+    error_message: string | null;
+    transaction_id: string | null;
+    created_at: string;
+    updated_at: string;
+    processed_at: string | null;
+  }
+
+  const parsedReceipts = (receipts.results as unknown as ReceiptDbRow[] | undefined)?.map((row) => ({
     id: row.id,
     userId: row.user_id,
     imageUrl: row.image_url,
-    thumbnailUrl: row.thumbnail_url,
+    thumbnailUrl: row.thumbnail_url || undefined,
     status: row.status,
     extractedData: JSON.parse(row.extracted_data),
     confidence: row.confidence,
-    errorMessage: row.error_message,
-    transactionId: row.transaction_id,
+    errorMessage: row.error_message || undefined,
+    transactionId: row.transaction_id || undefined,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),
-    processedAt: row.processed_at ? new Date(row.processed_at) : null,
+    processedAt: row.processed_at ? new Date(row.processed_at) : undefined,
   })) || [];
 
   return {

@@ -122,7 +122,7 @@ export const headers: HeadersFunction = () => {
  */
 async function loadTranslations(locale: Locale, request: Request) {
   const namespaces = ["common", "dashboard", "transactions", "credit_cards", "loans", "settings", "receipts"];
-  const mergedTranslations: Record<string, any> = {};
+  const mergedTranslations: Record<string, unknown> = {};
 
   try {
     const url = new URL(request.url);

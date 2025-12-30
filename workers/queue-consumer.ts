@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Queue Consumer Worker
  * Processes async jobs for OCR and CSV parsing

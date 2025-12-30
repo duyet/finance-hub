@@ -347,8 +347,8 @@ function parseAnomalyResponse(text: string, transactions: Array<{ date: string; 
       const parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
       if (Array.isArray(parsed)) {
         return parsed
-          .filter((item: any) => item.index !== undefined && item.reason)
-          .map((item: any) => ({
+          .filter((item: { index?: number; reason?: string }) => item.index !== undefined && item.reason)
+          .map((item: { index: number; reason: string; severity?: "low" | "medium" | "high" }) => ({
             transaction: transactions[item.index] || transactions[0],
             reason: item.reason,
             severity: item.severity || "medium",

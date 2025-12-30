@@ -76,6 +76,8 @@ Important rules:
    */
   private async callAI(prompt: string): Promise<string> {
     // Use @cf/meta/llama-3.3-8b-instruct model for column mapping
+    // Model name cast needed for Cloudflare Workers AI compatibility
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await this.ai.run("@cf/meta/llama-3.3-8b-instruct" as any, {
       prompt,
       max_tokens: 500,

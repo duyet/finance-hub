@@ -63,7 +63,7 @@ async function validateTransactionOwnership(
     .bind(...transactionIds, userId)
     .all();
 
-  const validIds = new Set((result.results || []).map((row: any) => row.id));
+  const validIds = new Set((result.results as Array<{ id: string }> || []).map((row) => row.id));
   const valid: string[] = [];
   const invalid: string[] = [];
 
@@ -334,7 +334,7 @@ export async function previewBatchOperation(
       .bind(...valid)
       .all();
 
-    preview = (result.results || []).map((row: any) => ({
+    preview = (result.results as Array<{ id: string; date: string; description: string; amount: number }> || []).map((row) => ({
       id: row.id,
       date: row.date,
       description: row.description,
