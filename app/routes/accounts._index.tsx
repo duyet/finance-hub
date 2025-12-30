@@ -318,7 +318,7 @@ export default function AccountsIndexPage() {
             ref={setArchiveFormRef}
             method="post"
             action="/accounts"
-            style={{ display: "none" }}
+            className="hidden"
           >
             <input type="hidden" name="intent" value="archive" />
             <input type="hidden" name="accountId" value={accountIdToArchive} />
