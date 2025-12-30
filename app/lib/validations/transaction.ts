@@ -80,35 +80,6 @@ export const createTransactionSchema = z.object({
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 
 /**
- * Update transaction schema (all fields optional)
- */
-export const updateTransactionSchema = z.object({
-  accountId: z.string().min(1).optional(),
-  categoryId: z.string().nullable().optional(),
-  date: z.string().min(1).optional(),
-  amount: z
-    .number()
-    .finite()
-    .refine((val) => {
-      const decimals = val.toString().split(".")[1]?.length || 0;
-      return decimals <= 2;
-    }, "Amount can have at most 2 decimal places")
-    .optional(),
-  description: z
-    .string()
-    .min(1)
-    .max(500)
-    .optional(),
-  merchantName: z.string().max(200).nullable().optional(),
-  status: TransactionStatusEnum.optional(),
-  referenceNumber: z.string().max(100).nullable().optional(),
-  receiptUrl: z.string().url().nullable().optional(),
-  notes: z.string().max(2000).nullable().optional(),
-});
-
-export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
-
-/**
  * Transaction ID parameter schema
  */
 export const transactionIdSchema = z.object({
