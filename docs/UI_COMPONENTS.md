@@ -68,9 +68,6 @@ All Shadcn UI components have been successfully created for the Finance Hub proj
     - Based on @radix-ui/react-separator
     - Horizontal and vertical orientations
 
-## Index File
-- **`app/components/ui/index.ts`** - Re-exports all components for easy importing
-
 ## Features
 - TypeScript with full type safety
 - ForwardRef support on all applicable components
@@ -83,12 +80,9 @@ All Shadcn UI components have been successfully created for the Finance Hub proj
 ## Usage Examples
 
 ```tsx
-// Import individual components
 import { Button } from "~/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card"
-
-// Or import from the index
-import { Button, Card, Input } from "~/components/ui"
+import { Input } from "~/components/ui/input"
 ```
 
 ## Styling System
