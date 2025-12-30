@@ -15,15 +15,6 @@ import type {
   AccountWithTransactions,
 } from "./accounts.types";
 
-// Re-export types for convenience
-export type {
-  FinancialAccount,
-  AccountType,
-  CreateAccountData,
-  UpdateAccountData,
-  AccountWithTransactions,
-};
-
 interface FinancialAccountRow {
   id: string;
   user_id: string;

@@ -5,21 +5,19 @@
 
 import type { D1Database } from "@cloudflare/workers-types";
 import type {
-  CategoryRow,
   CategoryWithStats,
   CreateCategoryInput,
   UpdateCategoryInput,
   CategoryFilters,
 } from "./categories.types";
 
-// Re-export types for convenience
+// Re-export types imported from this module by consumers
 export type {
   CategoryRow,
   CategoryWithStats,
   CreateCategoryInput,
   UpdateCategoryInput,
-  CategoryFilters,
-};
+} from "./categories.types";
 
 /**
  * Categories CRUD operations
