@@ -1,6 +1,6 @@
 ---
 active: true
-iteration: 484
+iteration: 485
 max_iterations: 0
 completion_promise: null
 started_at: "2025-12-29T23:22:00Z"
@@ -11,14 +11,15 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 484 - Progress
+## Ralph Loop Iteration 485 - Progress
 
-### Commits This Session (6):
+### Commits This Session (8):
 ```
+70ced2e docs: update README with accurate tech stack and bun commands
 4f52b35 chore: sort package.json dependencies alphabetically
+b516415 docs: update ralph-loop to iteration 484
 ffc689d docs: update ralph-loop to iteration 483
 64d4b04 chore(deps): remove unused dependencies
-c131dd6 docs: update ralph-loop to iteration 482
 45b3ef3 chore(deps): update typescript-eslint to v8.51.0
 f4e32d1 feat(import): add AI-powered column mapping for CSV imports
 ```
@@ -40,10 +41,11 @@ f4e32d1 feat(import): add AI-powered column mapping for CSV imports
 
 ### Latest Improvements:
 - AI-powered column mapping for CSV imports
-- Removed 4 unused dependencies (cloudflare, fs-routes, tailwindcss/vite, eslint-plugin-react-hooks)
+- Removed 4 unused dependencies
 - Updated typescript-eslint 8.50.1 → 8.51.0
 - Dismissed stale esbuild security alert
-- Vietnamese header support in column mapping
+- Updated README with accurate tech stack
+- Replaced npm with bun in all documentation
 
 ### Core Features ✓:
 - Dashboard + Financial Health
