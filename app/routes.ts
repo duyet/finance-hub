@@ -20,6 +20,7 @@ export default [
       { path: "import/csv", file: "routes/import.csv.tsx" },
       { path: "action.import-csv", file: "routes/action.import-csv.ts" },
       { path: "api/ai/insights", file: "routes/api.ai.insights.ts" },
+      { path: "api/batch-transactions", file: "routes/api.batch-transactions.tsx" },
     ],
   },
 ] satisfies RouteConfig;

@@ -62,15 +62,18 @@ type Pages = {
   "/api/ai/insights": {
     params: {};
   };
+  "/api/batch-transactions": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights" | "/api/batch-transactions";
   } | {
     id: "app-root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights" | "/api/batch-transactions";
   };
   "routes/_index.tsx": {
     id: "routes/_index";
@@ -132,6 +135,10 @@ type RouteFiles = {
     id: "routes/api.ai.insights";
     page: "/api/ai/insights";
   };
+  "routes/api.batch-transactions.tsx": {
+    id: "routes/api.batch-transactions";
+    page: "/api/batch-transactions";
+  };
 };
 
 type RouteModules = {
@@ -152,4 +159,5 @@ type RouteModules = {
   "routes/import.csv": typeof import("./app/routes/import.csv.tsx");
   "routes/action.import-csv": typeof import("./app/routes/action.import-csv.ts");
   "routes/api.ai.insights": typeof import("./app/routes/api.ai.insights.ts");
+  "routes/api.batch-transactions": typeof import("./app/routes/api.batch-transactions.tsx");
 };
