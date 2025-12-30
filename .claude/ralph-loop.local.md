@@ -11,10 +11,11 @@ started_at: "2025-12-29T23:22:00Z"
 Optimize and deploy to Cloudflare Workers with lightweight stack
 Never stop the loop, always find something to improve next!
 
-## Ralph Loop Iteration 522 - Progress
+## Ralph Loop Iteration 523 - Progress
 
 ### Recent Commits:
 ```
+847d51f deps: add explicit Radix UI dependencies
 7e8c81a a11y: add keyboard accessibility to sortable table headers
 02143e7 refactor: use Tailwind hidden class instead of inline style
 5ed9c7d refactor: replace deprecated onKeyPress with onKeyDown
@@ -22,7 +23,6 @@ Never stop the loop, always find something to improve next!
 61e9ef6 chore: remove unused _form variable in categories.new
 bb1babf chore: remove unused loading components
 6be09c0 chore: remove unused exported components
-f2404ca chore: remove unused BudgetAlert barrel export
 ```
 
 ### Session Stats:
@@ -35,10 +35,11 @@ f2404ca chore: remove unused BudgetAlert barrel export
 | Lines of code | 17,241 |
 | Lines removed | ~27,800+ |
 
-### This Session (Iterations 518-522):
+### This Session (Iterations 518-523):
 - Replaced deprecated onKeyPress with onKeyDown
 - Converted inline style to Tailwind class (hidden)
 - Added keyboard accessibility to sortable table headers
+- Added explicit Radix UI dependencies (6 packages)
 - Verified no empty catch blocks
 - Verified all buttons have type attribute
 - Verified all images have alt text
@@ -46,6 +47,7 @@ f2404ca chore: remove unused BudgetAlert barrel export
 - Verified no index-as-key React anti-patterns
 - Verified all event listeners have proper cleanup
 - Verified target="_blank" has noopener noreferrer
+- Noted: papaparse unused (custom CSV parser used instead)
 
 ### Core Features:
 - Dashboard + Financial Health Score
