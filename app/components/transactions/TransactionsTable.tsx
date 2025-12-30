@@ -52,11 +52,23 @@ function SortableHeader({
   const icon = isActive && currentOrder === "asc" ? "↑" : "↓";
 
   return (
-    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => onSort(column)}>
+    <TableHead
+      className="cursor-pointer hover:bg-muted/50"
+      onClick={() => onSort(column)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSort(column);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Sort by ${column}${isActive ? `, currently ${currentOrder === "asc" ? "ascending" : "descending"}` : ""}`}
+    >
       <div className="flex items-center gap-1">
         {children}
         {isActive && (
-          <span className="text-xs text-muted-foreground">{icon}</span>
+          <span className="text-xs text-muted-foreground" aria-hidden="true">{icon}</span>
         )}
       </div>
     </TableHead>
