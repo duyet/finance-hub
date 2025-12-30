@@ -63,29 +63,6 @@ export const accountDb = {
   },
 
   /**
-   * Get accounts by type
-   */
-  async getByType(
-    db: D1Database,
-    userId: string,
-    type: AccountType
-  ): Promise<FinancialAccount[]> {
-    const result = await db
-      .prepare(`
-        SELECT *
-        FROM financial_accounts
-        WHERE user_id = ?
-          AND type = ?
-          AND is_archived = 0
-        ORDER BY name ASC
-      `)
-      .bind(userId, type)
-      .all<FinancialAccountRow>();
-
-    return result.results;
-  },
-
-  /**
    * Get a single account by ID
    */
   async getById(
@@ -265,25 +242,6 @@ export const accountDb = {
       .prepare(`
         UPDATE financial_accounts
         SET is_archived = 1, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ? AND user_id = ?
-      `)
-      .bind(accountId, userId)
-      .run();
-
-    return result.meta.changes > 0;
-  },
-
-  /**
-   * Delete a financial account permanently
-   */
-  async delete(
-    db: D1Database,
-    accountId: string,
-    userId: string
-  ): Promise<boolean> {
-    const result = await db
-      .prepare(`
-        DELETE FROM financial_accounts
         WHERE id = ? AND user_id = ?
       `)
       .bind(accountId, userId)
