@@ -125,14 +125,25 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
         : "good"
       : null;
 
+  const handleNavigate = () => navigate(`/categories/${category.id}`);
+
   return (
     <Card
       className={cn(
-        "relative transition-all hover:shadow-md cursor-pointer border-2",
+        "relative transition-all hover:shadow-md cursor-pointer border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         theme.bg,
         theme.border
       )}
-      onClick={() => navigate(`/categories/${category.id}`)}
+      onClick={handleNavigate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleNavigate();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`View ${category.name} category details`}
     >
       {/* Header with Icon and Actions */}
       <CardHeader className="pb-3">
@@ -329,11 +340,20 @@ export function CategoryCardCompact({ category, onClick }: CategoryCardCompactPr
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-sm",
+        "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         theme.bg,
         theme.border
       )}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if ((e.key === "Enter" || e.key === " ") && onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? "button" : undefined}
+      aria-label={onClick ? `Select ${category.name} category` : undefined}
     >
       <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-xl", theme.iconBg)}>
         {icon}
