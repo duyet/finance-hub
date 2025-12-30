@@ -56,15 +56,21 @@ type Pages = {
   "/import/csv": {
     params: {};
   };
+  "/action.import-csv": {
+    params: {};
+  };
+  "/api/ai/insights": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights";
   } | {
     id: "app-root";
-    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv";
+    page: "/" | "/auth/login" | "/auth/callback/:provider" | "/auth/logout" | "/dashboard" | "/transactions" | "/transactions/:id" | "/accounts" | "/accounts/:id" | "/accounts/new" | "/categories" | "/categories/new" | "/import/csv" | "/action.import-csv" | "/api/ai/insights";
   };
   "routes/_index.tsx": {
     id: "routes/_index";
@@ -118,6 +124,14 @@ type RouteFiles = {
     id: "routes/import.csv";
     page: "/import/csv";
   };
+  "routes/action.import-csv.ts": {
+    id: "routes/action.import-csv";
+    page: "/action.import-csv";
+  };
+  "routes/api.ai.insights.ts": {
+    id: "routes/api.ai.insights";
+    page: "/api/ai/insights";
+  };
 };
 
 type RouteModules = {
@@ -136,4 +150,6 @@ type RouteModules = {
   "routes/categories._index": typeof import("./app/routes/categories._index.tsx");
   "routes/categories.new": typeof import("./app/routes/categories.new.tsx");
   "routes/import.csv": typeof import("./app/routes/import.csv.tsx");
+  "routes/action.import-csv": typeof import("./app/routes/action.import-csv.ts");
+  "routes/api.ai.insights": typeof import("./app/routes/api.ai.insights.ts");
 };

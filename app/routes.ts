@@ -18,6 +18,8 @@ export default [
       { path: "categories", file: "routes/categories._index.tsx" },
       { path: "categories/new", file: "routes/categories.new.tsx" },
       { path: "import/csv", file: "routes/import.csv.tsx" },
+      { path: "action.import-csv", file: "routes/action.import-csv.ts" },
+      { path: "api/ai/insights", file: "routes/api.ai.insights.ts" },
     ],
   },
 ] satisfies RouteConfig;
