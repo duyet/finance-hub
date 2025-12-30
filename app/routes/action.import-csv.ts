@@ -183,7 +183,7 @@ export async function action({ request }: ActionFunctionArgs) {
           }
 
           // Parse date (handle various formats)
-          let dateStr = row[reverseMapping.date];
+          const dateStr = row[reverseMapping.date];
           let parsedDate = new Date(dateStr);
           if (isNaN(parsedDate.getTime())) {
             // Try DD/MM/YYYY or MM/DD/YYYY format

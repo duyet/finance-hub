@@ -1,21 +1,14 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { redirect, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
+import { useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
 import { useState, lazy, Suspense } from "react";
 import { Plus } from "lucide-react";
 import { getDb } from "../lib/auth/db.server";
 import { requireAuth } from "../lib/auth/session.server";
 import { transactionsCrud } from "../lib/db/transactions.server";
 import type { TransactionFilters, PaginationOptions, TransactionStatus } from "../lib/db/transactions.types";
-import { parseTransactionFilters, type CreateTransactionInput } from "../lib/validations/transaction";
+import { parseTransactionFilters } from "../lib/validations/transaction";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { useToast } from "~/components/ui/use-toast";
 import { ConfirmDialog } from "~/components/ui/confirm-dialog";
 
@@ -370,7 +363,7 @@ export default function TransactionsListPage() {
           transaction={editingTransaction}
           filterOptions={data.filterOptions}
           isSubmitting={isPending}
-          onSubmit={(data) => {
+          onSubmit={() => {
             const isEditing = !!editingTransaction;
             toast({
               title: isEditing ? "Updating transaction..." : "Creating transaction..."

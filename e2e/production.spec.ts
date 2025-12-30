@@ -114,7 +114,7 @@ test.describe('Production URL Tests', () => {
     await expect(charset).toHaveAttribute('charset', 'utf-8');
   });
 
-  test('page is responsive on mobile', async ({ page, viewport }) => {
+  test('page is responsive on mobile', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
@@ -257,19 +257,17 @@ test.describe('Vietnamese Locale Tests', () => {
 
     // Check for Vietnamese content (common words)
     const vietnameseText = await page.textContent('body');
-    const hasVietnamese = /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]/i.test(vietnameseText || '');
-    // This might not find Vietnamese if locale switch doesn't work without cookies
+    // Vietnamese might not be present if locale switch requires cookies
+    expect(vietnameseText).toBeTruthy();
   });
 
   test('currency formatting for VND', async ({ page }) => {
     await page.goto('/?locale=vi');
     await page.waitForLoadState('networkidle');
 
-    // If VND currency is displayed, it should use Vietnamese formatting
+    // Verify page loads - VND formatting might not be visible on homepage
     const bodyText = await page.textContent('body');
-    // Vietnamese uses dot as thousands separator: 1.234.567 ₫
-    const hasVND = /[0-9]\.[0-9]{3}\.[0-9]{3}\s*₫/.test(bodyText || '');
-    // This might not be present on homepage
+    expect(bodyText).toBeTruthy();
   });
 });
 

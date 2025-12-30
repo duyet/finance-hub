@@ -5,10 +5,10 @@
  * Handles localStorage persistence and system preference detection.
  */
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+ 
+ 
+ 
+ 
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
