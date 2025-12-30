@@ -170,16 +170,3 @@ Important rules:
     return mapping;
   }
 }
-
-/**
- * Get AI service instance from request context
- */
-export function getAIService(request: Request): AIService {
-  const context = request as unknown as { env?: { AI?: Ai } };
-
-  if (!context?.env?.AI) {
-    throw new Error("AI binding not available. Check wrangler.toml configuration.");
-  }
-
-  return new AIService(context.env.AI);
-}
