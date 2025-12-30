@@ -2,7 +2,6 @@ import { generateState } from "arctic";
 import { GitHub, Google } from "arctic";
 import { generateRandomString, alphabet } from "oslo/crypto";
 import { getDb, userDb } from "./db.server";
-import { getUserFromSession } from "./session.server";
 
 /**
  * Get environment variable or throw error if missing
@@ -55,7 +54,7 @@ export const google = new Google(
 /**
  * Generate state for OAuth flow
  */
-export async function generateOAuthState(): Promise<string> {
+async function generateOAuthState(): Promise<string> {
   return await generateState();
 }
 
@@ -317,19 +316,6 @@ export async function getUser(request: Request, userId: string): Promise<User | 
   const db = getDb(request);
   const user = await userDb.findById(db, userId);
   return user ? mapUserRowToUser(user) : null;
-}
-
-/**
- * Require user to be authenticated, throw error if not
- */
-export async function requireUserId(request: Request): Promise<string> {
-  const user = await getUserFromSession(request);
-
-  if (!user) {
-    throw new Response("Unauthorized", { status: 401 });
-  }
-
-  return user.id;
 }
 
 /**
