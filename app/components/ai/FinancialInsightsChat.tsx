@@ -20,14 +20,13 @@ interface Message {
 }
 
 interface ChatProps {
-  userId: string;
   initialContext?: {
     recentTransactions?: Array<{ date: string; amount: number; category: string; description: string }>;
     accounts?: Array<{ name: string; type: string; balance: number }>;
   };
 }
 
-export function FinancialInsightsChat({ userId: _userId, initialContext }: ChatProps) {
+export function FinancialInsightsChat({ initialContext }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",

@@ -338,7 +338,6 @@ export default function DashboardPage() {
               </h2>
               <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded" />}>
                 <FinancialInsightsChat
-                  userId={user.id}
                   initialContext={aiContext}
                 />
               </Suspense>
