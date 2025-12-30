@@ -262,7 +262,7 @@ export class CsvImportService {
       try {
         const dateFormat = options.dateFormat || DATE_FORMATS.ISO;
         this.parseDate(row[mapping.date], dateFormat);
-      } catch (error) {
+      } catch {
         errors.push(
           `Invalid date format: "${row[mapping.date]}". Expected format: ${options.dateFormat || "auto"}`
         );
@@ -273,7 +273,7 @@ export class CsvImportService {
     if (mapping.amount) {
       try {
         this.parseAmount(row[mapping.amount]);
-      } catch (error) {
+      } catch {
         errors.push(`Invalid amount format: "${row[mapping.amount]}"`);
       }
     }

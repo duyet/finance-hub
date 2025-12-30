@@ -106,7 +106,7 @@ export function FinancialHealthCard({ health }: FinancialHealthCardProps) {
 /**
  * Score icon based on category
  */
-function ScoreIcon({ score, category }: { score: number; category: FinancialHealthScore["category"] }) {
+function ScoreIcon({ score: _score, category }: { score: number; category: FinancialHealthScore["category"] }) {
   if (category === "excellent" || category === "good") {
     return <CheckCircle2 className={`w-8 h-8 ${getScoreCategoryColor(category)}`} />;
   }

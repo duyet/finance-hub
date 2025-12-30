@@ -294,7 +294,7 @@ function createFallbackI18n() {
   return {
     locale: "en" as Locale,
     translations: {},
-    t: (key: string, arg2?: Record<string, string | number> | string, arg3?: Record<string, string | number>): string => {
+    t: (key: string, arg2?: Record<string, string | number> | string, _arg3?: Record<string, string | number>): string => {
       if (typeof arg2 === "string") {
         // Return fallback string, ignore params
         return arg2;

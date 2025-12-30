@@ -27,7 +27,7 @@ interface ChatProps {
   };
 }
 
-export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
+export function FinancialInsightsChat({ userId: _userId, initialContext }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -91,7 +91,7 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -163,7 +163,7 @@ export function FinancialInsightsChat({ userId, initialContext }: ChatProps) {
           <div className="space-y-2 pt-2" role="region" aria-label="Quick question suggestions">
             <p className="text-xs text-gray-500">Quick questions:</p>
             <div className="flex flex-wrap gap-2">
-              {quickQuestions.map((question, index) => (
+              {quickQuestions.map((question) => (
                 <button
                   key={question}
                   onClick={(e) => {

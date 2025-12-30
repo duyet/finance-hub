@@ -8,7 +8,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
-import { useI18n } from "~/lib/i18n/client";
 
 interface RunwayCardProps {
   months: number;
@@ -16,7 +15,6 @@ interface RunwayCardProps {
 }
 
 export function RunwayCard({ months, health }: RunwayCardProps) {
-  const { t } = useI18n();
 
   // Determine health colors and icon
   const healthConfig = {

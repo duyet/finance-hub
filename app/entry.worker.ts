@@ -83,7 +83,7 @@ async function networkFirst(request: Request): Promise<Response> {
       await cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-  } catch (error) {
+  } catch {
     // Network failed, try cache
     const cachedResponse = await cache.match(request);
     if (cachedResponse) {

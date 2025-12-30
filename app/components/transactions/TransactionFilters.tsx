@@ -1,4 +1,4 @@
-import { Form, useSearchParams } from "react-router";
+import { Form } from "react-router";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { z } from "zod";
@@ -90,7 +90,6 @@ function CategoryFilterItem({ category, isSelected, onToggle }: CategoryFilterIt
  * Provides filtering UI for transactions list
  */
 export function TransactionFilters({ filterOptions, currentFilters }: TransactionFiltersProps) {
-  const [searchParams] = useSearchParams();
   const [localFilters, setLocalFilters] = useState({
     search: currentFilters.search || "",
     type: currentFilters.type || "ALL",

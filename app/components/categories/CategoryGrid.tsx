@@ -8,7 +8,6 @@ import { CategoryWithStats } from "~/lib/db/categories.server";
 import { CategoryCard, CategoryCardCompact } from "./CategoryCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useState } from "react";
-import { useI18n } from "~/lib/i18n/client";
 import { Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
@@ -27,7 +26,6 @@ export function CategoryGrid({
   onDeleteCategory,
   compact = false,
 }: CategoryGridProps) {
-  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
 
   // Filter categories by type

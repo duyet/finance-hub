@@ -1,8 +1,6 @@
 import { generateState } from "arctic";
 import { GitHub, Google } from "arctic";
 import { generateRandomString, alphabet } from "oslo/crypto";
-import { sha256 } from "oslo/crypto";
-import { encodeHex } from "oslo/encoding";
 import { getDb, userDb } from "./db.server";
 import { getUserFromSession } from "./session.server";
 
@@ -87,15 +85,6 @@ export async function createGoogleAuthorizationUrl(): Promise<{
   const url = google.createAuthorizationURL(state, codeVerifier, ["profile", "email"]);
 
   return { url, state, codeVerifier };
-}
-
-/**
- * Hash a string using SHA-256
- */
-async function hash(value: string): Promise<string> {
-  const data = new TextEncoder().encode(value);
-  const hashBuffer = await sha256(data);
-  return encodeHex(hashBuffer);
 }
 
 /**

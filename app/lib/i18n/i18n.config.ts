@@ -12,15 +12,8 @@ export const NAMESPACES = {
   TRANSACTIONS: "transactions",
 } as const;
 
-// Translation resources interface (for type reference)
-interface TranslationResources {
-  [locale: string]: {
-    [namespace: string]: Record<string, string | object>;
-  };
-}
-
 // No-op function for compatibility - i18n is now fully custom
-export async function initI18n(locale: Locale = DEFAULT_LOCALE) {
+export async function initI18n(_locale: Locale = DEFAULT_LOCALE) {
   // i18n is now handled by the custom useI18n hook
   // This function exists for backward compatibility
   return Promise.resolve();
