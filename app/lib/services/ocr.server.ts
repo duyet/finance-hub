@@ -43,20 +43,6 @@ function getAI(request: CloudflareRequest): AiBinding | undefined {
 }
 
 /**
- * Get R2 bucket binding from request context
- */
-function getR2Bucket(request: CloudflareRequest) {
-  return request.context?.cloudflare?.env?.RECEIPTS_BUCKET;
-}
-
-/**
- * Get Queue binding from request context
- */
-function getQueue(request: CloudflareRequest) {
-  return request.context?.cloudflare?.env?.QUEUE;
-}
-
-/**
  * Process receipt image with Workers AI
  * Supports Gemma 3 (multimodal) and Llama 3.2 Vision models
  */

@@ -42,19 +42,6 @@ export interface HealthFactor {
 }
 
 /**
- * Transaction data for health calculation
- */
-interface TransactionData {
-  totalIncome: number;
-  totalExpenses: number;
-  savingsRate: number;
-  spendingVariance: number;
-  debtPayments: number;
-  emergencyFundMonths?: number;
-  monthlyIncomeVariance: number;
-}
-
-/**
  * Calculate savings rate score (0-100)
  * Measures what percentage of income is saved
  */

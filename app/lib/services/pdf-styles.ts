@@ -464,8 +464,7 @@ export function formatMonth(year: number, month: number): string {
   }).format(new Date(year, month - 1));
 }
 
-export function getBarColor(value: number, maxValue: number): string {
-  const ratio = Math.abs(value) / maxValue;
+export function getBarColor(value: number, _maxValue: number): string {
   if (value > 0) {
     return colors.success;
   } else if (value < 0) {
