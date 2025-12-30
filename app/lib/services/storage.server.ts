@@ -4,7 +4,15 @@
  */
 
 import type { CloudflareRequest } from "../auth/db.server";
-import type { ReceiptUploadResponse } from "../types/receipt";
+
+/**
+ * Response from receipt upload
+ */
+export interface ReceiptUploadResponse {
+  receiptId: string;
+  imageUrl: string;
+  expiresAt: Date;
+}
 
 /**
  * Get R2 bucket binding from request context
